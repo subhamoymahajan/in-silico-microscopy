@@ -21,18 +21,18 @@ import scipy.integrate as integrate
 import scipy.special as special
 import numpy as np
 
-def psf_gandm(NA,meu,lambd,dl,dm,dn,Lx,Ly,Lz,fs,outname):
-   Nz=int((int(Lz/dn)+1)/2)+1
-   for k in range(Nz):
-       psf_gandm_sep(NA,meu,lambd,dl,dm,dn,Lx,Ly,Lz,fs,outname,'a',k)       
+def psf_gandm(NA,meu,lambd,dl,dm,dn,Ll,Lm,Ln,fs,outname):
+   Nn=int((int(Ln/dn)+1)/2)+1
+   for k in range(Nn):
+       psf_gandm_sep(NA,meu,lambd,dl,dm,dn,Ll,Lm,Ln,fs,outname,'a',k)       
 
-def psf_gandm_sep(NA,meu,lambd,dl,dm,dn,Lx,Ly,Lz,fs,outname,otype,zidx):
+def psf_gandm_sep(NA,meu,lambd,dl,dm,dn,Ll,Lm,Ln,fs,outname,otype,zidx):
 # Based on  R O Gandm 1954 Proc. Phys. Soc. B 67 825
 # NA = numerical aperture
 # meu = refractive index of the immersion oil
 # lambd = wavelength of light
 # dl, dm pixel dimensions. dn is the distance in the sectioned object plane (gro file)
-# Lz, Ly, Lz is the dimension of the psf box
+# Ln, Lm, Ln is the dimension of the psf box
 # fs = FWHM scaling factor; scaling factor of wavenumber (2pi/lambda); scaling factor of "gro" coordinates. (New Paper Cite) 
 # outname = the output file name
 # otype = open a file outname with type type ('a' or  'w')
@@ -55,12 +55,12 @@ def psf_gandm_sep(NA,meu,lambd,dl,dm,dn,Lx,Ly,Lz,fs,outname,otype,zidx):
    
    w=open(outname,otype)
    if otype=='w':
-       w.write('# NA= '+str(NA)+' meu= '+str(meu)+' lambda= '+str(lambd)+' dl= '+str(dl)+' dm= '+str(dm)+' dn= '+str(dn)+' Lx= '+str(Lx)+' Ly= '+str(Ly)+' Lz= '+str(Lz)+' fs= '+str(fs)+'\n')
-   Nx=int((int(Lx/dl)+1)/2)+1
-   Ny=int((int(Ly/dm)+1)/2)+1
+       w.write('# NA= '+str(NA)+' meu= '+str(meu)+' lambda= '+str(lambd)+' dl= '+str(dl)+' dm= '+str(dm)+' dn= '+str(dn)+' Ll= '+str(Ll)+' Lm= '+str(Lm)+' Ln= '+str(Ln)+' fs= '+str(fs)+'\n')
+   Nl=int((int(Ll/dl)+1)/2)+1
+   Nm=int((int(Lm/dm)+1)/2)+1
    z=round(zidx*dn,6)
    Kz=K*z
-   for i in range(Nx):
+   for i in range(Nl):
        x=round(i*dl,6)
        for j in range(i+1):
            y=round(j*dm,6)
