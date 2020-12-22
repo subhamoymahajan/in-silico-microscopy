@@ -21,17 +21,17 @@ import scipy.integrate as integrate
 import scipy.special as special
 import numpy as np
 
-def psf_gandy(NA,meu,lambd,dx,dy,dz,Lx,Ly,Lz,fs,outname):
-   Nz=int((int(Lz/dz)+1)/2)+1
+def psf_gandm(NA,meu,lambd,dl,dm,dn,Lx,Ly,Lz,fs,outname):
+   Nz=int((int(Lz/dn)+1)/2)+1
    for k in range(Nz):
-       psf_gandy_sep(NA,meu,lambd,dx,dy,dz,Lx,Ly,Lz,fs,outname,'a',k)       
+       psf_gandm_sep(NA,meu,lambd,dl,dm,dn,Lx,Ly,Lz,fs,outname,'a',k)       
 
-def psf_gandy_sep(NA,meu,lambd,dx,dy,dz,Lx,Ly,Lz,fs,outname,otype,zidx):
-# Based on  R O Gandy 1954 Proc. Phys. Soc. B 67 825
+def psf_gandm_sep(NA,meu,lambd,dl,dm,dn,Lx,Ly,Lz,fs,outname,otype,zidx):
+# Based on  R O Gandm 1954 Proc. Phys. Soc. B 67 825
 # NA = numerical aperture
 # meu = refractive index of the immersion oil
 # lambd = wavelength of light
-# dx, dy pixel dimensions. dz is the distance in the sectioned object plane (gro file)
+# dl, dm pixel dimensions. dn is the distance in the sectioned object plane (gro file)
 # Lz, Ly, Lz is the dimension of the psf box
 # fs = FWHM scaling factor; scaling factor of wavenumber (2pi/lambda); scaling factor of "gro" coordinates. (New Paper Cite) 
 # outname = the output file name
@@ -55,15 +55,15 @@ def psf_gandy_sep(NA,meu,lambd,dx,dy,dz,Lx,Ly,Lz,fs,outname,otype,zidx):
    
    w=open(outname,otype)
    if otype=='w':
-       w.write('# NA= '+str(NA)+' meu= '+str(meu)+' lambda= '+str(lambd)+' dx= '+str(dx)+' dy= '+str(dy)+' dz= '+str(dz)+' Lx= '+str(Lx)+' Ly= '+str(Ly)+' Lz= '+str(Lz)+' fs= '+str(fs)+'\n')
-   Nx=int((int(Lx/dx)+1)/2)+1
-   Ny=int((int(Ly/dy)+1)/2)+1
-   z=round(zidx*dz,6)
+       w.write('# NA= '+str(NA)+' meu= '+str(meu)+' lambda= '+str(lambd)+' dl= '+str(dl)+' dm= '+str(dm)+' dn= '+str(dn)+' Lx= '+str(Lx)+' Ly= '+str(Ly)+' Lz= '+str(Lz)+' fs= '+str(fs)+'\n')
+   Nx=int((int(Lx/dl)+1)/2)+1
+   Ny=int((int(Ly/dm)+1)/2)+1
+   z=round(zidx*dn,6)
    Kz=K*z
    for i in range(Nx):
-       x=round(i*dx,6)
+       x=round(i*dl,6)
        for j in range(i+1):
-           y=round(j*dy,6)
+           y=round(j*dm,6)
            r=np.sqrt(x*x+y*y)
            Kr=K*r
            H1=integrate.quad(integrand_real,0,beta,args=(Kr,Kz))
