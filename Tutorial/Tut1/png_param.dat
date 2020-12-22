@@ -1,0 +1,10 @@
+T=1 //Averaged over one time frame
+fs=800
+lam1=670
+lam2=518
+lam1_hue=255
+lam2_hue=60 
+lam1_I0=0.13
+lam2_I0=0.25
+size=24.3
+scale=5
