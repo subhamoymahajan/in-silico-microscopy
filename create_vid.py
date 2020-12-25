@@ -29,6 +29,8 @@ for i in range(2,len(sys.argv),2):
         paramfile=sys.argv[i]
     elif sys.argv[i-1]=='-tmax':
         tmax=int(sys.argv[i]) 
+    elif sys.argv[i-1]=='-t0':
+        t0=int(sys.argv[i]) 
     elif sys.argv[i-1]=='-tdiff':
         tdiff=int(sys.argv[i]) 
 
@@ -56,8 +58,8 @@ for i in range(10):
 print('T = '+str(T)+'\nfs = '+str(fs)+'\ntmax = '+str(tmax)+'\nI0 = '+str(lam_I0)+'\ntdiff = '+str(tdiff))    
     
 import cv2
-vidname='img_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.avi'
-filename='img0_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
+vidname=filename+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.avi'
+filename=filename+str(t0)'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
 if os.path.exists(filename):
     img0=cv2.imread(filename)
 else:
@@ -66,8 +68,8 @@ else:
 h,w,l=img0.shape
 video=cv2.VideoWriter(vidname,0,5,(w,h))
 
-for i in range(0,tmax,tdiff):
-    filename='img'+str(i)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
+for i in range(t0,tmax,tdiff):
+    filename=filename+str(i)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
     if os.path.exists(filename):
         video.write(cv2.imread(filename))
     else:
