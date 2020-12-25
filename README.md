@@ -170,3 +170,7 @@ This creates a .AVI video from multiple microscopy images (monochrome or colored
 
 
 **output file**
+
+```Note
+Same param.dat file can be used for render_mono.py, mono2color.py, and create_vid.py
+```
