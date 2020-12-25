@@ -56,12 +56,12 @@ to represent absence of molecular simulation system (and the frame).
 **parameter file**
 - f: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
 - maxlen: (float float float). Largest dimension of molecular simulation box in x, y, and z directions (<img src="https://render.githubusercontent.com/render/math?math=B_l^*, B_m^*, B_n^*"> in Cite).
-- focus_cor: (float). The n-coordinate (in gro file) to which the *in-silico* microscope is focused ($n_O$ in Cite). 
+- focus_cor: (float). The n-coordinate (in gro file) to which the *in-silico* microscope is focused (<img src="https://render.githubusercontent.com/render/math?math=n_O"> in Cite). 
 - opt_axis: (int). Optical axis direction 0 for x, 1 for y, and 2 for z (<img src="https://render.githubusercontent.com/render/math?math=n"> in Cite).
-- lam1: (int). The wavelength of light emitted by fluorophore of type 1. Similar syntax for lam2, ..., lam10. ($\lambda$ in Cite).
+- lam1: (int). The wavelength of light emitted by fluorophore of type 1. Similar syntax for lam2, ..., lam10. (<img src="https://render.githubusercontent.com/render/math?math=\lambda"> in Cite).
 - lam_names1: (string separated by spaces). Bead or atom names of fluorophore of type 1. Similar syntax for lam_names2, ..., lam_names10. Upto 100 atom names are supported for each fluorophore type.
 - NA: (float). Numerical aperture. 
-- dx: (float float float). The grid spacing for the PSF. (<img src="https://render.githubusercontent.com/render/math?math=\Delta l^'">, $\Delta m'$, $\Delta n'$ in Cite)
+- dx: (float float float). The grid spacing for the PSF. (<img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'">,  in Cite)
 - Lpsf: (float float float). The PSF box dimension. 
 - psfheader: (string). Starting characters with which PSF was saved.
 - pbc: (string). Directions in which PBC was applied. None, x, y, z, xy, yz, xz, or xyz should be used.
