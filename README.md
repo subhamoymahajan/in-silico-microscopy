@@ -13,7 +13,7 @@ package is free to use as long as you comply to the license (GPLv3).
 ### 1. gen_psf.py 
 
 Generates a point spread function file where each line represents the l, m, n, and PSF intensity.
-The PSF intensity is only printed for $m \leq l$.
+The PSF intensity is only printed for <img src="https://render.githubusercontent.com/render/math?math=m \leq l">.
 
 #### psf_gandy or psf_gandy_sep
 Usage: 
@@ -24,7 +24,7 @@ gen_psf.psf_gandy(beta,dl,dm,dn,Ll,Lm,Ln,fs,outname,otype,nidx)
 
 This PSF is based on  R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. psf_gandy_sep calculates PSF for a fixed z coordinate, whereas
 psf_gandy calculates PSF for all z coordinates.
-- beta = maximum half angle as seen from immersion oil; $sin^{-1}(NA/\mu), where NA is numerical aperture
+- beta = maximum half angle as seen from immersion oil; <img src="https://render.githubusercontent.com/render/math?math=\sin^{-1}(NA/\mu)">, where NA is numerical aperture
   and μ is the refractive index of of the immersion oil. 
 - dl, dm, and dn = are the grid spacing over which PSF is calculated. 
 - Ll, Lm, and Ln = are the the dimension of the box over which PSF is calculated. PSF is calculated for (-Ll/2 to Ll/2, -Lm/2 to Lm/2, -Ln/2 to Ln/2). However, because PSF
