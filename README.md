@@ -21,17 +21,20 @@ The PSF intensity is only printed for <img src="https://render.githubusercontent
 
 ```python
 import gen_psf
-gen_psf.psf_gandy(beta, dl, dm, dn, Ll, Lm, Ln, fs, outname)
-gen_psf.psf_gandy(beta, dl, dm, dn, Ll, Lm, Ln, fs, outname, otype, nidx)
+gen_psf.psf_gandy(beta, dl, dm, dn, Pl, Pm, Pn, fs, outname)
+gen_psf.psf_gandy(beta, dl, dm, dn, Pl, Pm, Pn, fs, outname, otype, nidx)
 ```
 
 
 This PSF is based on  R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. psf_gandy_sep calculates PSF for a fixed  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinate, whereas
 psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinates.
+
+**arguments**
+
 - beta = maximum half angle as seen from immersion oil <img src="https://render.githubusercontent.com/render/math?math=\beta=\sin^{-1}(NA/\mu)">, where NA is numerical aperture and  <img src="https://render.githubusercontent.com/render/math?math=\mu"> is the refractive index of of the immersion oil. 
 - dl, dm, and dn = are the grid spacing over which PSF is calculated. ( <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> )
-- Ll, Lm, and Ln = are the the dimension of the box over which PSF is calculated (<img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">). PSF is calculated for (-Ll/2 to Ll/2, -Lm/2 to Lm/2, -Ln/2 to Ln/2). However, because PSF 
-  by Gandy is radially and axially symmetrical, it is calculated for (0 to Ll/2, 0 to Ll/2, 0 to Ln/2) and Ll = Lm.
+- Pl, Pm, and Pn = are the the dimension of the box over which PSF is calculated (<img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">). PSF is calculated for (-Pl/2 to Pl/2, -Pm/2 to Pm/2, -Pn/2 to Pn/2). However, because PSF 
+  by Gandy is radially and axially symmetrical, it is calculated for (0 to Pl/2, 0 to Pl/2, 0 to Pn/2) and Pl = Pm.
 - fs = full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber (<img src="https://render.githubusercontent.com/render/math?math=k=2\pi/\lambda">); scaling factor of "gro" coordinates. (Cite) 
 - outname = the output file name
 - otype = open the file "outname" to write or append ('w' or 'a')
@@ -58,6 +61,12 @@ The output file consisted of intensity values for <img src="https://render.githu
 To compare different simulation times, a frame is created which is larger than the molecular simulation box size (over the simulation time). 
 The resultant intensity <img src="https://render.githubusercontent.com/render/math?math=I"> box size is scaled with respect to the frame and placed centered in it. The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> was between 0 and 1 (both included). Intensity of -1 was used in 
 to represent absence of molecular simulation system (and the frame).
+
+**arguments
+
+- f:
+- p:
+- o:
 
 **parameter file**
 
@@ -93,7 +102,22 @@ python render_mono.py -f imageheader -p param.dat -t timestep
 This generates an *in-silico* monochrome microscopy image (PNG with 1200 dpi). The frame is generated as white color. 
 The monochrome intensity is generated as with grey colormap.
 
+**arguments
+
+- f:
+- p:
+- t:
+
 **param.dat**
+
+-T: (int). Number of timesteps to generate a time-averaged image. Use the value of 1 to avoid time-averaging. 
+-fs: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
+-lam1: (int). The wavelength of light emitted by fluorophore of type 1. Similar syntax for lam2, ..., lam10. (<img src="https://render.githubusercontent.com/render/math?math=\lambda"> in Cite).
+-lam1_I0: (float). The maxmium intensity of of light emitted by fluorophore of type 1. Similar syntax for lam2_I0, ..., lam10_I0. (<img src="https://render.githubusercontent.com/render/math?math=I_0"> in Cite).
+-size: (float). The largest dimension of molecular simulation box in m direction (<img src="https://render.githubusercontent.com/render/math?math=B_m^*"> in Cite).
+-scale: (float). Length of the scale bar to be drawn.
+
+
 
 **output file**
 
@@ -106,7 +130,20 @@ python mono2color.py -f imageheader -p param.dat -t timestep
 
 This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 
+**arguments
+
+- f:
+- p:
+- t:
+
 **param.dat**
+-T: (int). Same as **render_mono.py**
+-fs: (int). Same as **render_mono.py**
+-lam1: (int). Same as **render_mono.py**
+-lam1_I0: (float). Same as **render_mono.py**
+-size: (float). Same as **render_mono.py**
+-scale: (float). Same as **render_mono.py**
+-lam1_hue: (int). The artificial hue (in degrees) assigned to fluorophore of type 1. Similar syntax for lam2_hue, ..., lam10_hue. 
 
 **output file**
 
@@ -118,6 +155,18 @@ python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
 ```
 This creates a .AVI video from multiple microscopy images (monochrome or colored).
 
+**arguments
+
+- f:
+- p:
+- tmax:
+- tdiff:
+
 **param.dat**
+-T: (int). Same as **render_mono.py**
+-fs: (int). Same as **render_mono.py**
+-lam1: (int). Same as **render_mono.py**
+-lam1_I0: (float). Same as **render_mono.py**
+
 
 **output file**
