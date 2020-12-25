@@ -235,7 +235,7 @@ lam2_I0 = 0.05
 then image file ```"ABC10_fs20_T1_I_0.1_0.05.png"``` will be created.
 
 
-When the argument after "-t" is less than zero, files **imageheader**\_fs**fs**\_I**lam_I0s**.png will be created. 
+When the argument after "-t" is less than zero, files **imageheader**\_fs**fs**\_I_**lam_I0s**.png will be created. 
 
 For example if the following command is used,
 ```Note
