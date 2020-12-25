@@ -108,8 +108,8 @@ for i in range(len(lam)):
         plt.tight_layout(pad=0)
         #plt.show()
         if ti>=0:
-            plt.savefig('mono_'+filename+str(ti)+'_fs'+str(fs)+'_I'+str(lam_I0[i])+'_type'+str(i)+'.png',dpi=1200)
+            plt.savefig('mono_'+filename+str(ti)+'_lam'+str(lam[i])+'_fs'+str(fs)+'_I'+str(lam_I0[i])+'.png',dpi=1200)
         else:
-            plt.savefig('mono_'+filename+'_fs'+str(fs)+'_I'+str(lam_I0[i])+'_type'+str(i)+'.png',dpi=1200)
+            plt.savefig('mono_'+filename+'_lam'+str(lam[i])+'_fs'+str(fs)+'_I'+str(lam_I0[i])+'.png',dpi=1200)
 
 
