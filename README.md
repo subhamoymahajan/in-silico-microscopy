@@ -41,9 +41,11 @@ psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com
 where,<img src="https://render.githubusercontent.com/render/math?math=k^'=\frac{2\pi f_s}{\lambda}">, and <img src="https://render.githubusercontent.com/render/math?math=I_0 = 1">.   
 
 **output file**
+
 Creates PSF data file with name **outname**
 
 ### 2. gen_mono or gen_mono_c
+
 Usage:
 ```bash
 gen_mono -f structure.gro -p parameter.dat -o imageheader
@@ -58,6 +60,7 @@ The resultant intensity <img src="https://render.githubusercontent.com/render/ma
 to represent absence of molecular simulation system (and the frame).
 
 **parameter file**
+
 - f: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
 - maxlen: (float float float). Largest dimension of molecular simulation box in x, y, and z directions (<img src="https://render.githubusercontent.com/render/math?math=B_l^*, B_m^*, B_n^*"> in Cite).
 - focus_cor: (float). The n-coordinate (in gro file) to which the *in-silico* microscope is focused (<img src="https://render.githubusercontent.com/render/math?math=n_O"> in Cite). 
@@ -73,9 +76,11 @@ to represent absence of molecular simulation system (and the frame).
 The C-code will search for the PSF file named, **psfheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
 **structure.gro**
+
 The structure file of the specimen should be in GROMACS structure format. (link)
 
 **output file**
+
 monochrome image data files are saved with names, **imageheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
 ### 3. render_mono.py
@@ -93,6 +98,7 @@ The monochrome intensity is generated as with grey colormap.
 **output file**
 
 ### 4. mono2color.py
+
 Usage:  
 ```bash
 python mono2color.py -f imageheader -p param.dat -t timestep
@@ -105,6 +111,7 @@ This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 **output file**
 
 ### 5. create_vid.py
+
 Usage:  
 ```bash
 python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
