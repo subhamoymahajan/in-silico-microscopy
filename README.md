@@ -304,19 +304,26 @@ Creates a video file **imageheader**\_fs**fs**\_T**T**\_I_**lam_I0s**.avi. For t
 
 ## Contribute
 
-### 1. PSF
+More functionalities can be added in each part of the code. 
+
+### 1. gen_psf.py
 
 - To add new PSF, please add it in gen_psf.py
 - Add GPU accelerations, improve the algorithm of PSF calculation (It is currently slow).
 
-### 2. Add functionalities to gen_mono
-
-Some  functionalities that I can think includes,
+### 2. gen_mono
 
 - Adding a generic (l,m,n) coordinates rather than (x,y,z), (y,z,x) and (z,x,y).
 - Handle molecular simulation format other than GROMACS.
 - Handle non-molecular simulations
 - Handle continuum simulations.
 
+### 3. render_mono.py
 
+### 4. mono2color.py
 
+### 5. create_vid.py
+
+### 6. Additional functionalities
+
+- Read Cite.
