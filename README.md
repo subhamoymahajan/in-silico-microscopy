@@ -82,7 +82,7 @@ to represent absence of molecular simulation system (and the frame).
 - psfheader: (string). Starting characters with which PSF was saved.
 - pbc: (string). Directions in which PBC was applied. None, x, y, z, xy, yz, xz, or xyz should be used.
 
-The C-code will search for the PSF file named, **psfheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
+The C-code will search for the PSF file named, **psfheader**\_lam**lam[i]**\_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
 **structure.gro**
 
@@ -104,7 +104,7 @@ lam1 = 200
 lam2 = 300
 ```
 
-then the output files are "ABC_lam200_fs20.dat", "ABC_lam300_fs20.dat".
+then the output files are ```"ABC_lam200_fs20.dat"```, ```"ABC_lam300_fs20.dat"```.
 
 
 ### 3. render_mono.py
