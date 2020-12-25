@@ -82,7 +82,18 @@ to represent absence of molecular simulation system (and the frame).
 - psfheader: (string). Starting characters with which PSF was saved.
 - pbc: (string). Directions in which PBC was applied. None, x, y, z, xy, yz, xz, or xyz should be used.
 
+**file requirements**
+
 The C-code will search for the PSF file named, **psfheader**\_lam**lam[i]**\_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
+
+For example if parameter.dat contains,
+```Note
+fs = 20
+lam1 = 200
+lam2 = 300
+psf_header = PSF_gandy
+```
+it will look for the files ```"PSF_gandy_lam200_fs20.dat"``` and ```"PSF_gandy_lam300_fs20.dat"```.
 
 **structure.gro**
 
