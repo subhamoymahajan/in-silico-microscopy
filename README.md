@@ -25,15 +25,14 @@ gen_psf.psf_gandy(beta, dl, dm, dn, Ll, Lm, Ln, fs, outname, otype, nidx)
 
 This PSF is based on  R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. psf_gandy_sep calculates PSF for a fixed  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinate, whereas
 psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinates.
-- beta = maximum half angle as seen from immersion oil; <img src="https://render.githubusercontent.com/render/math?math=\sin^{-1}(NA/\mu)">, where NA is numerical aperture
-  and μ is the refractive index of of the immersion oil. 
-- dl, dm, and dn = are the grid spacing over which PSF is calculated. 
-- Ll, Lm, and Ln = are the the dimension of the box over which PSF is calculated. PSF is calculated for (-Ll/2 to Ll/2, -Lm/2 to Lm/2, -Ln/2 to Ln/2). However, because PSF
-  by Gandy is radially and axially symmetrical, it is calculated for (0 to Ll/2, 0 to Ll/2, 0 to Ln/2) and Ly = Lx.
-- fs = full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber (k=2pi/lambda); scaling factor of "gro" coordinates. (Cite) 
+- beta = maximum half angle as seen from immersion oil; <img src="https://render.githubusercontent.com/render/math?math\beta=\sin^{-1}(NA/\mu)">, where NA is numerical aperture and  <img src="https://render.githubusercontent.com/render/math?math=\mu"> is the refractive index of of the immersion oil. 
+- dl, dm, and dn = are the grid spacing over which PSF is calculated. ( <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> )
+- Ll, Lm, and Ln = are the the dimension of the box over which PSF is calculated (<img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">). PSF is calculated for (-Ll/2 to Ll/2, -Lm/2 to Lm/2, -Ln/2 to Ln/2). However, because PSF 
+  by Gandy is radially and axially symmetrical, it is calculated for (0 to Ll/2, 0 to Ll/2, 0 to Ln/2) and Ll = Lm.
+- fs = full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber (<img src="https://render.githubusercontent.com/render/math?math=k=2\pi/\lambda">); scaling factor of "gro" coordinates. (Cite) 
 - outname = the output file name
 - otype = open the file "outname" to write or append ('w' or 'a')
-- nidx = a counter for n coordinate. This is an integer int(n/dn).
+- nidx = a counter for (<img src="https://render.githubusercontent.com/render/math?math=n^'">) coordinate. This is an integer int(n/dn).
 <img src="https://render.githubusercontent.com/render/math?math=PSF(r,n^')=PSF(l^',m^',n^')=I_0 \left\vert \frac{3}{2(1-\cos^{3/2}\beta)} \int_0^\beta e^{ik^'n^'\cos\theta}J_0(k^'r\sin\theta)\sin\theta\cos^{1/2}\theta d\theta \right\vert^2">
 
 where,<img src="https://render.githubusercontent.com/render/math?math=k^'=\frac{2\pi f_s}{\lambda}">, and <img src="https://render.githubusercontent.com/render/math?math=I_0 = 1">.   
