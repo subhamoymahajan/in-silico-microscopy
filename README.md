@@ -14,7 +14,7 @@ package is free to use as long as you comply to the license (GPLv3).
 ### 1. gen_psf.py 
 
 Generates a point spread function file where each line represents the <img src="https://render.githubusercontent.com/render/math?math=l^'">,  <img src="https://render.githubusercontent.com/render/math?math=m^'">,  <img src="https://render.githubusercontent.com/render/math?math=n^'">, and PSF intensity.
-The PSF intensity is only printed for <img src="https://render.githubusercontent.com/render/math?math=m?^' \leq l^'">.
+The PSF intensity is only printed for <img src="https://render.githubusercontent.com/render/math?math=m^' \leq l^'">.
 
 #### psf_gandy or psf_gandy_sep
 Usage: 
