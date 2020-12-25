@@ -167,11 +167,18 @@ The code searches for timesteps 0, **delta_time**, 2**delta_time**, ..., N**delt
 For example if param.dat contains,
 
 ```Note
+T = 1
+fs = 20
 lam1_I0 = 0.1
 lam2_I0 = 0.3
 lam3_I0 = 0.05
 ```
-then **lamI0s** is "0.1_0.3_0.05". 
+and the command,
+
+```bash
+python create_vid.py -f ABC -p param.dat -tmax 1000 -tdiff 10
+```
+then **lamI0s** is "0.1_0.3_0.05", and it will look for files "ABC0_fs20_T1_I_0.1_0.3_0.05.png", "ABC10_fs20_T1_I_0.1_0.3_0.05.png", ..., "ABC1000_fs20_T1_I_0.1_0.3_0.05.png". 
 
 **param.dat**
 - T: (int). Same as **render_mono.py**
