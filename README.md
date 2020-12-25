@@ -82,7 +82,18 @@ to represent absence of molecular simulation system (and the frame).
 - psfheader: (string). Starting characters with which PSF was saved.
 - pbc: (string). Directions in which PBC was applied. None, x, y, z, xy, yz, xz, or xyz should be used.
 
-The C-code will search for the PSF file named, **psfheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
+**file requirements**
+
+The C-code will search for the PSF file named, **psfheader**\_lam**lam[i]**\_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
+
+For example if parameter.dat contains,
+```Note
+fs = 20
+lam1 = 200
+lam2 = 300
+psf_header = PSF_gandy
+```
+it will look for the files ```"PSF_gandy_lam200_fs20.dat"``` and ```"PSF_gandy_lam300_fs20.dat"```.
 
 **structure.gro**
 
@@ -104,7 +115,7 @@ lam1 = 200
 lam2 = 300
 ```
 
-then the output files are "ABC_lam200_fs20.dat", "ABC_lam300_fs20.dat".
+then the output files are ```"ABC_lam200_fs20.dat"```, ```"ABC_lam300_fs20.dat"```.
 
 
 ### 3. render_mono.py
@@ -149,7 +160,7 @@ lam2 = 300
 lam1_I0 = 0.1
 lam2_I0 = 0.05
 ```
-then image data files "ABC10_lam200_fs20.dat", "ABC10_lam300_fs20.dat" will be used to render the monochrome image.
+then image data files ```"ABC10_lam200_fs20.dat"```, ```"ABC10_lam300_fs20.dat"``` will be used to render the monochrome image.
 
 When the argument after "-t" is less than zero, it searches for the files **imageheader**\_lam**lam[i]**\_fs**fs**.dat. 
 
@@ -167,13 +178,13 @@ lam1_I0 = 0.1
 lam2_I0 = 0.05
 ```
 
-then image data files "ABC_lam200_fs20.dat", "ABC_lam300_fs20.dat" will be used to render the monochrome image.
+then image data files ```"ABC_lam200_fs20.dat"```, ```"ABC_lam300_fs20.dat"``` will be used to render the monochrome image.
 
 **output file**
 
-When the argument after "-t" is greater than or equal to zero, files mono_**imageheaderTimestep**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, "mono_ABC10_lam200_fs20_I0.1.png" and "mono_ABC10_lam300_fs20_I0.05.png".
+When the argument after "-t" is greater than or equal to zero, files mono_**imageheaderTimestep**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, ```"mono_ABC10_lam200_fs20_I0.1.png"``` and ```"mono_ABC10_lam300_fs20_I0.05.png"```.
 
-When the argument after "-t" is less than zero, files mono_**imageheader**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, "mono_ABC_lam200_fs20_I0.1.png" and "mono_ABC_lam300_fs20_I0.05.png".
+When the argument after "-t" is less than zero, files mono_**imageheader**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, ```"mono_ABC_lam200_fs20_I0.1.png"``` and ```"mono_ABC_lam300_fs20_I0.05.png"```.
 
 ### 4. mono2color.py
 
@@ -186,9 +197,13 @@ This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 
 **arguments**
 
-- f:
-- p:
-- t:
+- f: Same as **render_mono.py**
+- p: Same as **render_mono.py**
+- t: Same as **render_mono.py**
+
+**file requirements**
+
+Same as **render_mono.py**
 
 **param.dat**
 - T: (int). Same as **render_mono.py**
@@ -200,6 +215,43 @@ This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 - lam1_hue: (int). The artificial hue (in degrees) assigned to fluorophore of type 1. Similar syntax for lam2_hue, ..., lam10_hue. 
 
 **output file**
+
+When the argument after "-t" is greater than or equal to zero, files **imageheaderTimestep**\_fs**fs**\_T**T**\_I_**lam_I0s**.png will be created, where **lam_I0s** is a string of all lam[i]\_I0 separated by \_.
+
+For example if the following command is used,
+```Note
+python mono2color.py -f ABC -p param.dat -t 10
+```
+
+and parameter.dat contains,
+```Note
+fs = 20
+T = 1
+lam1 = 200
+lam2 = 300
+lam1_I0 = 0.1
+lam2_I0 = 0.05
+```
+then image file ```"ABC10_fs20_T1_I_0.1_0.05.png"``` will be created.
+
+
+When the argument after "-t" is less than zero, files **imageheader**\_fs**fs**\_I_**lam_I0s**.png will be created. 
+
+For example if the following command is used,
+```Note
+python mono2color.py -f ABC -p param.dat -t -1
+```
+
+and parameter.dat contains,
+```Note
+fs = 20
+T = 1
+lam1 = 200
+lam2 = 300
+lam1_I0 = 0.1
+lam2_I0 = 0.05
+```
+then image file ```"ABC_fs20_T1_I_0.1_0.05.png"``` will be created.
 
 ### 5. create_vid.py
 
@@ -232,7 +284,7 @@ and the command,
 ```bash
 python create_vid.py -f ABC -p param.dat -tmax 1000 -tdiff 10
 ```
-then **lamI0s** is "0.1_0.3_0.05", and it will look for files "ABC0_fs20_T1_I_0.1_0.3_0.05.png", "ABC10_fs20_T1_I_0.1_0.3_0.05.png", ..., "ABC1000_fs20_T1_I_0.1_0.3_0.05.png". 
+then **lamI0s** is "0.1_0.3_0.05", and it will look for files ```"ABC0_fs20_T1_I_0.1_0.3_0.05.png"```, ```"ABC10_fs20_T1_I_0.1_0.3_0.05.png"```, ..., ```"ABC1000_fs20_T1_I_0.1_0.3_0.05.png"```. 
 
 **param.dat**
 - T: (int). Same as **render_mono.py**
