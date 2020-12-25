@@ -8,9 +8,9 @@ The programs are developed for GROMACS (.gro) files in mind. Please look at the 
 If you are using these set of programs for your research publications, don't forget to cite (Cite). This software 
 package is free to use as long as you comply to the license (GPLv3).
 
-'''math
+```math
 a^2+b^2=c^2
-'''
+```
 ## Manual
 
 ### 1. gen_psf.py 
