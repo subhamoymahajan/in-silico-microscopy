@@ -21,18 +21,18 @@ import scipy.integrate as integrate
 import scipy.special as special
 import numpy as np
 
-def psf_gandy(beta,lambd,dl,dm,dn,Ll,Lm,Ln,fs,outname):
-   Nn=int((int(Ln/dn)+1)/2)+1
+def psf_gandy(beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname):
+   Nn=int((int(Pn/dn)+1)/2)+1
    for k in range(Nn):
-       psf_gandy_sep(beta,lambd,dl,dm,dn,Ll,Lm,Ln,fs,outname,'a',k)       
+       psf_gandy_sep(beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname,'a',k)       
 
-def psf_gandy_sep(beta,lambd,dl,dm,dn,Ll,Lm,Ln,fs,outname,otype,nidx):
+def psf_gandy_sep(beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname,otype,nidx):
 # Based on  R O Gandy 1954 Proc. Phys. Soc. B 67 825-831
 # NA = Numerical aperture
 # meu = Refractive index of the immersion oil
 # lambd = Wavelength of light
 # dl, dm, and dn = Distance between consecutive grid points 
-# Ln, Lm, and Ln = Dimensions of the PSF box
+# Pn, Pm, and Pn = Dimensions of the PSF box
 # fs = full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber (k=2pi/lambda); scaling factor of "gro" coordinates. (New Paper Cite) 
 # outname = the output file name
 # otype = open a file outname to append or write ('a' or  'w')
@@ -52,9 +52,9 @@ def psf_gandy_sep(beta,lambd,dl,dm,dn,Ll,Lm,Ln,fs,outname,otype,nidx):
    
    w=open(outname,otype)
    if otype=='w':
-       w.write('# NA= '+str(NA)+' meu= '+str(meu)+' lambda= '+str(lambd)+' dl= '+str(dl)+' dm= '+str(dm)+' dn= '+str(dn)+' Ll= '+str(Ll)+' Lm= '+str(Lm)+' Ln= '+str(Ln)+' fs= '+str(fs)+'\n')
-   Nl=int((int(Ll/dl)+1)/2)+1
-   Nm=int((int(Lm/dm)+1)/2)+1
+       w.write('# NA= '+str(NA)+' meu= '+str(meu)+' lambda= '+str(lambd)+' dl= '+str(dl)+' dm= '+str(dm)+' dn= '+str(dn)+' Pl= '+str(Pl)+' Pm= '+str(Pm)+' Pn= '+str(Pn)+' fs= '+str(fs)+'\n')
+   Nl=int((int(Pl/dl)+1)/2)+1
+   Nm=int((int(Pm/dm)+1)/2)+1
    n=round(nidx*dn,6)
    Kn=K*n
    for i in range(Nl):
