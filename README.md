@@ -64,11 +64,11 @@ to represent absence of molecular simulation system (and the frame).
 
 **arguments**
 
-- f:
-- p:
-- o:
+- f: After using "-f" option enter the file name of the GROMACS structure file. **It should contain only one time step**.  
+- p: After using "-p" option enter the parameter file name. 
+- o: After using "-o" option enter the starting strings of the output filename.
 
-**parameter file**
+**parameter.dat file**
 
 - f: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
 - maxlen: (float float float). Largest dimension of molecular simulation box in x, y, and z directions (<img src="https://render.githubusercontent.com/render/math?math=B_l^*, B_m^*, B_n^*"> in Cite).
@@ -92,6 +92,21 @@ The structure file of the specimen should be in GROMACS structure format.
 
 monochrome image data files are saved with names, **imageheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
+For example if the following command is used,
+```Note
+gen_mono -f structure.gro -p parameter.dat -o ABC
+```
+
+and parameter.dat contains,
+```Note
+fs = 20
+lam1 = 200
+lam2 = 300
+```
+
+then the output files are "ABC_lam200_fs20.dat", "ABC_lam300_fs20.dat".
+
+
 ### 3. render_mono.py
 
 Usage:
@@ -104,9 +119,9 @@ The monochrome intensity is generated as with grey colormap.
 
 **arguments**
 
-- f:
-- p:
-- t:
+- f: After using "-f" option enter the starting characters of the image data files created by gen_mono.
+- p: After using "-p" option enter the image parameters filename. 
+- t: After using "-t" option enter the timestep associated with the image.
 
 **param.dat**
 
@@ -117,9 +132,48 @@ The monochrome intensity is generated as with grey colormap.
 - size: (float). The largest dimension of molecular simulation box in m direction (<img src="https://render.githubusercontent.com/render/math?math=B_m^*"> in Cite).
 - scale: (float). Length of the scale bar to be drawn.
 
+**file requirements**
 
+When the argument after "-t" is greater than or equal to zero, it searches for the files **imageheaderTimestep**\_lam**lam[i]**\_fs**fs**.dat. 
+
+For example if the following command is used,
+```Note
+python render_mono.py -f ABC -p param.dat -t 10
+```
+
+and parameter.dat contains,
+```Note
+fs = 20
+lam1 = 200
+lam2 = 300
+lam1_I0 = 0.1
+lam2_I0 = 0.05
+```
+then image data files "ABC10_lam200_fs20.dat", "ABC10_lam300_fs20.dat" will be used to render the monochrome image.
+
+When the argument after "-t" is less than zero, it searches for the files **imageheader**\_lam**lam[i]**\_fs**fs**.dat. 
+
+For example if the following command is used,
+```Note
+python render_mono.py -f ABC -p param.dat -t -1
+```
+
+and parameter.dat contains,
+```Note
+fs = 20
+lam1 = 200
+lam2 = 300
+lam1_I0 = 0.1
+lam2_I0 = 0.05
+```
+
+then image data files "ABC_lam200_fs20.dat", "ABC_lam300_fs20.dat" will be used to render the monochrome image.
 
 **output file**
+
+When the argument after "-t" is greater than or equal to zero, files mono_**imageheaderTimestep**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, "mono_ABC10_lam200_fs20_I0.1.png" and "mono_ABC10_lam300_fs20_I0.05.png".
+
+When the argument after "-t" is less than zero, files mono_**imageheader**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, "mono_ABC_lam200_fs20_I0.1.png" and "mono_ABC_lam300_fs20_I0.05.png".
 
 ### 4. mono2color.py
 
