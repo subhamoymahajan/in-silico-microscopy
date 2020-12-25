@@ -9,7 +9,7 @@ If you are using these set of programs for your research publications, don't for
 package is free to use as long as you comply to the license (GPLv3).
 
 ```math
-a^2+b^2=c^2
+a^2 + b^2 = c^2
 ```
 ## Manual
 
