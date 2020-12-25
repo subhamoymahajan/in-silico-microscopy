@@ -33,7 +33,7 @@ psf_gandy calculates PSF for all z coordinates.
 - outname = the output file name
 - otype = open the file "outname" to write or append ('w' or 'a')
 - nidx = a counter for n coordinate. This is an integer int(n/dn).
-<img src="https://render.githubusercontent.com/render/math?math=PSF(r,n^')=PSF(l^',m^',n^')=I_0 \left\vert \frac{3}{2(1-\cos^{3/2}\beta)} \int_0^\beta e^{ik^'n^'\cos\theta}J_0(k^'r\sin\theta)\sin\theta\cos^{1/2}\theta d\theta \right\vert^2">
+<img src="https://latex.codecogs.com/gif.latex?=PSF(r,n^')=PSF(l^',m^',n^')=I_0 \left\vert \frac{3}{2(1-\cos^{3/2}\beta)} \int_0^\beta e^{ik^'n^'\cos\theta}J_0(k^'r\sin\theta)\sin\theta\cos^{1/2}\theta d\theta \right\vert^2">
 
 where,<img src="https://render.githubusercontent.com/render/math?math=k^'=\frac{2\pi f_s}{\lambda}">, and <img src="https://render.githubusercontent.com/render/math?math=I_0 = 1">.   
 
