@@ -162,7 +162,7 @@ This creates a .AVI video from multiple microscopy images (monochrome or colored
 - tmax: After using "-tmax" enter the maximum timestep to consider for creating the video.
 - tdiff: After using the "-tdiff" enter the increaments of timesteps to use for creating the video.
 
-The code searches for timesteps 0, **delta_time**, 2**delta_time**, ..., N**delta_time** (less than or equal to **maxtime**). The specific files searched are **imageheaderTimestep**_fs**fs**_T**T**_I**lam_I0s**.dat, where **imageheader**, **timestep** is determined from the arguments, **fs**, **T**, and **lamI0s** are determined from the param.dat file (see below). **lamI0s** is a string **lam1_I0**_**lam2_I0**_ ... **lamN_I0**. 
+The code searches for timesteps 0, **delta_time**, 2**delta_time**, ..., N**delta_time** (less than or equal to **maxtime**). The specific files searched are **imageheaderTimestep**_fs**fs**_T**T**_I**lam_I0s**.dat, where **imageheader**, **timestep** is determined from the arguments, **fs**, **T**, and **lamI0s** are determined from the param.dat file (see below). **lamI0s** is a string **lam1_I0**__**lam2_I0**_ ... **lamN_I0**. 
 
 For example if param.dat contains,
 
