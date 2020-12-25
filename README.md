@@ -76,7 +76,7 @@ The C-code will search for the PSF file named, [**psfheader**]_lam[**lam[i]**]_f
 The structure file of the specimen should be in GROMACS structure format. (link)
 
 **output file**
-monochrome image data files are saved with names, [**imageheader**]_lam[**lam[i]**]_fs[**fs**].dat.
+monochrome image data files are saved with names, **imageheader**_lam**lam[i]**_fs**fs**.dat.
 
 ### 3. render_mono.py
 
