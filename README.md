@@ -197,9 +197,13 @@ This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 
 **arguments**
 
-- f:
-- p:
-- t:
+- f: Same as **render_mono.py**
+- p: Same as **render_mono.py**
+- t: Same as **render_mono.py**
+
+**file requirements**
+
+Same as **render_mono.py**
 
 **param.dat**
 - T: (int). Same as **render_mono.py**
@@ -211,6 +215,43 @@ This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 - lam1_hue: (int). The artificial hue (in degrees) assigned to fluorophore of type 1. Similar syntax for lam2_hue, ..., lam10_hue. 
 
 **output file**
+
+When the argument after "-t" is greater than or equal to zero, files **imageheaderTimestep**\_fs**fs**\_T**T**\_I_**lam_I0s**.png will be created, where **lam_I0s** is a string of all lam[i]\_I0 separated by \_.
+
+For example if the following command is used,
+```Note
+python mono2color.py -f ABC -p param.dat -t 10
+```
+
+and parameter.dat contains,
+```Note
+fs = 20
+T = 1
+lam1 = 200
+lam2 = 300
+lam1_I0 = 0.1
+lam2_I0 = 0.05
+```
+then image file ```"ABC10_fs20_T1_I_0.1_0.05.png"``` will be created.
+
+
+When the argument after "-t" is less than zero, files **imageheader**\_fs**fs**\_I**lam_I0s**.png will be created. 
+
+For example if the following command is used,
+```Note
+python mono2color.py -f ABC -p param.dat -t -1
+```
+
+and parameter.dat contains,
+```Note
+fs = 20
+T = 1
+lam1 = 200
+lam2 = 300
+lam1_I0 = 0.1
+lam2_I0 = 0.05
+```
+then image file ```"ABC_fs20_T1_I_0.1_0.05.png"``` will be created.
 
 ### 5. create_vid.py
 
