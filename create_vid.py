@@ -48,10 +48,7 @@ for lines in f:
             lam_I0[int(foo[0][3])-1]=float(foo1[0])    
         else:
             lam[int(foo[0][3])-1]=int(foo1[0])
-    elif foo[0]=='colmix':
-        foo2=foo1[0].split('\'')
-        colmix=foo2[1]
-        print('colmix = '+str(colmix))
+
 Istring=''
 for i in range(10):
     if lam_I0[i]>1E-10:
