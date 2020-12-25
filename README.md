@@ -77,7 +77,7 @@ The C-code will search for the PSF file named, **psfheader**_lam**lam[i]**_fs**f
 
 **structure.gro**
 
-The structure file of the specimen should be in GROMACS structure format. (link)
+The structure file of the specimen should be in GROMACS structure format. 
 
 **output file**
 
