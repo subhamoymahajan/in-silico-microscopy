@@ -80,7 +80,10 @@ monochrome image data files are saved with names, [**imageheader**]_lam[**lam[i]
 
 ### 3. render_mono.py
 
-Usage: python render_mono.py -f imageheader -p param.dat -t timestep
+Usage:
+```bash
+python render_mono.py -f imageheader -p param.dat -t timestep
+```
 
 This generates an *in-silico* monochrome microscopy image (PNG with 1200 dpi). The frame is generated as white color. 
 The monochrome intensity is generated as with grey colormap.
@@ -89,15 +92,20 @@ The monochrome intensity is generated as with grey colormap.
 **output file**
 
 ### 4. mono2color.py
-Usage:  python mono2color.py -f imageheader -p param.dat -t timestep
+Usage:  
+```bash
+python mono2color.py -f imageheader -p param.dat -t timestep
+```
 
 This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 **param.dat**
 **output file**
 
 ### 5. create_vid.py
-Usage:  python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
-
+Usage:  
+```bash
+python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
+```
 This creates a .AVI video from multiple microscopy images (monochrome or colored).
 
 **param.dat**
