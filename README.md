@@ -19,11 +19,11 @@ The PSF intensity is only printed for <img src="https://render.githubusercontent
 #### psf_gandy or psf_gandy_sep
 *Usage:* 
 
+```python
 import gen_psf
-
 gen_psf.psf_gandy(beta, dl, dm, dn, Ll, Lm, Ln, fs, outname)
-
 gen_psf.psf_gandy(beta, dl, dm, dn, Ll, Lm, Ln, fs, outname, otype, nidx)
+```
 
 
 This PSF is based on  R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. psf_gandy_sep calculates PSF for a fixed  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinate, whereas
