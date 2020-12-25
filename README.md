@@ -299,6 +299,6 @@ then **lamI0s** is "0.1_0.3_0.05", and it will look for files ```"ABC0_fs20_T1_I
 
 Creates a video file **imageheader**\_fs**fs**\_T**T**\_I_**lam_I0s**.avi. For the above example, the file ```"ABC_fs20_T1_I_0.1_0.3_0.05.avi"``` is created.
 
-```Note
-Same param.dat file can be used for render_mono.py, mono2color.py, and create_vid.py
-```
+
+**Same param.dat file can be used for render_mono.py, mono2color.py, and create_vid.py**
+
