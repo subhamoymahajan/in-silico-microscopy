@@ -300,5 +300,23 @@ then **lamI0s** is "0.1_0.3_0.05", and it will look for files ```"ABC0_fs20_T1_I
 Creates a video file **imageheader**\_fs**fs**\_T**T**\_I_**lam_I0s**.avi. For the above example, the file ```"ABC_fs20_T1_I_0.1_0.3_0.05.avi"``` is created.
 
 
-### **Same param.dat file can be used for render_mono.py, mono2color.py, and create_vid.py**
+### Same param.dat file can be used for render_mono.py, mono2color.py, and create_vid.py
+
+## Contribute
+
+### 1. PSF
+
+- To add new PSF, please add it in gen_psf.py
+- Add GPU accelerations, improve the algorithm of PSF calculation (It is currently slow).
+
+### 2. Add functionalities to gen_mono
+
+Some  functionalities that I can think includes,
+
+- Adding a generic (l,m,n) coordinates rather than (x,y,z), (y,z,x) and (z,x,y).
+- Handle molecular simulation format other than GROMACS.
+- Handle non-molecular simulations
+- Handle continuum simulations.
+
+
 
