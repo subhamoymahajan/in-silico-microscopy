@@ -25,7 +25,7 @@ gen_psf.psf_gandy(beta, dl, dm, dn, Ll, Lm, Ln, fs, outname, otype, nidx)
 
 This PSF is based on  R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. psf_gandy_sep calculates PSF for a fixed  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinate, whereas
 psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinates.
-- beta = maximum half angle as seen from immersion oil; <img src="https://render.githubusercontent.com/render/math?math=\beta=\sin^{-1}(NA/\mu)">, where NA is numerical aperture and  <img src="https://render.githubusercontent.com/render/math?math=\mu"> is the refractive index of of the immersion oil. 
+- beta = maximum half angle as seen from immersion oil <img src="https://render.githubusercontent.com/render/math?math=\beta=\sin^{-1}(NA/\mu)">, where NA is numerical aperture and  <img src="https://render.githubusercontent.com/render/math?math=\mu"> is the refractive index of of the immersion oil. 
 - dl, dm, and dn = are the grid spacing over which PSF is calculated. ( <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> )
 - Ll, Lm, and Ln = are the the dimension of the box over which PSF is calculated (<img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">). PSF is calculated for (-Ll/2 to Ll/2, -Lm/2 to Lm/2, -Ln/2 to Ln/2). However, because PSF 
   by Gandy is radially and axially symmetrical, it is calculated for (0 to Ll/2, 0 to Ll/2, 0 to Ln/2) and Ll = Lm.
@@ -62,7 +62,7 @@ to represent absence of molecular simulation system (and the frame).
 - lam_names1: (string separated by spaces). Bead or atom names of fluorophore of type 1. Similar syntax for lam_names2, ..., lam_names10. Upto 100 atom names are supported for each fluorophore type.
 - NA: (float). Numerical aperture. 
 - dx: (float float float). The grid spacing for the PSF. (<img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'">,  in Cite)
-- Lpsf: (float float float). The PSF box dimension. 
+- Lpsf: (float float float). The PSF box dimension. (<img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">)
 - psfheader: (string). Starting characters with which PSF was saved.
 - pbc: (string). Directions in which PBC was applied. None, x, y, z, xy, yz, xz, or xyz should be used.
 
