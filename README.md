@@ -89,6 +89,7 @@ This generates an *in-silico* monochrome microscopy image (PNG with 1200 dpi). T
 The monochrome intensity is generated as with grey colormap.
 
 **param.dat**
+
 **output file**
 
 ### 4. mono2color.py
