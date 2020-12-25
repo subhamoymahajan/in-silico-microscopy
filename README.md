@@ -110,12 +110,12 @@ The monochrome intensity is generated as with grey colormap.
 
 **param.dat**
 
--T: (int). Number of timesteps to generate a time-averaged image. Use the value of 1 to avoid time-averaging. 
--fs: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
--lam1: (int). The wavelength of light emitted by fluorophore of type 1. Similar syntax for lam2, ..., lam10. (<img src="https://render.githubusercontent.com/render/math?math=\lambda"> in Cite).
--lam1_I0: (float). The maxmium intensity of of light emitted by fluorophore of type 1. Similar syntax for lam2_I0, ..., lam10_I0. (<img src="https://render.githubusercontent.com/render/math?math=I_0"> in Cite).
--size: (float). The largest dimension of molecular simulation box in m direction (<img src="https://render.githubusercontent.com/render/math?math=B_m^*"> in Cite).
--scale: (float). Length of the scale bar to be drawn.
+- T: (int). Number of timesteps to generate a time-averaged image. Use the value of 1 to avoid time-averaging. 
+- fs: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
+- lam1: (int). The wavelength of light emitted by fluorophore of type 1. Similar syntax for lam2, ..., lam10. (<img src="https://render.githubusercontent.com/render/math?math=\lambda"> in Cite).
+- lam1_I0: (float). The maxmium intensity of of light emitted by fluorophore of type 1. Similar syntax for lam2_I0, ..., lam10_I0. (<img src="https://render.githubusercontent.com/render/math?math=I_0"> in Cite).
+- size: (float). The largest dimension of molecular simulation box in m direction (<img src="https://render.githubusercontent.com/render/math?math=B_m^*"> in Cite).
+- scale: (float). Length of the scale bar to be drawn.
 
 
 
@@ -137,13 +137,13 @@ This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 - t:
 
 **param.dat**
--T: (int). Same as **render_mono.py**
--fs: (int). Same as **render_mono.py**
--lam1: (int). Same as **render_mono.py**
--lam1_I0: (float). Same as **render_mono.py**
--size: (float). Same as **render_mono.py**
--scale: (float). Same as **render_mono.py**
--lam1_hue: (int). The artificial hue (in degrees) assigned to fluorophore of type 1. Similar syntax for lam2_hue, ..., lam10_hue. 
+- T: (int). Same as **render_mono.py**
+- fs: (int). Same as **render_mono.py**
+- lam1: (int). Same as **render_mono.py**
+- lam1_I0: (float). Same as **render_mono.py**
+- size: (float). Same as **render_mono.py**
+- scale: (float). Same as **render_mono.py**
+- lam1_hue: (int). The artificial hue (in degrees) assigned to fluorophore of type 1. Similar syntax for lam2_hue, ..., lam10_hue. 
 
 **output file**
 
@@ -163,10 +163,10 @@ This creates a .AVI video from multiple microscopy images (monochrome or colored
 - tdiff:
 
 **param.dat**
--T: (int). Same as **render_mono.py**
--fs: (int). Same as **render_mono.py**
--lam1: (int). Same as **render_mono.py**
--lam1_I0: (float). Same as **render_mono.py**
+- T: (int). Same as **render_mono.py**
+- fs: (int). Same as **render_mono.py**
+- lam1: (int). Same as **render_mono.py**
+- lam1_I0: (float). Same as **render_mono.py**
 
 
 **output file**
