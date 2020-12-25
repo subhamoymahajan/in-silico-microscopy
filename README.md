@@ -41,7 +41,7 @@ psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com
 where,<img src="https://render.githubusercontent.com/render/math?math=k^'=\frac{2\pi f_s}{\lambda}">, and <img src="https://render.githubusercontent.com/render/math?math=I_0 = 1">.   
 
 **output file**
-Creates PSF data file with name [**outname**]
+Creates PSF data file with name **outname**
 
 ### 2. gen_mono or gen_mono_c
 Usage:
@@ -70,13 +70,13 @@ to represent absence of molecular simulation system (and the frame).
 - psfheader: (string). Starting characters with which PSF was saved.
 - pbc: (string). Directions in which PBC was applied. None, x, y, z, xy, yz, xz, or xyz should be used.
 
-The C-code will search for the PSF file named, [**psfheader**]_lam[**lam[i]**]_fs[**fs**].dat, where [psfheader], [fs] refer to the values in the parameter file, and lam[i] refers to value of lam1, ..., lam10 in parameters file.
+The C-code will search for the PSF file named, **psfheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
 **structure.gro**
 The structure file of the specimen should be in GROMACS structure format. (link)
 
 **output file**
-monochrome image data files are saved with names, **imageheader**_lam**lam[i]**_fs**fs**.dat.
+monochrome image data files are saved with names, **imageheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
 ### 3. render_mono.py
 
