@@ -35,7 +35,7 @@ psf_gandy calculates PSF for all z coordinates.
 - nidx = a counter for n coordinate. This is an integer int(n/dn).
 <img src="https://render.githubusercontent.com/render/math?math=PSF(r,n^')=PSF(l^',m^',n^')=I_0 \left\vert \frac{3}{2(1-\cos^{3/2}\beta)} \int_0^\beta e^{ik^'n^'\cos\theta}J_0(k^'r\sin\theta)\sin\theta\cos^{1/2}\theta d\theta \right\vert^2">
 
-where, $I_0$ is taken as 1.   
+where,<img src="https://render.githubusercontent.com/render/math?math=k^'=\frac{2\pi f_s}{\lambda}">, and <img src="https://render.githubusercontent.com/render/math?math=I_0 = 1">.   
 
 **output file**
 Creates PSF data file with name [**outname**]
@@ -46,16 +46,16 @@ gen_mono -f structure.gro -p parameter.dat -o imageheader
 
 This evaluates the convolution between PSF and particle number density (ρ), which is evaluated as, 
 
-$$I(l',m')=\sum_{j=1}^N PSF(l'-l_j,m'-m_j,n_O-n_j)$$
+<img src="https://render.githubusercontent.com/render/math?math=I(l^',m^')=\sum_{j=1}^N PSF(l^'-l_j,m^'-m_j,n_O-n_j)">
 
-The output file consisted of intensity values for (l',m') coordinates. While evaluating $I$, periodic boundary condition was applied. 
+The output file consisted of intensity values for <img src="https://render.githubusercontent.com/render/math?math=(l^',m^')"> coordinates. While evaluating <img src="https://render.githubusercontent.com/render/math?math=I">, periodic boundary condition was applied. 
 To compare different simulation times, a frame is created which is larger than the molecular simulation box size (over the simulation time). 
-The resultant intensity $I$ box size is scaled with respect to the frame and placed centered in it. The intensity $I$ was between 0 and 1 (both included). Intensity of -1 was used in 
+The resultant intensity <img src="https://render.githubusercontent.com/render/math?math=I"> box size is scaled with respect to the frame and placed centered in it. The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> was between 0 and 1 (both included). Intensity of -1 was used in 
 to represent absence of molecular simulation system (and the frame).
 
 **parameter file**
-- f: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber (k=2pi/lambda); scaling factor of "gro" coordinates. ($f_s$ in Cite).
-- maxlen: (float float float). Largest dimension of molecular simulation box in x, y, and z directions ($B_l^*$, $B_m^*$, $B_n^*$ in Cite).
+- f: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
+- maxlen: (float float float). Largest dimension of molecular simulation box in <img src="https://render.githubusercontent.com/render/math?math=x">, <img src="https://render.githubusercontent.com/render/math?math=y">, and <img src="https://render.githubusercontent.com/render/math?math=z"> directions (<img src="https://render.githubusercontent.com/render/math?math=B_l^*, B_m^*, B_n^*"> in Cite).
 - focus_cor: (float). The n-coordinate (in gro file) to which the *in-silico* microscope is focused ($n_O$ in Cite). 
 - opt_axis: (int). Optical axis direction 0 for x, 1 for y, and 2 for z ($n$ in Cite).
 - lam1: (int). The wavelength of light emitted by fluorophore of type 1. Similar syntax for lam2, ..., lam10. ($\lambda$ in Cite).
