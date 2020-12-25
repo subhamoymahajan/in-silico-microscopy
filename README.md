@@ -62,7 +62,7 @@ To compare different simulation times, a frame is created which is larger than t
 The resultant intensity <img src="https://render.githubusercontent.com/render/math?math=I"> box size is scaled with respect to the frame and placed centered in it. The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> was between 0 and 1 (both included). Intensity of -1 was used in 
 to represent absence of molecular simulation system (and the frame).
 
-**arguments
+**arguments**
 
 - f:
 - p:
@@ -102,7 +102,7 @@ python render_mono.py -f imageheader -p param.dat -t timestep
 This generates an *in-silico* monochrome microscopy image (PNG with 1200 dpi). The frame is generated as white color. 
 The monochrome intensity is generated as with grey colormap.
 
-**arguments
+**arguments**
 
 - f:
 - p:
@@ -130,7 +130,7 @@ python mono2color.py -f imageheader -p param.dat -t timestep
 
 This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 
-**arguments
+**arguments**
 
 - f:
 - p:
@@ -155,7 +155,7 @@ python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
 ```
 This creates a .AVI video from multiple microscopy images (monochrome or colored).
 
-**arguments
+**arguments**
 
 - f:
 - p:
