@@ -98,7 +98,9 @@ python mono2color.py -f imageheader -p param.dat -t timestep
 ```
 
 This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
+
 **param.dat**
+
 **output file**
 
 ### 5. create_vid.py
@@ -109,4 +111,5 @@ python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
 This creates a .AVI video from multiple microscopy images (monochrome or colored).
 
 **param.dat**
+
 **output file**
