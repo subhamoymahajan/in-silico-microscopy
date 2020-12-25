@@ -8,14 +8,14 @@ The programs are developed for GROMACS (.gro) files in mind. Please look at the 
 If you are using these set of programs for your research publications, don't forget to cite (Cite). This software 
 package is free to use as long as you comply to the license (GPLv3).
 
-##Manual
+## Manual
 
-###1. gen_psf.py 
+### 1. gen_psf.py 
 
 Generates a point spread function file where each line represents the l, m, n, and PSF intensity.
 The PSF intensity is only printed for $m \leq l$.
 
-#### a. psf_gandy or psf_gandy_sep
+#### psf_gandy or psf_gandy_sep
 Usage: 
 import gen_psf
 gen_psf.psf_gandy(beta,dl,dm,dn,Ll,Lm,Ln,fs,outname)
@@ -41,7 +41,7 @@ where, $I_0$ is taken as 1.
 **output file**
 Creates PSF data file with name [**outname**]
 
-#### b. gen_mono or gen_mono_c
+### 2. gen_mono or gen_mono_c
 Usage:
 gen_mono -f structure.gro -p parameter.dat -o imageheader
 
@@ -75,7 +75,7 @@ The structure file of the specimen should be in GROMACS structure format. (link)
 **output file**
 monochrome image data files are saved with names, [**imageheader**]_lam[**lam[i]**]_fs[**fs**].dat.
 
-#### b. render_mono.py
+### 3. render_mono.py
 
 Usage: python render_mono.py -f imageheader -p param.dat -t timestep
 
@@ -85,14 +85,14 @@ The monochrome intensity is generated as with grey colormap.
 **param.dat**
 **output file**
 
-#### c. mono2color.py
+### 4. mono2color.py
 Usage:  python mono2color.py -f imageheader -p param.dat -t timestep
 
 This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 **param.dat**
 **output file**
 
-#### d. create_vid.py
+### 5. create_vid.py
 Usage:  python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
 
 This creates a .AVI video from multiple microscopy images (monochrome or colored).
