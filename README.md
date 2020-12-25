@@ -45,8 +45,9 @@ Creates PSF data file with name [**outname**]
 
 ### 2. gen_mono or gen_mono_c
 Usage:
+```bash
 gen_mono -f structure.gro -p parameter.dat -o imageheader
-
+```
 This evaluates the convolution between PSF and particle number density (ρ), which is evaluated as, 
 
 <img src="https://render.githubusercontent.com/render/math?math=I(l^',m^')=\sum_{j=1}^N PSF(l^'-l_j,m^'-m_j,n_O-n_j)">
