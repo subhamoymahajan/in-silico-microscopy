@@ -263,10 +263,19 @@ This creates a .AVI video from multiple microscopy images (monochrome or colored
 
 **arguments**
 
-- f: After using "-f" option enter the starting characters of the image files to combine and form videos.
-- p: After using "-p" option enter the image parameters filename. 
-- tmax: After using "-tmax" enter the maximum timestep to consider for creating the video.
-- tdiff: After using the "-tdiff" enter the increaments of timesteps to use for creating the video.
+- f: (str). After using "-f" option enter the starting characters of the image files to combine and form videos.
+- p: (str). After using "-p" option enter the image parameters filename. 
+- t0: (int). After using "-t0" enter the first timestep to consider for creating the video.
+- tmax: (int). After using "-tmax" enter the maximum timestep to consider for creating the video.
+- tdiff: (int). After using the "-tdiff" enter the increaments of timesteps to use for creating the video.
+
+**param.dat**
+- T: (int). Same as **render_mono.py**
+- fs: (int). Same as **render_mono.py**
+- lam1: (int). Same as **render_mono.py**
+- lam1_I0: (float). Same as **render_mono.py**
+
+**file requirements**
 
 The code searches for timesteps 0, **delta_time**, 2**delta_time**, ..., N**delta_time** (less than or equal to **maxtime**). The specific files searched are **imageheaderTimestep**\_fs**fs**\_T**T**\_I_**lam_I0s**.dat, where **imageheader**, **timestep** is determined from the arguments, **fs**, **T**, and **lamI0s** are determined from the param.dat file (see below). **lamI0s** is a string **lam1_I0**\_**lam2_I0**_ ... **lamN_I0**. 
 
@@ -286,14 +295,9 @@ python create_vid.py -f ABC -p param.dat -tmax 1000 -tdiff 10
 ```
 then **lamI0s** is "0.1_0.3_0.05", and it will look for files ```"ABC0_fs20_T1_I_0.1_0.3_0.05.png"```, ```"ABC10_fs20_T1_I_0.1_0.3_0.05.png"```, ..., ```"ABC1000_fs20_T1_I_0.1_0.3_0.05.png"```. 
 
-**param.dat**
-- T: (int). Same as **render_mono.py**
-- fs: (int). Same as **render_mono.py**
-- lam1: (int). Same as **render_mono.py**
-- lam1_I0: (float). Same as **render_mono.py**
-
-
 **output file**
+
+Creates a video file **imageheader**\_fs**fs**\_T**T**\_I**lam_I0s**.avi. For the above example, the file ```"ABC_fs20_T1_I_0.1_0.3_0.05.avi"``` is created.
 
 ```Note
 Same param.dat file can be used for render_mono.py, mono2color.py, and create_vid.py
