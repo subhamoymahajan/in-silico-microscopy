@@ -149,7 +149,7 @@ lam2 = 300
 lam1_I0 = 0.1
 lam2_I0 = 0.05
 ```
-then image data files "ABC10_lam200_fs20.dat", "ABC10_lam300_fs20.dat" will be used to render the monochrome image.
+then image data files ```"ABC10_lam200_fs20.dat"```, ```"ABC10_lam300_fs20.dat"``` will be used to render the monochrome image.
 
 When the argument after "-t" is less than zero, it searches for the files **imageheader**\_lam**lam[i]**\_fs**fs**.dat. 
 
@@ -167,13 +167,13 @@ lam1_I0 = 0.1
 lam2_I0 = 0.05
 ```
 
-then image data files "ABC_lam200_fs20.dat", "ABC_lam300_fs20.dat" will be used to render the monochrome image.
+then image data files ```"ABC_lam200_fs20.dat"```, ```"ABC_lam300_fs20.dat"``` will be used to render the monochrome image.
 
 **output file**
 
-When the argument after "-t" is greater than or equal to zero, files mono_**imageheaderTimestep**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, "mono_ABC10_lam200_fs20_I0.1.png" and "mono_ABC10_lam300_fs20_I0.05.png".
+When the argument after "-t" is greater than or equal to zero, files mono_**imageheaderTimestep**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, ```"mono_ABC10_lam200_fs20_I0.1.png"``` and ```"mono_ABC10_lam300_fs20_I0.05.png"```.
 
-When the argument after "-t" is less than zero, files mono_**imageheader**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, "mono_ABC_lam200_fs20_I0.1.png" and "mono_ABC_lam300_fs20_I0.05.png".
+When the argument after "-t" is less than zero, files mono_**imageheader**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, ```"mono_ABC_lam200_fs20_I0.1.png"``` and ```"mono_ABC_lam300_fs20_I0.05.png"```.
 
 ### 4. mono2color.py
 
@@ -232,7 +232,7 @@ and the command,
 ```bash
 python create_vid.py -f ABC -p param.dat -tmax 1000 -tdiff 10
 ```
-then **lamI0s** is "0.1_0.3_0.05", and it will look for files "ABC0_fs20_T1_I_0.1_0.3_0.05.png", "ABC10_fs20_T1_I_0.1_0.3_0.05.png", ..., "ABC1000_fs20_T1_I_0.1_0.3_0.05.png". 
+then **lamI0s** is "0.1_0.3_0.05", and it will look for files ```"ABC0_fs20_T1_I_0.1_0.3_0.05.png"```, ```"ABC10_fs20_T1_I_0.1_0.3_0.05.png"```, ..., ```"ABC1000_fs20_T1_I_0.1_0.3_0.05.png"```. 
 
 **param.dat**
 - T: (int). Same as **render_mono.py**
