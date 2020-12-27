@@ -18,7 +18,7 @@ The PSF intensity is only printed for <img src="https://render.githubusercontent
 
 #### psf_gandy or psf_gandy_sep
 
-Usage:
+**Usage:**
 
 ```python
 import gen_psf
@@ -50,7 +50,7 @@ Creates PSF data file with name **outname**
 
 ### 2. gen_mono or gen_mono_c
 
-Usage:
+**Usage:**
 ```bash
 gen_mono -f structure.gro -p parameter.dat -o imageheader
 ```
@@ -121,7 +121,7 @@ then the output files are ```"ABC_lam200_fs20.dat"```, ```"ABC_lam300_fs20.dat"`
 
 ### 3. render_mono.py
 
-Usage:
+**Usage:**
 ```bash
 python render_mono.py -f imageheader -p param.dat -t timestep
 ```
@@ -189,7 +189,7 @@ When the argument after "-t" is less than zero, files mono_**imageheader**\_lam*
 
 ### 4. mono2color.py
 
-Usage:  
+**Usage:**  
 ```bash
 python mono2color.py -f imageheader -p param.dat -t timestep
 ```
@@ -256,7 +256,7 @@ then image file ```"ABC_fs20_T1_I_0.1_0.05.png"``` will be created.
 
 ### 5. create_vid.py
 
-Usage:  
+**Usage:**  
 ```bash
 python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
 ```
