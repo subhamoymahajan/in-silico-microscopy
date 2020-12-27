@@ -102,7 +102,7 @@ The structure file of the specimen should be in GROMACS structure format.
 
 **Output:**
 
-monochrome image data files are saved with names, **imageheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
+monochrome image data files are saved with names **imageheader**\_lam**lam[i]**\_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
 For example if the following command is used,
 ```Note
