@@ -1,7 +1,7 @@
 # In-silico-widefield-microscopy
 
 This open-source software package allows *in-silico* microscopy of molecular simulations such as molecular
-dynamics simulations, monte carlo simulations, etc. The current version can perform widefield microscopy 
+dynamics, monte carlo, etc. The current version can perform widefield microscopy 
 and approximate forms of confocal, light-sheet, two-photon, and super-resolution microscopy (Cite). 
 The programs are developed for GROMACS (.gro) files in mind. Please look at the tutorials for examples.
 
