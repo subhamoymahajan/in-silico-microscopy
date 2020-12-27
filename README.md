@@ -127,7 +127,7 @@ python render_mono.py -f imageheader -p param.dat -t timestep
 ```
 
 This generates an *in-silico* monochrome microscopy image (PNG with 1200 dpi). The frame is generated as white color. 
-The monochrome intensity is generated as with grey colormap.
+The monochrome intensity is generated with grey colormap.
 
 **Arguments:**
 
