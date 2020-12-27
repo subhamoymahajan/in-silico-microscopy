@@ -194,7 +194,7 @@ When the argument after "-t" is less than zero, files mono_**imageheader**\_lam*
 python mono2color.py -f imageheader -p param.dat -t timestep
 ```
 
-This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
+This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi). The frame is generated as white color. The colors are mixed based on Cite.
 
 **Arguments:**
 
