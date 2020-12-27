@@ -138,8 +138,8 @@ The monochrome image is generated with grey colormap.
 **param.dat file:**
 
 - T: (int). Number of timesteps to generate a time-averaged image. Use the value of 1 to avoid time-averaging. 
-- fs: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
-- lam1: (int). The wavelength of light emitted by fluorophore of type 1. Similar syntax for lam2, ..., lam10. (<img src="https://render.githubusercontent.com/render/math?math=\lambda"> in Cite).
+- fs: (int). Same as **f in gen_mono.**
+- lam1: (int). Same as **gen_mono**.
 - lam1_I0: (float). The maxmium intensity of of light emitted by fluorophore of type 1. Similar syntax for lam2_I0, ..., lam10_I0. (<img src="https://render.githubusercontent.com/render/math?math=I_0"> in Cite).
 - size: (float). The largest dimension of molecular simulation box in m direction (<img src="https://render.githubusercontent.com/render/math?math=B_m^*"> in Cite).
 - scale: (float). Length of the scale bar to be drawn.
