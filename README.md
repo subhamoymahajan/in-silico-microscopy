@@ -17,7 +17,8 @@ Generates a point spread function file where each line represents the <img src="
 The PSF intensity is only printed for <img src="https://render.githubusercontent.com/render/math?math=m^' \leq l^'">.
 
 #### psf_gandy or psf_gandy_sep
-*Usage:* 
+
+Usage:
 
 ```python
 import gen_psf
