@@ -61,21 +61,21 @@ print('T = '+str(T)+'\nfs = '+str(fs)+'\ntmax = '+str(tmax)+'\nI0 = '+str(lam_I0
     
 import cv2
 vidname=filename+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.avi'
-filename=filename+str(t0)'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
-if os.path.exists(filename):
-    img0=cv2.imread(filename)
+fname=filename+str(t0)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
+if os.path.exists(fname):
+    img0=cv2.imread(fname)
 else:
-    print(filename+' does not exist')
+    print(fname+' does not exist')
     sys.exit()
 h,w,l=img0.shape
 video=cv2.VideoWriter(vidname,0,fps,(w,h))
 
 for i in range(t0,tmax,tdiff):
-    filename=filename+str(i)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
-    if os.path.exists(filename):
-        video.write(cv2.imread(filename))
+    fname=filename+str(i)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
+    if os.path.exists(fname):
+        video.write(cv2.imread(fname))
     else:
-        print (filename+' does not exists')
+        print (fname+' does not exists')
         sys.exit()
 cv2.destroyAllWindows()
 video.release()
