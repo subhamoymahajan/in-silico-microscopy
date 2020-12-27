@@ -126,7 +126,7 @@ then the output files are ```"ABC_lam200_fs20.dat"```, ```"ABC_lam300_fs20.dat"`
 python render_mono.py -f imageheader -p param.dat -t timestep
 ```
 
-This generates an *in-silico* monochrome microscopy image (PNG with 1200 dpi). The frame is generated as white color. 
+This generates an *in-silico* monochrome microscopy image (PNG with 600 dpi). The frame is generated as white color. 
 The monochrome image is generated with grey colormap.
 
 **Arguments:**
@@ -194,7 +194,7 @@ When the argument after "-t" is less than zero, files mono_**imageheader**\_lam*
 python mono2color.py -f imageheader -p param.dat -t timestep
 ```
 
-This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi). The frame is generated as white color. The colors are mixed based on Cite.
+This generates a colored *in-silico* microsocpy image (PNG with 600 dpi). The frame is generated as white color. The colors are mixed based on Cite.
 
 **Arguments:**
 
