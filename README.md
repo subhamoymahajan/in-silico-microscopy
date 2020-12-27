@@ -30,7 +30,7 @@ gen_psf.psf_gandy(beta, dl, dm, dn, Pl, Pm, Pn, fs, outname, otype, nidx)
 This PSF is based on  R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. psf_gandy_sep calculates PSF for a fixed  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinate, whereas
 psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com/render/math?math=n^'"> coordinates.
 
-**arguments**
+**Arguments:**
 
 - beta = maximum half angle as seen from immersion oil <img src="https://render.githubusercontent.com/render/math?math=\beta=\sin^{-1}(NA/\mu)">, where NA is numerical aperture and  <img src="https://render.githubusercontent.com/render/math?math=\mu"> is the refractive index of of the immersion oil. 
 - dl, dm, and dn = are the grid spacing for which PSF is calculated. ( <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> )
@@ -44,7 +44,7 @@ psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com
 
 where,<img src="https://render.githubusercontent.com/render/math?math=k^'=\frac{2\pi f_s}{\lambda}">, and <img src="https://render.githubusercontent.com/render/math?math=I_0 = 1">.   
 
-**output file**
+**Output:**
 
 Creates PSF data file with name **outname**
 
@@ -63,13 +63,13 @@ To compare different simulation times, a frame is created which is larger than t
 The resultant intensity <img src="https://render.githubusercontent.com/render/math?math=I"> box size is scaled with respect to the frame and placed centered in it. The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> was between 0 and 1 (both included). Intensity of -1 was used in 
 to represent absence of molecular simulation system (and the frame).
 
-**arguments**
+**Arguments:**
 
 - f: After using "-f" option enter the file name of the GROMACS structure file. **It should contain only one time step**.  
 - p: After using "-p" option enter the parameter file name. 
 - o: After using "-o" option enter the starting strings of the output filename.
 
-**parameter.dat file**
+**parameter.dat file:**
 
 - f: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
 - maxlen: (float float float). Largest dimension of molecular simulation box in x, y, and z directions (<img src="https://render.githubusercontent.com/render/math?math=B_l^*, B_m^*, B_n^*"> in Cite).
@@ -83,7 +83,7 @@ to represent absence of molecular simulation system (and the frame).
 - psfheader: (string). Starting characters with which PSF was saved.
 - pbc: (string). Directions in which PBC was applied. None, x, y, z, xy, yz, xz, or xyz should be used.
 
-**file requirements**
+**File requirements:**
 
 The C-code will search for the PSF file named, **psfheader**\_lam**lam[i]**\_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
@@ -96,11 +96,11 @@ psf_header = PSF_gandy
 ```
 it will look for the files ```"PSF_gandy_lam200_fs20.dat"``` and ```"PSF_gandy_lam300_fs20.dat"```.
 
-**structure.gro**
+**structure.gro file:**
 
 The structure file of the specimen should be in GROMACS structure format. 
 
-**output file**
+**Output:**
 
 monochrome image data files are saved with names, **imageheader**_lam**lam[i]**_fs**fs**.dat, where **psfheader**, **lam[i]**, and **fs** refer to the values in the parameter file.
 
@@ -129,13 +129,13 @@ python render_mono.py -f imageheader -p param.dat -t timestep
 This generates an *in-silico* monochrome microscopy image (PNG with 1200 dpi). The frame is generated as white color. 
 The monochrome intensity is generated as with grey colormap.
 
-**arguments**
+**Arguments:**
 
 - f: After using "-f" option enter the starting characters of the image data files created by gen_mono.
 - p: After using "-p" option enter the image parameters filename. 
 - t: After using "-t" option enter the timestep associated with the image.
 
-**param.dat**
+**param.dat file:**
 
 - T: (int). Number of timesteps to generate a time-averaged image. Use the value of 1 to avoid time-averaging. 
 - fs: (int). full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber <img src="https://render.githubusercontent.com/render/math?math=\left( k=2\pi/\lambda\right)">; scaling factor of "gro" coordinates. (<img src="https://render.githubusercontent.com/render/math?math=f_s"> in Cite).
@@ -144,7 +144,7 @@ The monochrome intensity is generated as with grey colormap.
 - size: (float). The largest dimension of molecular simulation box in m direction (<img src="https://render.githubusercontent.com/render/math?math=B_m^*"> in Cite).
 - scale: (float). Length of the scale bar to be drawn.
 
-**file requirements**
+**File requirements:**
 
 When the argument after "-t" is greater than or equal to zero, it searches for the files **imageheaderTimestep**\_lam**lam[i]**\_fs**fs**.dat. 
 
@@ -181,7 +181,7 @@ lam2_I0 = 0.05
 
 then image data files ```"ABC_lam200_fs20.dat"```, ```"ABC_lam300_fs20.dat"``` will be used to render the monochrome image.
 
-**output file**
+**Output:**
 
 When the argument after "-t" is greater than or equal to zero, files mono_**imageheaderTimestep**\_lam**lam[i]**\_fs**fs**\_I**lam[i]\_I0**.png will be created. For the above example, ```"mono_ABC10_lam200_fs20_I0.1.png"``` and ```"mono_ABC10_lam300_fs20_I0.05.png"```.
 
@@ -196,17 +196,17 @@ python mono2color.py -f imageheader -p param.dat -t timestep
 
 This generates a colored *in-silico* microsocpy image (PNG with 1200 dpi).
 
-**arguments**
+**Arguments:**
 
 - f: Same as **render_mono.py**
 - p: Same as **render_mono.py**
 - t: Same as **render_mono.py**
 
-**file requirements**
+**File requirements:**
 
 Same as **render_mono.py**
 
-**param.dat**
+**param.dat file:**
 - T: (int). Same as **render_mono.py**
 - fs: (int). Same as **render_mono.py**
 - lam1: (int). Same as **render_mono.py**
@@ -215,7 +215,7 @@ Same as **render_mono.py**
 - scale: (float). Same as **render_mono.py**
 - lam1_hue: (int). The artificial hue (in degrees) assigned to fluorophore of type 1. Similar syntax for lam2_hue, ..., lam10_hue. 
 
-**output file**
+**Output:**
 
 When the argument after "-t" is greater than or equal to zero, files **imageheaderTimestep**\_fs**fs**\_T**T**\_I_**lam_I0s**.png will be created, where **lam_I0s** is a string of all lam[i]\_I0 separated by \_.
 
@@ -262,21 +262,21 @@ python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
 ```
 This creates a .AVI video from multiple microscopy images (monochrome or colored).
 
-**arguments**
+**Arguments:**
 
 - f: (str). After using "-f" option enter the starting characters of the image files to combine and form videos.
 - p: (str). After using "-p" option enter the image parameters filename. 
 - t0: (int). After using "-t0" enter the first timestep to consider for creating the video.
 - tmax: (int). After using "-tmax" enter the maximum timestep to consider for creating the video.
 - tdiff: (int). After using the "-tdiff" enter the increaments of timesteps to use for creating the video.
-
-**param.dat**
+ 
+**param.dat file:**
 - T: (int). Same as **render_mono.py**
 - fs: (int). Same as **render_mono.py**
 - lam1: (int). Same as **render_mono.py**
 - lam1_I0: (float). Same as **render_mono.py**
 
-**file requirements**
+**File requirements:**
 
 The code searches for timesteps 0, **delta_time**, 2**delta_time**, ..., N**delta_time** (less than or equal to **maxtime**). The specific files searched are **imageheaderTimestep**\_fs**fs**\_T**T**\_I_**lam_I0s**.dat, where **imageheader**, **timestep** is determined from the arguments, **fs**, **T**, and **lamI0s** are determined from the param.dat file (see below). **lamI0s** is a string **lam1_I0**\_**lam2_I0**_ ... **lamN_I0**. 
 
@@ -296,7 +296,7 @@ python create_vid.py -f ABC -p param.dat -tmax 1000 -tdiff 10
 ```
 then **lamI0s** is "0.1_0.3_0.05", and it will look for files ```"ABC0_fs20_T1_I_0.1_0.3_0.05.png"```, ```"ABC10_fs20_T1_I_0.1_0.3_0.05.png"```, ..., ```"ABC1000_fs20_T1_I_0.1_0.3_0.05.png"```. 
 
-**output file**
+**Output:**
 
 Creates a video file **imageheader**\_fs**fs**\_T**T**\_I_**lam_I0s**.avi. For the above example, the file ```"ABC_fs20_T1_I_0.1_0.3_0.05.avi"``` is created.
 
