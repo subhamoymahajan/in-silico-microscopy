@@ -258,7 +258,7 @@ then image file ```"ABC0.png"``` will be created. If ```"ABC0.png"``` already ex
 
 **Usage:**  
 ```bash
-python create_vid.py -f imageheader -p param.dat -tmax maxtime -tdiff delta_time
+python create_vid.py -f imageheader -p param.dat -t0 initial_time -tmax maxtime -tdiff delta_time -fps frame_rate
 ```
 This creates a .AVI video from multiple microscopy images (monochrome or colored).
 
@@ -266,9 +266,10 @@ This creates a .AVI video from multiple microscopy images (monochrome or colored
 
 - f: (str). After using "-f" option enter the starting characters of the image files to combine and form videos.
 - p: (str). After using "-p" option enter the image parameters filename. 
-- t0: (int). After using "-t0" enter the first timestep to consider for creating the video.
-- tmax: (int). After using "-tmax" enter the maximum timestep to consider for creating the video.
-- tdiff: (int). After using the "-tdiff" enter the increaments of timesteps to use for creating the video.
+- t0: (int). After using "-t0" option enter the first timestep to consider for creating the video.
+- tmax: (int). After using "-tmax" option enter the maximum timestep to consider for creating the video.
+- tdiff: (int). After using the "-tdiff" option enter the increaments of timesteps to use for creating the video.
+- fps: (int). Default value 5. After using the "-fps" option enter the frame rate of the output video.
  
 **param.dat file:**
 - T: (int). Same as **render_mono.py**
