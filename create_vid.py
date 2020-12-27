@@ -21,7 +21,7 @@ import numpy as np
 lam=np.zeros(10,dtype=int)
 lam_col_hue=np.zeros(10)
 lam_I0=np.zeros(10)
-
+fps = 5
 for i in range(2,len(sys.argv),2):
     if sys.argv[i-1]=='-f':
         filename=sys.argv[i] #Starting filename without lambda or fs values
@@ -33,6 +33,8 @@ for i in range(2,len(sys.argv),2):
         t0=int(sys.argv[i]) 
     elif sys.argv[i-1]=='-tdiff':
         tdiff=int(sys.argv[i]) 
+    elif sys.argv[i-1]=='-fps':
+        fps=int(sys.argv[i]) 
 
 f=open(paramfile)
 for lines in f:
@@ -66,7 +68,7 @@ else:
     print(filename+' does not exist')
     sys.exit()
 h,w,l=img0.shape
-video=cv2.VideoWriter(vidname,0,5,(w,h))
+video=cv2.VideoWriter(vidname,0,fps,(w,h))
 
 for i in range(t0,tmax,tdiff):
     filename=filename+str(i)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
