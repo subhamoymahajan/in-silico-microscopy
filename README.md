@@ -60,8 +60,8 @@ This evaluates the convolution between PSF and particle number density (ρ), whi
 
 The output file consisted of intensity values for <img src="https://render.githubusercontent.com/render/math?math=(l^',m^')"> coordinates. While evaluating <img src="https://render.githubusercontent.com/render/math?math=I">, periodic boundary condition was applied. 
 To compare different simulation times, a frame is created which is larger than the molecular simulation box size (over the simulation time). 
-The resultant intensity <img src="https://render.githubusercontent.com/render/math?math=I"> (for all <img src="https://render.githubusercontent.com/render/math?math=(l^',m^')">) is scaled with respect to the frame and placed centered in it. The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> was between 0 and 1 (both included). Intensity of -1 was used in 
-to represent absence of molecular simulation system and the frame (See Cite for more details).
+The resultant intensity <img src="https://render.githubusercontent.com/render/math?math=I(l^',m^')"> matrix is scaled with respect to the frame and placed centered in it. The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> was between 0 and 1 (both included). Intensity of -1 was used in 
+to represent the frame where molecular simulation system is absence (See Cite for more details).
 
 **Arguments:**
 
