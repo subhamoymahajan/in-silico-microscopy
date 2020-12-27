@@ -32,8 +32,8 @@ psf_gandy calculates PSF for all  <img src="https://render.githubusercontent.com
 **arguments**
 
 - beta = maximum half angle as seen from immersion oil <img src="https://render.githubusercontent.com/render/math?math=\beta=\sin^{-1}(NA/\mu)">, where NA is numerical aperture and  <img src="https://render.githubusercontent.com/render/math?math=\mu"> is the refractive index of of the immersion oil. 
-- dl, dm, and dn = are the grid spacing over which PSF is calculated. ( <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> )
-- Pl, Pm, and Pn = are the the dimension of the box over which PSF is calculated (<img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">). PSF is calculated for (-Pl/2 to Pl/2, -Pm/2 to Pm/2, -Pn/2 to Pn/2). However, because PSF 
+- dl, dm, and dn = are the grid spacing for which PSF is calculated. ( <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> )
+- Pl, Pm, and Pn = are the the dimension of the box for which PSF is calculated (<img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">). PSF is calculated for (-Pl/2 to Pl/2, -Pm/2 to Pm/2, -Pn/2 to Pn/2). However, because PSF 
   by Gandy is radially and axially symmetrical, it is calculated for (0 to Pl/2, 0 to Pl/2, 0 to Pn/2) and Pl = Pm.
 - fs = full-width-at-half-maximum (FWHM) scaling factor; scaling factor of wavenumber (<img src="https://render.githubusercontent.com/render/math?math=k=2\pi/\lambda">); scaling factor of "gro" coordinates. (Cite) 
 - outname = the output file name
