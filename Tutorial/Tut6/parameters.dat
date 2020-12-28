@@ -1,0 +1,13 @@
+f = 800 // FWHM scaling factor (int)
+maxlen = 25 25 25 // x,y,z box length (float, float, float)
+focus_cor = 12.5 // the n-coordinate (in gro file) which should be used as focal length (float)
+opt_axis = 2 //Optical axis direction 0 => x, 1 => y, 2 => z.
+lam1 = 670 // value of lambda 1
+lam2 = 518 // value of lambda 2
+NA = 1.3 // Numerical aperture
+lam_names1 = BB1 BB2 BB3 SC1 SC2 SC3
+lam_names2 = QPri Pri QSec Sec Ter
+dx = 0.1 0.1 0.2 // delta x, y, z to section the gro file (float, float, float)
+Lpsf = 15.0 15.0 25.0 // x,y,z box length for PSF generated (float, float, float)
+psfheader = PSF_gandy // starting characters with which PSF was saved
+pbc = xyz // PBC directions: None, x, y, z, xy, yz, xz, or xyz 
