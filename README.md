@@ -270,6 +270,7 @@ This creates a .AVI video from multiple microscopy images (monochrome or colored
 - tmax: (int). After using "-tmax" option enter the maximum timestep to consider for creating the video.
 - tdiff: (int). After using the "-tdiff" option enter the increaments of timesteps to use for creating the video.
 - fps: (int). Default value 5. After using the "-fps" option enter the frame rate of the output video.
+- type: (str). Default is 'color'. After using the "-type" option enter 'mono' to generate monochrome videos.
  
 **param.dat file:**
 - T: (int). Same as **render_mono.py**
