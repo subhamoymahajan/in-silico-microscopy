@@ -287,6 +287,9 @@ For example if param.dat contains,
 ```Note
 T = 1
 fs = 20
+lam1 = 300
+lam2 = 400
+lam3 = 500
 lam1_I0 = 0.1
 lam2_I0 = 0.3
 lam3_I0 = 0.05
@@ -300,7 +303,9 @@ then **lamI0s** is "0.1_0.3_0.05", and it will look for files ```"ABC0_fs20_T1_I
 
 **Output:**
 
-Creates a video file **imageheader**\_fs**fs**\_T**T**\_I_**lam_I0s**.avi. For the above example, the file ```"ABC_fs20_T1_I_0.1_0.3_0.05.avi"``` is created.
+By default colored *in-silico* microscopy videos are created with the file name **imageheader**\_fs**fs**\_T**T**\_I_**lam_I0s**.avi. For the above example, the file ```"ABC_fs20_T1_I_0.1_0.3_0.05.avi"``` is created.
+
+If "-type mono" is used monochrome *in-silico* microscopy videos are created with the file name mono\_**imageheader**\_lam**lam[i]**\_fs**fs**\_T**T**\_I**lam[i]\_I0**.avi. For the above example, if "-type mono" was used, the files ```"mono_ABC_lam300_fs20_T1_I0.1.avi"```, ```"mono_ABC_lam400_fs20_T1_I0.3.avi"```, and ```"mono_ABC_lam500_fs20_T1_I0.05.avi"```.
 
 
 ### Same param.dat file can be used for render_mono.py, mono2color.py, and create_vid.py
