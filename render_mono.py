@@ -25,23 +25,61 @@ lam_col_hue=np.zeros(10)
 lam_I0=np.zeros(10)
 
 import sys
-def get_img(filename,scale,size,I0):
-    f=open(filename,'r')
+def get_img(filename,scale,size,I0,lam,T,ti,fs):
+    if ti<0 and T>1:
+        print('Error: T>1 but ti<0')
+        sys.exit(-1)
     IMG=[]
-    for lines in f:
-        foo=lines.split()
-        if foo[0][0]=='#':
-            continue
-        img_row=[]
-        for i in range(len(foo)):
-            I=float(foo[i])*I0
-            if I>1:#max intensity value is 1
-                img_row.append(1.0)
-            elif I<0: #white background image
-                img_row.append(1.0)
+    Timg=[]
+    for i in range(T):
+        if ti>=0:
+            fname=filename+str(i+ti)+'_lam'+str(lam)+'_fs'+str(fs)+'.dat'
+        else:
+            fname=filename+'_lam'+str(lam)+'_fs'+str(fs)+'.dat'
+        
+        f=open(fname,'r')
+        if i==0:
+            for lines in f:
+                foo=lines.split()
+                if foo[0][0]=='#':
+                    continue
+                img_row=[]
+                t_row=[]
+                for j in range(len(foo)):
+                    I=float(foo[j])*I0
+                    if I>1:#max intensity value is 1
+                        img_row.append(1.0)
+                        t_row.append(1)
+                    elif I<0: #white background image
+                        img_row.append(0.0)
+                        t_row.append(0)
+                    else:
+                        img_row.append(I)
+                        t_row.append(1)
+                IMG.append(img_row)
+                Timg.append(t_row)
+        if i>0:
+            j=0
+            for lines in f:
+                foo=lines.split()
+                if foo[0][0]=='#':
+                    continue
+                for k in range(len(foo)):
+                    I=float(foo[k])*I0
+                    if I>1:#max intensity value is 1
+                        IMG[j][k]=IMG[j][k]+1
+                        Timg[j][k]=Timg[j][k]+1
+                    elif I>0: #microscopy image
+                        IMG[j][j]=IMG[j][k]+I
+                        Timg[j][k]=Timg[j][k]+1
+                j+=1
+    for j in range(len(IMG)):
+        for k in range(len(IMG[0])):
+            if Timg[j][k]>0:
+                IMG[j][k]=IMG[j][k]/Timg[j][k]
             else:
-                img_row.append(I)
-        IMG.append(img_row)
+                IMG[j][k]=1 #white background image
+
     L=int(scale/size*len(IMG[0]))
     Llast=int(0.9*len(IMG[0]))
     Hlast=int(0.9*len(IMG))
@@ -87,12 +125,7 @@ for lines in f:
 import matplotlib.pyplot as plt
 for i in range(len(lam)):
     if lam[i]>0.5:
-        if ti>=0:
-            fname=filename+str(ti)+'_lam'+str(lam[i])+'_fs'+str(fs)+'.dat'
-        else:
-            fname=filename+'_lam'+str(lam[i])+'_fs'+str(fs)+'.dat'
-
-        IMG=get_img(fname,scale,size,lam_I0[i])
+        IMG=get_img(filename,scale,size,lam_I0[i],lam[i],T,ti,fs)
         img_width=len(IMG[0])*3/float(len(IMG))
         fig,ax=plt.subplots(1,1,figsize=(img_width,3))
         ax.imshow(IMG,vmin=0, vmax=1,cmap='gray')
@@ -108,8 +141,8 @@ for i in range(len(lam)):
         plt.tight_layout(pad=0)
         #plt.show()
         if ti>=0:
-            plt.savefig('mono_'+filename+str(ti)+'_lam'+str(lam[i])+'_fs'+str(fs)+'_I'+str(lam_I0[i])+'.png',dpi=1200)
+            plt.savefig('mono_'+filename+str(ti)+'_lam'+str(lam[i])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0[i])+'.png',dpi=600)
         else:
-            plt.savefig('mono_'+filename+'_lam'+str(lam[i])+'_fs'+str(fs)+'_I'+str(lam_I0[i])+'.png',dpi=1200)
+            plt.savefig('mono_'+filename+'_lam'+str(lam[i])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0[i])+'.png',dpi=600)
 
 

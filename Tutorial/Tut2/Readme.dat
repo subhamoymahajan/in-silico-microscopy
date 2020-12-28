@@ -1,0 +1,12 @@
+# 1. Extract GRO files
+tar -xzf Struct.tar.gz
+
+# 2. Generate Image dat
+bash gen_imgdat.sh
+
+# 3. Render color images
+bash gen_img.sh
+
+# 4. Create videos
+python ../../create_vid.py -f img -p png_param.dat -t0 10 -tmax 100 -tdiff 10 -fps 5
+python ../../create_vid.py -f img -p png_param_T10.dat -t0 10 -tmax 100 -tdiff 10 -fps 5

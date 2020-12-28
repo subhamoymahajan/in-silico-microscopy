@@ -22,6 +22,7 @@ lam=np.zeros(10,dtype=int)
 lam_col_hue=np.zeros(10)
 lam_I0=np.zeros(10)
 fps = 5
+mono = 0
 for i in range(2,len(sys.argv),2):
     if sys.argv[i-1]=='-f':
         filename=sys.argv[i] #Starting filename without lambda or fs values
@@ -35,6 +36,11 @@ for i in range(2,len(sys.argv),2):
         tdiff=int(sys.argv[i]) 
     elif sys.argv[i-1]=='-fps':
         fps=int(sys.argv[i]) 
+    elif sys.argv[i-1]=='-type':
+        if sys.argv[i]=='mono':
+            mono=1
+        elif sys.argv[i]=='color':
+            mono=0
 
 f=open(paramfile)
 for lines in f:
@@ -60,23 +66,47 @@ for i in range(10):
 print('T = '+str(T)+'\nfs = '+str(fs)+'\ntmax = '+str(tmax)+'\nI0 = '+str(lam_I0)+'\ntdiff = '+str(tdiff))    
     
 import cv2
-vidname=filename+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.avi'
-fname=filename+str(t0)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
-if os.path.exists(fname):
-    img0=cv2.imread(fname)
-else:
-    print(fname+' does not exist')
-    sys.exit()
-h,w,l=img0.shape
-video=cv2.VideoWriter(vidname,0,fps,(w,h))
-
-for i in range(t0,tmax,tdiff):
-    fname=filename+str(i)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
+if mono==0:
+    vidname=filename+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.avi'
+    fname=filename+str(t0)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
     if os.path.exists(fname):
-        video.write(cv2.imread(fname))
+        img0=cv2.imread(fname)
     else:
-        print (fname+' does not exists')
+        print(fname+' does not exist')
         sys.exit()
-cv2.destroyAllWindows()
-video.release()
+    h,w,l=img0.shape
+    video=cv2.VideoWriter(vidname,0,fps,(w,h))
+    
+    for i in range(t0,tmax,tdiff):
+        fname=filename+str(i)+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(Istring)+'.png'
+        if os.path.exists(fname):
+            video.write(cv2.imread(fname))
+        else:
+            print (fname+' does not exists')
+            sys.exit()
+    cv2.destroyAllWindows()
+    video.release()
+elif mono==1:
+    for i in range(len(lam)):
+        if lam[i]<0.5:
+            break
+        vidname='mono_'+filename+'_lam'+str(lam[i])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0[i])+'.avi'
+        fname='mono_'+filename+str(t0)+'_lam'+str(lam[i])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0[i])+'.png'
+        if os.path.exists(fname):
+            img0=cv2.imread(fname)
+        else:
+            print(fname+' does not exist')
+            sys.exit()
+        h,w,l=img0.shape
+        video=cv2.VideoWriter(vidname,0,fps,(w,h))
+        
+        for t in range(t0,tmax,tdiff):
+            fname='mono_'+filename+str(t)+'_lam'+str(lam[i])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0[i])+'.png'
+            if os.path.exists(fname):
+                video.write(cv2.imread(fname))
+            else:
+                print (fname+' does not exists')
+                sys.exit()
+        cv2.destroyAllWindows()
+        video.release()
 
