@@ -13,6 +13,6 @@ Ll=15
 Lm=15
 Ln=50
 fs=800
-gpsf.psf_gandy(beta,lambd,dl,dm,dn,Ll,Lm,Lm,fs,'PSF_gandy_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
+gpsf.psf_gandy(beta,lambd,dl,dm,dn,Ll,Lm,Ln,fs,'PSF_gandy_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
 lambd=670
 gpsf.psf_gandy(beta,lambd,dl,dm,dn,Ll,Lm,Ln,fs,'PSF_gandy_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
