@@ -59,13 +59,13 @@ for lines in f:
             lam[int(foo[0][3])-1]=int(foo1[0])
 
 print('T = '+str(T)+'\nfs = '+str(fs)+'\nt = '+str(ti)+'\n')
-print('lam_I0 = ', lam_I0)    
 
 for i in range(10):
     if lam[i]<1: # no lambda
         break
 nlam=i 
 print('nlam = '+str(nlam))
+print('lam_I0 = ', lam_I0[:nlam])    
 
 Img_dat=[]
 T_dat=[]
