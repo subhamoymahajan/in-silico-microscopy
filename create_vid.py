@@ -54,16 +54,17 @@ for lines in f:
         if foo[0][-4:]=='_hue':
             lam_col_hue[int(foo[0][3])-1]=float(foo1[0])/360.0
         elif foo[0][-3:]=='_I0':
-            print(foo1)
             lam_I0[int(foo[0][3])-1]=float(foo1[0])    
         else:
             lam[int(foo[0][3])-1]=int(foo1[0])
 
 Istring=''
+nlam=0
 for i in range(10):
     if lam_I0[i]>1E-10:
         Istring=Istring+'_'+str(round(lam_I0[i],3))
-print('T = '+str(T)+'\nfs = '+str(fs)+'\ntmax = '+str(tmax)+'\nI0 = '+str(lam_I0)+'\ntdiff = '+str(tdiff))    
+        nlam+=1
+print('T = '+str(T)+'\nfs = '+str(fs)+'\nT0 = '+str(t0)+'\nTmax = '+str(tmax)+'\nI0 = '+str(lam_I0[:nlam])+'\ntdiff = '+str(tdiff))    
     
 import cv2
 if mono==0:
