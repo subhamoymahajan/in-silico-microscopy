@@ -20,6 +20,8 @@
 import scipy.integrate as integrate
 import scipy.special as special
 import numpy as np
+import multiprocessing as mp
+import os 
 
 def psf_gandy(beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname):
    Nn=int((int(Pn/dn)+1)/2)+1
@@ -52,7 +54,7 @@ def psf_gandy_sep(beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname,otype,nidx):
    
    w=open(outname,otype)
    if otype=='w':
-       w.write('# NA= '+str(NA)+' meu= '+str(meu)+' lambda= '+str(lambd)+' dl= '+str(dl)+' dm= '+str(dm)+' dn= '+str(dn)+' Pl= '+str(Pl)+' Pm= '+str(Pm)+' Pn= '+str(Pn)+' fs= '+str(fs)+'\n')
+       w.write('# Beta= '+str(beta)+' lambda= '+str(lambd)+' dl= '+str(dl)+' dm= '+str(dm)+' dn= '+str(dn)+' Pl= '+str(Pl)+' Pm= '+str(Pm)+' Pn= '+str(Pn)+' fs= '+str(fs)+'\n')
    Nl=int((int(Pl/dl)+1)/2)+1
    Nm=int((int(Pm/dm)+1)/2)+1
    n=round(nidx*dn,6)
@@ -68,6 +70,23 @@ def psf_gandy_sep(beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname,otype,nidx):
            I=round((H1[0]*H1[0]+H2[0]*H2[0])*A*A,6)
            w.write(str(l).rjust(10)+str(m).rjust(10)+str(n).rjust(10)+str(I).rjust(10)+'\n')
    print('n = '+str(n)+' done')
+
+def worker_gandy(data):
+    #              beta    lambd   dl      dm     dn       Pl      Pm      Pn       fs     outname  w       k
+    psf_gandy_sep(data[0],data[1],data[2],data[3],data[4],data[5],data[6],data[7],data[8],data[9],data[10],data[11])
+
+def psf_gandy_mp(beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname):
+
+   Nn=int((int(Pn/dn)+1)/2)+1
+   Arguments=[]
+   for k in range(Nn):
+       Arguments.append([beta,lambd,dl,dm,dn,Pl,Pm,Pn,fs,outname+'n'+str(k),'w',k])
+   pool=mp.Pool(mp.cpu_count())
+   results=pool.map(worker_gandy,Arguments)
+   os.system('mv '+outname+'n'+str(0)+' '+outname)
+   for k in range(1,Nn):
+       os.system('tail -n +2 '+outname+'n'+str(k)+' >> '+outname)
+       os.system('rm '+outname+'n'+str(k))
 
 #Ref: https://www.micro-shop.zeiss.com/en/us/shop/objectives/420493-9900-000/Objective-EC-Plan-Neofluar-100x-1.3-Oil-Pol-M27#/
 #Lens: Plan-Neofluar 100x/1.3
