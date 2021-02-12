@@ -31,17 +31,17 @@ siliscopy gen_psf --method gandy \
                  --output [output file header] \
                  --multiprocess 
 ```
-**Note1:** Details of parameters that should be included in the parameters file can be found at the end of this Readme file.
+> **_> **_Note1:_*_** Details of parameters that should be included in the parameters file can be found at the end of this Readme file.
 
-**Note2:** This can be run serially but is very slow. Serial code is not extensively tested.
+> **_> **_Note2:_*_** This can be run serially but is very slow. Serial code is not extensively tested.
 
-**Note3:** Creates file `output file header`\_lam`lam[i]`_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.
+> **_> **_Note3:_*_** Creates file `output file header`\_lam`lam[i]`_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.
 
 ### 2. Generate Monochrome Image Intensity 
 
 Calculate the monochrome image intensity using the convolution between PSF and particle number density (ρ), 
 
-<img src="https://render.githubusercontent.com/render/math?math=I(l^',m^')=\sum_{j=1}^N PSF(l^'-l_j,m^'-m_j,n_O-n_j)">
+<img src="https://render.githubusercontent.com/render/math?math=I(l^',m^')=\sum_{j=1}^> **_N PSF(l^'-l_j,m^'-m_j,n_O-n_j)">
 
 The output file consisted of intensity values for <img src="https://render.githubusercontent.com/render/math?math=(l^',m^')"> coordinates. 
 While evaluating <img src="https://render.githubusercontent.com/render/math?math=I">, periodic boundary condition was applied.
@@ -72,15 +72,15 @@ file1.gro,param1.dat,out1
 file2.gro,param2.dat,out2
 ```
 
-**Note1:** Index each output file with an index, which can be the timestep of the simulation.
+> **_Note1:_*** Index each output file with an index, which can be the timestep of the simulation.
 
-**Note2:** The file names `output file header`_lam`lam[i]`_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from `parameter file`.
+> **_Note2:_*** The file names `output file header`_lam`lam[i]`_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from `parameter file`.
 
-**Note3:** This runs a C-binary code for faster calculation.  
+> **_Note3:_*** This runs a C-binary code for faster calculation.  
 
-**Note4:** Use parallel processing when the number of files is high. Parallelism is not implemented for files.
+> **_Note4:_*** Use parallel processing when the number of files is high. Parallelism is not implemented for files.
 
-**Note5:** `GRO file` must contain only one timestep.
+> **_Note5:_*** `GRO file` must contain only one timestep.
 
 ### 3. Plot Images
 
@@ -106,15 +106,15 @@ siliscopy plot --file [filename header] \
                --calc specific \
                --output [output file header] 
 ```
-**Note1:** If `--output` is not provided, then `output file header` its taken to be the same as `filename header`
+> **_Note1:_*** If `--output` is not provided, then `output file header` its taken to be the same as `filename header`
 
-**Note2:** The file names `[output file header]``[timestep]`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg will be created, where `lam[i]`, `lam_I0[i]`, `fs`, `T` are read from `parameter file`.
+> **_Note2:_*** The file names `[output file header][timestep]`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg will be created, where `lam[i]`, `lam_I0[i]`, `fs`, `T` are read from `parameter file`.
 
-**Note3:** The timestep can be negative. This would imply the image does not have a timestep. Then, the output filename will be `output file header`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg\
+> **_Note3:_*** The timestep can be negative. This would imply the image does not have a timestep. Then, the output filename will be `output file header`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg\
 
-**Note4:** `filename header` should be the same as `output header` used in by `gen_mono`.
+> **_Note4:_*** `filename header` should be the same as `output header` used in by `gen_mono`.
 
-**Note5:** The calculation method `specific` and `spec` yeild the same results. 
+> **_Note5:_*** The calculation method `specific` and `spec` yeild the same results. 
 
 **Save multiple JPEG files with parallel processing**
 ```bash
@@ -127,22 +127,22 @@ siliscopy plot --file [filename header] \
 ```
 To calculate it serially remove `--multiprocess`
 
-**Note6:** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.
+> **_Note6:_*** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.
 
-**Note7:** The method name `gray`, `grey` and `mono` can be used interchangably.
+> **_Note7:_*** The method name `gray`, `grey` and `mono` can be used interchangably.
 
 
 #### Plot Color Image
 
 The commands remain the same as monochrome image. Replace the method `mono` with `color` or `col`.
  
-**Note1:** If outname is not provided its taken to be the same as `filename header`
+> **_Note1:_*** If outname is not provided its taken to be the same as `filename header`
 
-**Note2:** The file names `[output file header]``[timestep]`_fs`fs`_T`T`_I`lam_I0s`.jpeg will be created, where `fs`, `T` are read from `parameter file`. `lam_I0s` is a all `lam_I0[i]` in `parameter file` appended together with a '\_' separator. Example, '_[lam\_I0[0]]_[lam\_I0[1]]'.
+> **_Note2:_*** The file names `[output file header][timestep]`_fs`fs`_T`T`_I`lam_I0s`.jpeg will be created, where `fs`, `T` are read from `parameter file`. `lam_I0s` is a all `lam_I0[i]` in `parameter file` appended together with a '\_' separator. Example, '_[lam\_I0[0]]_[lam\_I0[1]]'.
 
-**Note3:** timestep can be negative. This would imply the image does not have a timestep. So the output filename is [output file header]_fs[fs]_T[T]_I[lam\_I0s].jpeg
+> **_Note3:_*** timestep can be negative. This would imply the image does not have a timestep. So the output filename is [output file header]_fs[fs]_T[T]_I[lam\_I0s].jpeg
 
-**Note4:** `filename header` is `output header` used in by `gen_mono`.
+> **_Note4:_*** `filename header` is `output header` used in by `gen_mono`.
 
 
 ### 5. Generate Video
