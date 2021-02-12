@@ -276,6 +276,7 @@ int main(int argc, char* argv[] )
    -f input filename (The gro file .gro)
    -o output filename (image data file)
    -p parameters file (input)
+   -psf PSF header name (input)
 */
 /////////////////////////////////////Define Variables////////////////////////////////////////////
     int i,j,k,l,val;
@@ -321,9 +322,14 @@ int main(int argc, char* argv[] )
            printf("paramfile is %s\n",paramfile);
            val++;
        }
+       else if (strcmp(argv[i-1],"-psf")==0){ // Parameters file
+           strcpy(psfheader,argv[i]);
+           printf("psfheader is %s\n",psfheader);
+           val++;
+       }
     }
-    if (val!=3){
-       printf("Provide all arguments -f (input file), -o (output file), and -p (parameters file)\n");
+    if (val!=4){
+       printf("Provide all arguments -f (input file), -o (output file), and -p (parameters file) -psf (psf fileheader)\n");
        return -1;
     }
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -366,10 +372,6 @@ int main(int argc, char* argv[] )
               a++;
            }
            printf("%s = [%d,%d,%d] #1 is on, 0 is off\n",varname,pbc[0],pbc[1],pbc[2]);
-       }
-       else if(strcmp(varname,"psfheader")==0){//Improve code.
-           strcpy(psfheader,a);
-           printf("%s = %s\n",varname,psfheader);
        }
        else if(strcmp(varname,"opt_axis")==0){
            opt_axis=atoi(a);

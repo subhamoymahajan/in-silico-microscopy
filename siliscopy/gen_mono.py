@@ -1,7 +1,7 @@
 import os
 import multiprocessing as mp
 def gen_mono_c(data):
-    os.system(os.path.dirname(__file__)+'/gen_mono -f '+data[0]+' -p '+data[1]+' -o '+data[2])
+    os.system(os.path.dirname(__file__)+'/gen_mono -f '+data[0]+' -p '+data[1]+' -psf '+data[2]+' -o '+data[3])
 
 def read_data(datafile):
     Arguments=[]

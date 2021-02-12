@@ -53,6 +53,7 @@ Single file:
 ```bash
 siliscopy gen_mono --file [GRO file] \
                    --paramfile [parameter file] \
+                   --psf [PSF file header]
                    --output [output file header]
 ```
 
@@ -65,11 +66,11 @@ To calculate it serially, remove `--multiprocess`.
 
 Template of data file:
 
-Store all filenames, parameter file (can be the same), output file header separated by ','. For each new monochrome image intensity evaluation, write the arguments in a new line. For example,
+Store all filenames, parameter file (can be the same), PSF header file name (can be the same), output file header separated by ','. For each new monochrome image intensity evaluation, write the arguments in a new line. For example,
 
 ```data
-file1.gro,param1.dat,out1
-file2.gro,param2.dat,out2
+file1.gro,param1.dat,psf.dat,out1
+file2.gro,param2.dat,psf.dat,out2
 ```
 
 > **_Note1:_** Index each output file with an index, which can be the timestep of the simulation.  
@@ -82,6 +83,8 @@ file2.gro,param2.dat,out2
 >  
 > **_Note5:_** `GRO file` must contain only one timestep.  
 >  
+> **_Note6:_** `PSF file header` is the same as `--output` in `gen_psf`.
+>
 
 ### 3. Plot Images
 
@@ -89,7 +92,7 @@ Generate *In-silico* microscopy images. If saved to a file, all images are saved
 
 #### Plot monochrome image
 
-Show specific file:
+Show specific file
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [Parameter file] \

@@ -11,6 +11,8 @@ def main():
                       help="Provide Gromacs containing 1 timestep.")
     parser.add_option('-p','--paramfile', dest="pfile", metavar="FILE", type="str",
                       help="Provide files containing all the parameters")
+    parser.add_option('-q','--psf', dest="psfheader", metavar="FILE", type="str",
+                      help="Starting name of the PSF file")
     parser.add_option('-o','--output', dest="outname", metavar="FILE", type="str",
                       help="Provide output filename")
     parser.add_option('-s','--multiprocess', dest="mprocess",action="store_true", default=False,
@@ -114,7 +116,7 @@ def main():
                 gen_mono_c_serial(options.data)
         else: #No data file
             # siliscopy gen_mono -f [gro] -p [param] -o [out]
-            gen_mono_c([options.filename,options.pfile,options.outname])
+            gen_mono_c([options.filename,options.pfile,options.psfheader,options.outname])
     
     elif remainder[0]=='plot':
         for key in ["lam","I0","T","fs","maxlen","dlmn","scale","dpi"]:
