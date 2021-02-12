@@ -1,21 +1,27 @@
-Generating my first in-silico microscopy image.
-1) Generate the the PSF
-term$ python run_genpsf.py
+# Tutorial 1: First in-silico microscopy image
 
-It will create two PSF for wavelength 670 nm and 518 nm. The code is currently slow. I will work on GPU accelerations (or hopefully someone else can help me with that).
+## 1. Generating PSF
 
-2) Generate in-silico monochrome images.
-a) Image data files
-term$ ../../gen_mono -p parameters.dat -f dp100.gro -o img100
-term$ ../../gen_mono -p parameters.dat -f dp2000.gro -o img2000
+```bash
+siliscopy gen_psf --method gandy --paramfile parameters.dat --calc all --output PSF_gandy --multiprocess
+```
 
-b) Render grey-scale images
-term$ python ../../render_mono.py -f img -p png_param.dat -t 100
-term$ python ../../render_mono.py -f img -p png_param.dat -t 2000
+## 2. Calculate Monochrome Intensities
 
-3) Generate colored in-silico monochrome image.
-term$ python ../../mono2color.py -f img -p png_param.dat -t 100
-term$ python ../../mono2color.py -f img -p png_param.dat -t 2000
+```bash
+siliscopy gen_mono --file dp100.gro --paramfile parameters.dat --psf PSF_gandy --output img100
+siliscopy gen_mono --file dp2000.gro --paramfile parameters.dat --psf PSF_gandy --output img2000
+```
 
+## 3. Plot Monochome In-silico Images
 
+```bash
+siliscopy plot --file img --paramfile parameters.dat --method mono --timestep 100 --calc specific 
+siliscopy plot --file img --paramfile parameters.dat --method mono --timestep 2000 --calc specific 
+```
 
+## 4. Plot Colored In-silico Images
+```bash
+siliscopy plot --file img --paramfile parameters.dat --method color --timestep 100 --calc specific 
+siliscopy plot --file img --paramfile parameters.dat --method color --timestep 2000 --calc specific 
+```
