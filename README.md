@@ -22,7 +22,6 @@ Generates a PSF file where each line represents the <img src="https://render.git
 
 Currently the PSF is only evaluated based on R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. 
 
-**Usage: parallel processing**
 
 ```bash
 siliscopy gen_psf --method gandy \
@@ -31,11 +30,9 @@ siliscopy gen_psf --method gandy \
                  --output [output file header] \
                  --multiprocess 
 ```
-> **_> **_Note1:_*_** Details of parameters that should be included in the parameters file can be found at the end of this Readme file.
-
-> **_> **_Note2:_*_** This can be run serially but is very slow. Serial code is not extensively tested.
-
-> **_> **_Note3:_*_** Creates file `output file header`\_lam`lam[i]`_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.
+> **_Note1:_*_** Details of parameters that should be included in the parameters file can be found at the end of this Readme file.  
+> **_Note2:_*_** This can be run serially but is very slow. Serial code is not extensively tested.  
+> **_Note3:_*_** Creates file `output file header`\_lam`lam[i]`_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.  
 
 ### 2. Generate Monochrome Image Intensity 
 
@@ -48,7 +45,7 @@ While evaluating <img src="https://render.githubusercontent.com/render/math?math
 The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> is between 0 and 1 (both included). Intensity of -1 was used in 
 to represent the white frame where molecular simulation system is absent (See Cite for more details).
 
-**Single file**
+Single file:
 
 ```bash
 siliscopy gen_mono --file [GRO file] \
@@ -56,14 +53,14 @@ siliscopy gen_mono --file [GRO file] \
                    --output [output file header]
 ```
 
-**Multiple file with parallel processing**
+Multiple file with parallel processing:
 ```bash
 siliscopy gen_mono --data [datafile] \
                    --multiprocess
 ```
 To calculate it serially, remove `--multiprocess`.
 
-**Template of data file:**
+Template of data file:
 
 Store all filenames, parameter file (can be the same), output file header separated by ','. For each new monochrome image intensity evaluation, write the arguments in a new line. For example,
 
@@ -72,15 +69,11 @@ file1.gro,param1.dat,out1
 file2.gro,param2.dat,out2
 ```
 
-> **_Note1:_*** Index each output file with an index, which can be the timestep of the simulation.
-
-> **_Note2:_*** The file names `output file header`_lam`lam[i]`_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from `parameter file`.
-
-> **_Note3:_*** This runs a C-binary code for faster calculation.  
-
-> **_Note4:_*** Use parallel processing when the number of files is high. Parallelism is not implemented for files.
-
-> **_Note5:_*** `GRO file` must contain only one timestep.
+> **_Note1:_** Index each output file with an index, which can be the timestep of the simulation.  
+> **_Note2:_** The file names `output file header`_lam`lam[i]`_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from `parameter file`.  
+> **_Note3:_** This runs a C-binary code for faster calculation.    
+> **_Note4:_** Use parallel processing when the number of files is high. Parallelism is not implemented for files.  
+> **_Note5:_** `GRO file` must contain only one timestep.  
 
 ### 3. Plot Images
 
@@ -88,7 +81,7 @@ Generate *In-silico* microscopy images. If saved to a file, all images are saved
 
 #### Plot monochrome image
 
-**Show specific file**
+Show specific file:
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [Parameter file] \
@@ -97,7 +90,7 @@ siliscopy plot --file [filename header] \
                --calc show
 ```
 
-**Save a specific JPEG file**
+Save a specific JPEG file:
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [parameter file] \
@@ -106,17 +99,13 @@ siliscopy plot --file [filename header] \
                --calc specific \
                --output [output file header] 
 ```
-> **_Note1:_*** If `--output` is not provided, then `output file header` its taken to be the same as `filename header`
+> **_Note1:_** If `--output` is not provided, then `output file header` its taken to be the same as `filename header`  
+> **_Note2:_** The file names `[output file header][timestep]`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg will be created, where `lam[i]`, `lam_I0[i]`, `fs`, `T` are read from `parameter file`.  
+> **_Note3:_** The timestep can be negative. This would imply the image does not have a timestep. Then, the output filename will be `output file header`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg\  
+> **_Note4:_** `filename header` should be the same as `output header` used in by `gen_mono`.  
+> **_Note5:_** The calculation method `specific` and `spec` yeild the same results.   
 
-> **_Note2:_*** The file names `[output file header][timestep]`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg will be created, where `lam[i]`, `lam_I0[i]`, `fs`, `T` are read from `parameter file`.
-
-> **_Note3:_*** The timestep can be negative. This would imply the image does not have a timestep. Then, the output filename will be `output file header`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg\
-
-> **_Note4:_*** `filename header` should be the same as `output header` used in by `gen_mono`.
-
-> **_Note5:_*** The calculation method `specific` and `spec` yeild the same results. 
-
-**Save multiple JPEG files with parallel processing**
+Save multiple JPEG files with parallel processing:
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [parameter file] \
@@ -127,29 +116,25 @@ siliscopy plot --file [filename header] \
 ```
 To calculate it serially remove `--multiprocess`
 
-> **_Note6:_*** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.
-
-> **_Note7:_*** The method name `gray`, `grey` and `mono` can be used interchangably.
+> **_Note6:_*** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.  
+> **_Note7:_*** The method name `gray`, `grey` and `mono` can be used interchangably.  
 
 
 #### Plot Color Image
 
 The commands remain the same as monochrome image. Replace the method `mono` with `color` or `col`.
  
-> **_Note1:_*** If outname is not provided its taken to be the same as `filename header`
-
-> **_Note2:_*** The file names `[output file header][timestep]`_fs`fs`_T`T`_I`lam_I0s`.jpeg will be created, where `fs`, `T` are read from `parameter file`. `lam_I0s` is a all `lam_I0[i]` in `parameter file` appended together with a '\_' separator. Example, '_[lam\_I0[0]]_[lam\_I0[1]]'.
-
-> **_Note3:_*** timestep can be negative. This would imply the image does not have a timestep. So the output filename is [output file header]_fs[fs]_T[T]_I[lam\_I0s].jpeg
-
-> **_Note4:_*** `filename header` is `output header` used in by `gen_mono`.
+> **_Note1:_*** If outname is not provided its taken to be the same as `filename header`  
+> **_Note2:_*** The file names `[output file header][timestep]`_fs`fs`_T`T`_I`lam_I0s`.jpeg will be created, where `fs`, `T` are read from `parameter file`. `lam_I0s` is a all `lam_I0[i]` in `parameter file` appended together with a '\_' separator. Example, '_[lam\_I0[0]]_[lam\_I0[1]]'.  
+> **_Note3:_*** timestep can be negative. This would imply the image does not have a timestep. So the output filename is [output file header]_fs[fs]_T[T]_I[lam\_I0s].jpeg  
+> **_Note4:_*** `filename header` is `output header` used in by `gen_mono`.  
 
 
 ### 5. Generate Video
 
 Generates a movie from a set of `JPEG` images.
 
-**Monochrome video**
+Monochrome video:  
 ```bash
 siliscopy video
                 --file [filename header] \
@@ -157,11 +142,11 @@ siliscopy video
                 --method mono \
 ```
 
-**Color video**
-
+Color video:  
 Use the method 'color' instead of 'mono'
 
-**Custom video from a list of image filenames**
+Custom video from a list of image filenames:
+
 ```bash
 siliscopy video --method data \
                 --data [data file] \
