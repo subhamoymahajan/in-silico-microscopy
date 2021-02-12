@@ -181,12 +181,12 @@ The parameter file should contain the following parameters (Not all are used in 
 * `lam[i]`: (int). Wavelenght of [i]th fluorophore type in nm. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. 
 * `lam_names[i]`: (str str ... str). Atom names of [i]th fluorophore type. Replace [i] with integers strating from 1. Currently 200 names are supported.
 * `dlmn`: (float float float). The voxel dimensions <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> in nm.  
-* `Plmn`: (float float float). The dimensions of the box in nm within which PSF is calculated; <img src="https://render.githubusercontent.com/render/math?math= P_{l^'}, P_{m^'}, P_{n^'}">
+* `Plmn`: (float float float). The dimensions of the box in nm within which PSF is calculated; <img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">
 * `psfheader`: = PSF\_gandy // starting characters with which PSF was saved (to be removed)
 * `pbc`: (str). Directions in which periodic boundary condition is active. `None`, `x`, `y`, `z`, `xy`, `yz`, `xz`, or `xyz`.
 * `NA`: (float). Numerical aperture.
 * `meu`: (float). Refractive index of immersion oil.
-* `beta`: (float). Maximum half-angle as seen from immersion oil. <img src="https://render.githubusercontent.com/render/math?math= sin^{-1}(NA/\mu)">.
+* `beta`: (float). Maximum half-angle as seen from immersion oil. <img src="https://render.githubusercontent.com/render/math?math=sin^{-1}(NA/\mu)">.
 * `T`: (int). Number of consecutive timesteps to average the the *in-silico* microscopy image.
 * `lam_hue[i]`: (float). Hue in degrees of [i]th fluorophore type. Replace [i] with integers starting from 1.
 * `lam_I0_[i]`:  (float). Maximum image intensity of of [i]th fluorophore type. Replace [i] with integers starting from 1.
