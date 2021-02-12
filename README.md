@@ -34,7 +34,7 @@ siliscopy gen_psf --method gandy \
 >   
 > **_Note2:_** This can be run serially but is very slow. Serial code is not extensively tested.  
 >  
-> **_Note3:_** Creates file `output file header`\_lam`lam[i]`_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.  
+> **_Note3:_** Creates file `output file header`\_lam`lam[i]`\_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.  
 >  
 
 ### 2. Generate Monochrome Image Intensity 
@@ -74,7 +74,7 @@ file2.gro,param2.dat,out2
 
 > **_Note1:_** Index each output file with an index, which can be the timestep of the simulation.  
 >  
-> **_Note2:_** The file names `output file header`_lam`lam[i]`_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from `parameter file`.  
+> **_Note2:_** The file names `output file header`\_lam`lam[i]`\_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from `parameter file`.  
 >  
 > **_Note3:_** This runs a C-binary code for faster calculation.    
 >  
@@ -109,11 +109,11 @@ siliscopy plot --file [filename header] \
 ```
 > **_Note1:_** If `--output` is not provided, then `output file header` its taken to be the same as `filename header`  
 >  
-> **_Note2:_** The file names `[output file header][timestep]`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg will be created, where `lam[i]`, `lam_I0[i]`, `fs`, `T` are read from `parameter file`.  
+> **_Note2:_** The file names `[output file header][timestep]`\_lam`lam[i]`\_fs`fs`\_T`T`\_I`lam\_I0[i]`.jpeg will be created, where `lam[i]`, `lam\_I0[i]`, `fs`, `T` are read from `parameter file`.  
 >  
-> **_Note3:_** The timestep can be negative. This would imply the image does not have a timestep. Then, the output filename will be `output file header`_lam`lam[i]`_fs`fs`_T`T`_I`lam_I0[i]`.jpeg\  
+> **_Note3:_** The timestep can be negative. This would imply the image does not have a timestep. Then, the output filename will be `output file header`\_lam`lam[i]`\_fs`fs`\_T`T`\_I`lam\_I0[i]`.jpeg\  
 >  
-> **_Note4:_** `filename header` should be the same as `output header` used in by `gen_mono`.  
+> **_Note4:_** `filename header` should be the same as `output header` used in by `gen\_mono`.  
 >   
 > **_Note5:_** The calculation method `specific` and `spec` yeild the same results.   
 
@@ -128,22 +128,22 @@ siliscopy plot --file [filename header] \
 ```
 To calculate it serially remove `--multiprocess`
 
-> **_Note6:_*** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.  
+> **_Note6:_** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.  
 >  
-> **_Note7:_*** The method name `gray`, `grey` and `mono` can be used interchangably.  
+> **_Note7:_** The method name `gray`, `grey` and `mono` can be used interchangably.  
 >  
 
 #### Plot Color Image
 
 The commands remain the same as monochrome image. Replace the method `mono` with `color` or `col`.
  
-> **_Note1:_*** If outname is not provided its taken to be the same as `filename header`  
+> **_Note1:_** If outname is not provided its taken to be the same as `filename header`  
 >  
-> **_Note2:_*** The file names `[output file header][timestep]`_fs`fs`_T`T`_I`lam_I0s`.jpeg will be created, where `fs`, `T` are read from `parameter file`. `lam_I0s` is a all `lam_I0[i]` in `parameter file` appended together with a '\_' separator. Example, '_[lam\_I0[0]]_[lam\_I0[1]]'.  
+> **_Note2:_** The file names `[output file header][timestep]`_fs`fs`_T`T`_I`lam\_I0s`.jpeg will be created, where `fs`, `T` are read from `parameter file`. `lam\_I0s` is a all `lam\_I0[i]` in `parameter file` appended together with a '\_' separator. Example, '\_[lam\_I0[0]]\_[lam\_I0[1]]'.  
 >  
-> **_Note3:_*** timestep can be negative. This would imply the image does not have a timestep. So the output filename is [output file header]_fs[fs]_T[T]_I[lam\_I0s].jpeg  
+> **_Note3:_** timestep can be negative. This would imply the image does not have a timestep. So the output filename is [output file header]\_fs[fs]\_T[T]\_I[lam\_I0s].jpeg  
 >  
-> **_Note4:_*** `filename header` is `output header` used in by `gen_mono`.  
+> **_Note4:_** `filename header` is `output header` used in by `gen\_mono`.  
 >  
 
 ### 5. Generate Video
@@ -174,27 +174,27 @@ siliscopy video --method data \
 
 The parameter file should contain the following parameters (Not all are used in every step). 
 
-* fs: (int). Full-Width-at-Half-Maximum (FWHM) scaling factor. Equivalently scales all molecular simulation coordinates or the wave vector.  
-* maxlen: (float float float). Maximum molecular simulation box dimensions in nm.
-* focus_cor:  (float). The n-coordinate (in gro file) at whic the *in-silico* microscope is focused in nm.
-* opt_axis: (int). The direction of the optical axis. 0 => x, 1 => y, 2 => z.
-* lam[i]: (int). Wavelenght of [i]th fluorophore type in nm. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. 
-* lam_names[i]: (str str ... str). Atom names of [i]th fluorophore type. Replace [i] with integers strating from 1. Currently 200 names are supported.
-* dlmn: (float float float). The voxel dimensions <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> in nm.  
-* Plmn: (float float float). The dimensions of the box in nm within which PSF is calculated; <img src="https://render.githubusercontent.com/render/math?math= P_{l^'}, P_{m^'}, P_{n^'}">
-* psfheader: = PSF_gandy // starting characters with which PSF was saved (to be removed)
-* pbc: (str). Directions in which periodic boundary condition is active. `None`, `x`, `y`, `z`, `xy`, `yz`, `xz`, or `xyz`.
-* NA: (float). Numerical aperture.
-* meu: (float). Refractive index of immersion oil.
-* beta: (float). Maximum half-angle as seen from immersion oil. <img src="https://render.githubusercontent.com/render/math?math= sin^{-1}(NA/\mu)">.
-* T: (int). Number of consecutive timesteps to average the the *in-silico* microscopy image.
-* lam\_hue[i]: (float). Hue in degrees of [i]th fluorophore type. Replace [i] with integers starting from 1.
-* lam\_I0\_[i] = (float). Maximum image intensity of of [i]th fluorophore type. Replace [i] with integers starting from 1.
-* scale: (float). Length of scale bar in nm. 
-* dpi: (int). Dots per square inch of the output image. The image resolution is also dependent on `dlmn`. 
-* t0: (int). Index associated with first timestep (will be included).
-* tmax: (int). Index associated with last timestep (will not be included).
-* tdiff: (int). Difference in index associated with timestep.
-* fps: (int). Frames per second of the output video. (default value is 1)
-* vid`_ext: (str). The extension of the output video. (default value is .mov)
-* fourcc: ('str'). The four character code of the encoder with which video will be created. (default value is 'mp4v') 
+* `fs`: (int). Full-Width-at-Half-Maximum (FWHM) scaling factor. Equivalently scales all molecular simulation coordinates or the wave vector.  
+* `maxlen`: (float float float). Maximum molecular simulation box dimensions in nm.
+* `focus\_cor`:  (float). The n-coordinate (in gro file) at whic the *in-silico* microscope is focused in nm.
+* `opt\_axis`: (int). The direction of the optical axis. 0 => x, 1 => y, 2 => z.
+* `lam[i]`: (int). Wavelenght of [i]th fluorophore type in nm. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. 
+* `lam\_names[i]`: (str str ... str). Atom names of [i]th fluorophore type. Replace [i] with integers strating from 1. Currently 200 names are supported.
+* `dlmn`: (float float float). The voxel dimensions <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> in nm.  
+* `Plmn`: (float float float). The dimensions of the box in nm within which PSF is calculated; <img src="https://render.githubusercontent.com/render/math?math= P_{l^'}, P_{m^'}, P_{n^'}">
+* `psfheader`: = PSF`_gandy // starting characters with which PSF was saved (to be removed)
+* `pbc`: (str). Directions in which periodic boundary condition is active. `None`, `x`, `y`, `z`, `xy`, `yz`, `xz`, or `xyz`.
+* `NA`: (float). Numerical aperture.
+* `meu`: (float). Refractive index of immersion oil.
+* `beta`: (float). Maximum half-angle as seen from immersion oil. <img src="https://render.githubusercontent.com/render/math?math= sin^{-1}(NA/\mu)">.
+* `T`: (int). Number of consecutive timesteps to average the the *in-silico* microscopy image.
+* `lam\_hue[i]`: (float). Hue in degrees of [i]th fluorophore type. Replace [i] with integers starting from 1.
+* `lam\_I0\_[i]` = (float). Maximum image intensity of of [i]th fluorophore type. Replace [i] with integers starting from 1.
+* `scale`: (float). Length of scale bar in nm. 
+* `dpi`: (int). Dots per square inch of the output image. The image resolution is also dependent on `dlmn`. 
+* `t0`: (int). Index associated with first timestep (will be included).
+* `tmax`: (int). Index associated with last timestep (will not be included).
+* `tdiff`: (int). Difference in index associated with timestep.
+* `fps`: (int). Frames per second of the output video. (default value is 1)
+* `vid\_ext`: (str). The extension of the output video. (default value is .mov)
+* `fourcc`: ('str'). The four character code of the encoder with which video will be created. (default value is 'mp4v') 
