@@ -8,12 +8,13 @@ The programs are developed for GROMACS (.gro) files in mind. Please look at the 
 If you are using these set of programs for your research publications, don't forget to cite (Cite). This software 
 package is free to use as long as you comply to the license (GPLv3).
 
+## Installation
+
+```bash
+python setup.py install --user
+```
 
 ## Quickstart
-
-### 0. parameters file
-
-
 
 ### 1. Generate Point Spread Function
 
@@ -31,8 +32,10 @@ siliscopy gen_psf --method gandy \
                  --multiprocess 
 ```
 **Note1:** Details of parameters that should be included in the parameters file can be found at the end of this Readme file.
+
 **Note2:** This can be run serially but is very slow. Serial code is not extensively tested.
-**Note3:** Creates file [output file header]_lam[lam[i]]_fs[fs].dat, where [lam[i]] and [fs] are read from [parameter file]
+
+**Note3:** Creates file `output file header`\_lam`lam[i]`_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.
 
 ### 2. Generate Monochrome Image Intensity 
 
