@@ -23,35 +23,46 @@ import multiprocessing as mp
 import sys
 small=1E-10
 
-def get_grey_img(filename,I0,lam,T,ti,fs,Blmn,dlmn,whiteframe=False):
+def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=False):
     """ Calculates greyscale image
      
-        Parameters
-        ----------
-        filename: str
-            Filename header for image data file
-        I0: float
-            The maximum image intensity 
-        lam: int
-            The wavelength
-        T: int
-            Number of timesteps to perform an average.
-        ti: int
-            timestep of the image data file. -1 if there is no sense of time
-            (static system).
-        fs: int
-            Scaling factor for wave vector or MS position coordinates.
-        Blmn: array of floats
+    Parameters
+    ----------
+    filename: str
+        Filename header for image data file
+    I0: float
+        The maximum image intensity 
+    lam: int
+        The wavelength
+    T: int
+        Number of timesteps to perform an average.
+    ti: int
+        timestep of the image data file. -1 if there is no sense of time
+        (static system).
+    fs: int
+        Scaling factor for wave vector or MS position coordinates.
+    MaxBox: array of ints
+        Contains the number of pixels in the image in l and m directions.
+    whiteframe: Bool, optional
+        True keeps the image intensity of white frame as -1. False converts
+        the image intensities of -1 to 1. (default is False).
+   
+    Returns
+    -------
+    IMG: 2D ndarray
+        Image intensities between 0 and 1. Image intensity of -1 implies white 
+        frame (absence of molecular simulation system).
     """
     if ti<0 and T>1:
         raise Exception('More than one timesteps cannot be accomodate '+ \
                         'for a simulation without time.')
 
-    IMG=np.zeros((int(Blmn[0]/dlmn[0]),int(Blmn[1]/dlmn[1])))
-    Cnt=np.zeros((int(Blmn[0]/dlmn[0]),int(Blmn[1]/dlmn[1])),dtype=int)
+    IMG=np.zeros((MaxBox[0],MaxBox[1]))
+    Cnt=np.zeros((MaxBox[0],MaxBox[1]),dtype=int)
     for i in range(T):
         if ti>=0:
-            fname=filename+str(i+ti)+'_lam'+str(lam)+'_fs'+str(fs)+'.dat'
+            fname=filename + str(i+ti) + '_lam' + str(lam) + '_fs' + \
+                  str(fs) + '.dat'
         else:
             fname=filename+'_lam'+str(lam)+'_fs'+str(fs)+'.dat'
         
@@ -82,7 +93,7 @@ def get_grey_img(filename,I0,lam,T,ti,fs,Blmn,dlmn,whiteframe=False):
                     IMG[j,k]=1 #white background image
     return IMG
 
-def add_scale(IMG,scale,Bm):
+def add_scale(IMG, scale, Bm):
     """ Adds a scale bar to the in-silico image
        
     Parameters
@@ -108,7 +119,8 @@ def add_scale(IMG,scale,Bm):
             IMG[j][i]=1.0
     return IMG
 
-def plot_ism(IMG,lam_I0,lam,T,ti,fs,img_hei=3.0,filename=None,show=False,gcolmap='gray',dpi=600):
+def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None, 
+    show=False, gcolmap='gray', dpi=600):
     """ Plots in-silico microscopy image.
     
     Parameters
@@ -140,7 +152,8 @@ def plot_ism(IMG,lam_I0,lam,T,ti,fs,img_hei=3.0,filename=None,show=False,gcolmap
     Writes
     ------
     [filename]: JPEG Image file
-        Writes the in-silico microscopy image if show is False and filename is not None
+        Writes the in-silico microscopy image if show is False and filename 
+        is not None
     """
     consts=IMG.shape
     img_width=consts[1]*img_hei/consts[0]
@@ -148,9 +161,9 @@ def plot_ism(IMG,lam_I0,lam,T,ti,fs,img_hei=3.0,filename=None,show=False,gcolmap
     if img_width<3:
         fontS=img_width*72/18.0
     
-    fig,ax=plt.subplots(1,1,figsize=(img_width,img_hei))
+    fig,ax=plt.subplots(1, 1, figsize=(img_width, img_hei))
     if len(consts)==2: #Greyscale
-        ax.imshow(IMG,vmin=0, vmax=1,cmap=gcolmap)
+        ax.imshow(IMG, vmin=0, vmax=1, cmap=gcolmap)
     else: #Color
         ax.imshow(IMG)
         Istring=''
@@ -167,29 +180,57 @@ def plot_ism(IMG,lam_I0,lam,T,ti,fs,img_hei=3.0,filename=None,show=False,gcolmap
     
     if ti>=0:#dynamic gro structure 
         if len(lam_I0)==1: #mono
-            fname=filename+str(ti)+'_lam'+str(lam[0])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0[0])+'.jpeg'
+            fname=filename + str(ti) + '_lam' + str(lam[0]) + '_fs' + \
+                  str(fs) + '_T' + str(T) + '_I' + str(lam_I0[0]) + '.jpeg'
         else:#color
-            fname=filename+str(ti)+'_fs'+str(fs)+'_T'+str(T)+'_I'+Istring+'.jpeg'
+            fname=filename + str(ti) + '_fs' + str(fs) + '_T' + str(T) + \
+                  '_I' + Istring + '.jpeg'
     else:# static gro structure
         if len(lam_I0)==1:#mono
-            fname=filename+'_lam'+str(lam[0])+'_fs'+str(fs)+'_I'+str(lam_I0[0])+'.jpeg'
+            fname=filename + '_lam' + str(lam[0]) + '_fs' + str(fs) + '_I' + \
+                  str(lam_I0[0]) + '.jpeg'
         else:#color
-            fname=filename+'_fs'+str(fs)+'_T'+str(T)+'_I'+Istring+'.jpeg'
+            fname=filename + '_fs' + str(fs) + '_T' + str(T) + '_I' + \
+                  Istring + '.jpeg'
 
     print('Writing: '+fname)
     plt.savefig(fname,dpi=dpi,quality=100)
     plt.close()
     return
 
-def get_col_img(filename,lam_I0s,lams,lam_hues,T,ti,fs,Blmn,dlmn):
+def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
     """ Calculates the image intensity for a color image,
 
     Parameters
-    -----
+    ----------
+    filename: str
+        Filename header for image data file
+    lam_I0s: array of floats
+        The maximum image intensity of all fluorophore types
+    lams: array of int
+        The wavelength of all flurophore types
+    lam_hues: array of floats
+        The hue in degree of all fluorophore types
+    T: int
+        Number of timesteps to perform an average.
+    ti: int
+        timestep of the image data file. -1 if there is no sense of time
+        (static system).
+    fs: int
+        Scaling factor for wave vector or MS position coordinates.
+    MaxBox: array of ints
+        Contains the number of pixels in the image in l and m directions.
+   
+    Returns
+    ------- 
+    IMG: 3D ndarray
+        Axis 2 corresponds to red, green and blue channels. Image intensities 
+        between 0 and 1.
     """
     IMGs=[]
     for i in range(len(lams)):
-        IMGs.append(get_grey_img(filename,lam_I0s[i],lams[i],T,ti,fs,Blmn,dlmn,whiteframe=True))
+        IMGs.append(get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs,
+                    MaxBox, whiteframe=True))
     consts=IMGs[0].shape
     col_IMG=np.zeros((consts[0],consts[1],3))
     for i in range(consts[0]):
@@ -208,9 +249,12 @@ def get_col_img(filename,lam_I0s,lams,lam_hues,T,ti,fs,Blmn,dlmn):
                 ncol=0
                 for lam_id in range(len(lams)):
                     if IMGs[lam_id][i,j]>small:
-                        # V*e^(i(hue)) #I0 was multiplied when determining grey images.
-                        xres+=IMGs[lam_id][i,j]*np.cos(lam_hues[lam_id]*2*np.pi/360)   
-                        yres+=IMGs[lam_id][i,j]*np.sin(lam_hues[lam_id]*2*np.pi/360)
+                        # V*e^(i(hue)) #I0 was multiplied when determining 
+                        # grey images.
+                        xres+=IMGs[lam_id][i,j]*np.cos(lam_hues[lam_id]* \
+                                                       2*np.pi/360)   
+                        yres+=IMGs[lam_id][i,j]*np.sin(lam_hues[lam_id]* \
+                                                       2*np.pi/360)
                         Is.append(IMGs[lam_id][i,j])
                         ncol+=1
 
@@ -235,6 +279,7 @@ def get_col_img(filename,lam_I0s,lams,lam_hues,T,ti,fs,Blmn,dlmn):
                 # for colorsys module hres should be belong to [0,1]
                 rgb=list(colorsys.hsv_to_rgb(hres,sres,vres))
                 col_IMG[i,j,:]=rgb[:]
+
     for i in range(consts[0]):
         for j in range(consts[1]):
             for k in range(3):
@@ -242,47 +287,101 @@ def get_col_img(filename,lam_I0s,lams,lam_hues,T,ti,fs,Blmn,dlmn):
                     col_IMG[i,j,k]=1.0
     return col_IMG    
 
-def plot_grey_img(filename,lam_I0s,lams,T,ti,fs,Blmn,dlmn,scale,dpi=600,outfile=None):
-    for i in range(len(lams)):
-        IMG=get_grey_img(filename,lam_I0s[i],lams[i],T,ti,fs,Blmn,dlmn)
-        IMG=add_scale(IMG,scale,Blmn[1])
-        plot_ism(IMG,[lam_I0s[i]],[lams[i]],T,ti,fs,filename=outfile,dpi=dpi)
-
-def plot_col_img(filename,lam_I0s,lams,lam_hues,T,ti,fs,Blmn,dlmn,scale,dpi=600,outfile=None):
-    IMG=get_col_img(filename,lam_I0s,lams,lam_hues,T,ti,fs,Blmn,dlmn)
-    IMG=add_scale(IMG,scale,Blmn[1])
-    plot_ism(IMG,lam_I0s,lams,T,ti,fs,filename=outfile,dpi=dpi)
-
-def plot_grey_serial(filename,lam_I0s,lams,T,t0,tmax,tdiff,fs,Blmn,dlmn,scale,dpi,outname):
-    for i in range(t0,tmax,tdiff):
-        worker_grey([filename,lam_I0s,lams,T,i,fs,Blmn,dlmn,scale,dpi,outname])
+def plot_grey_img(filename, lam_I0s, lams, T, ti, fs, MaxBox, Bm, scale, 
+    dpi=600, outfile=None):
+    """ Plots greyscale or monochrome image with a scale.
     
-def plot_col_serial(filename,lam_I0s,lams,lam_hues,T,t0,tmax,tdiff,fs,Blmn,dlmn,scale,dpi,outname):
-    for i in range(t0,tmax,tdiff):
-        worker_col([filename,lam_I0s,lams,lam_hues,T,i,fs,Blmn,dlmn,scale,dpi,outname])
+    See functions get_grey_img, add_scale and plot_ism for more details.
+    """
+    for i in range(len(lams)):
+        IMG=get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs, MaxBox)
+        IMG=add_scale(IMG, scale, Bm)
+        plot_ism(IMG, [lam_I0s[i]], [lams[i]], T, ti, fs, filename=outfile,
+                 dpi=dpi)
 
-def plot_grey_mp(filename,lam_I0s,lams,T,t0,tmax,tdiff,fs,Blmn,dlmn,scale,dpi,output):
+def plot_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, Bm, 
+    scale, dpi=600, outfile=None):
+    """ Plots coloured image with a scale.
+    
+    See functions get_col_img, add_scale and plot_ism for more details.
+    """
+    IMG=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox)
+    IMG=add_scale(IMG, scale, Bm)
+    plot_ism(IMG,  lam_I0s,  lams,  T,  ti,  fs,  filename=outfile,  dpi=dpi)
+
+def plot_grey_serial(filename, lam_I0s, lams, T, t0, tmax, tdiff, fs, MaxBox,
+    Bm, scale, dpi, outname):
+    """ Plots several greyscale or monochrome images serially.
+
+    See plot_grey_img for more details.
+    """
+    for i in range(t0,tmax,tdiff):
+        worker_grey([filename, lam_I0s, lams, T, i, fs, MaxBox, Bm, scale, dpi, 
+                     outname])
+    
+def plot_col_serial(filename, lam_I0s, lams, lam_hues, T, t0, tmax, tdiff, fs, 
+    MaxBox, Bm, scale, dpi, outname):
+    """ Plots several coloured images serially.
+
+    See plot_col_img for more details.
+    """
+    for i in range(t0,tmax,tdiff):
+        worker_col([filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, Bm, 
+                    scale, dpi, outname])
+
+def plot_grey_mp(filename, lam_I0s, lams, T, t0, tmax, tdiff, fs, MaxBox, Bm, 
+    scale, dpi, output):
+    """ Plots several greyscale or monochrome images parallelly.
+
+    See plot_grey_img for more details.
+    """
+
     Arguments=[]
     for i in range(t0,tmax,tdiff): 
-        Arguments.append([filename,lam_I0s,lams,T,i,fs,Blmn,dlmn,scale,dpi,output])
+        Arguments.append([filename, lam_I0s, lams, T, i, fs, MaxBox, Bm, scale, 
+                          dpi, output])
     cpus=mp.cpu_count()
     if len(Arguments)<cpus:
         cpus=len(Arguments)
     pool=mp.Pool(cpus)
-    results=pool.map(worker_grey,Arguments)
+    results=pool.map(worker_grey, Arguments)
 
-def plot_col_mp(filename,lam_I0s,lams,lam_hues,T,t0,tmax,tdiff,fs,Blmn,dlmn,scale,dpi,output):
+def plot_col_mp(filename, lam_I0s, lams, lam_hues, T, t0, tmax, tdiff, fs, 
+    MaxBox, Bm, scale, dpi, output):
+    """ Plots several coloured images parallely.
+
+    See plot_col_img for more details.
+    """
     Arguments=[]
     for i in range(t0,tmax,tdiff):
-        Arguments.append([filename,lam_I0s,lams,lam_hues,T,i,fs,Blmn,dlmn,scale,dpi,output])
+        Arguments.append([filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, 
+                          Bm, scale, dpi, output])
     cpus=mp.cpu_count()
     if len(Arguments)<cpus:
         cpus=len(Arguments)
     pool=mp.Pool(cpus)
-    results=pool.map(worker_col,Arguments)
+    results=pool.map(worker_col, Arguments)
 
 def worker_grey(Args):
-    plot_grey_img(Args[0],Args[1],Args[2],Args[3],Args[4],Args[5],Args[6],Args[7],Args[8],dpi=Args[9],outfile=Args[10])
+    """ Runs plot_grey_img for a list of arguments.
 
+    See plot_grey_img for more details
+    """
+    #             Args[0]  Args[1]  Args[2]  Args[3]  Args[4]  Args[5] 
+    #            filename  lam_I0s    lams      T        ti       fs     
+    plot_grey_img(Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], 
+                  Args[6], Args[7], Args[8], dpi=Args[9], outfile=Args[10])
+               #  Args[6]  Args[7]  Args[8]    Args[9]      Args[10]
+               #  MaxBox      Bm     scale      dpi          output
 def worker_col(Args):
-    plot_col_img(Args[0],Args[1],Args[2],Args[3],Args[4],Args[5],Args[6],Args[7],Args[8],Args[9],dpi=Args[10],outfile=Args[11])
+    """ Runs plot_col_img for a list of arguments.
+
+    See plot_col_img for more details
+    """
+    #             Args[0] Args[1]  Args[2]  Args[3]  Args[4]  Args[5]  Args[6]
+    #            filename lam_I0s    lams   lam_hues    T       ti       fs
+    plot_col_img(Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6],
+                  Args[7], Args[8], Args[9], dpi=Args[10], outfile=Args[11])
+               #  Args[7]  Args[8]  Args[9]    Args[10]       Args[11]
+               #  MaxBox     Bm      scale       dpi           output
+

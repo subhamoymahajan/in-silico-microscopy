@@ -21,6 +21,11 @@ import numpy as np
 import cv2
 
 def gen_vid(begin_name,end_name,vid_ext,fps,t0,tmax,tdiff,fourcc):
+    """ Generates a video from given begining and ending names of JPEG images.
+    
+    Parameters
+    ----------
+    """
     vidname=begin_name+end_name+vid_ext
     fname=begin_name+str(t0)+end_name+'.jpeg'
     if not os.path.exists(fname):
