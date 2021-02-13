@@ -1,4 +1,4 @@
-#    Copyright 2020 SUBHAMOY MAHAJAN 
+#    Copyright 2020,2021 SUBHAMOY MAHAJAN 
 #    
 #    This file is part of InSilicoMicroscopy software.
 # 
