@@ -75,17 +75,17 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=False):
             for k in range(len(IMG[0])):
                 I=float(foo[k])*I0
                 if I>1:
-                    IMG[j,k]=1.0
+                    IMG[j,k]+=1.0
                     Cnt[j,k]+=1
                 elif I>= -small:
-                    IMG[j,k]=I
+                    IMG[j,k]+=I
                     Cnt[j,k]+=1
                 # else its white frame - do nothing
             j+=1                            
     for j in range(len(IMG)):
         for k in range(len(IMG[0])):
             if Cnt[j,k]>0:
-                IMG[j,k]=IMG[j,k]/Cnt[j,k]
+                IMG[j,k]=IMG[j,k]/float(Cnt[j,k])
             else:
                 if whiteframe:
                     IMG[j,k]=-1
