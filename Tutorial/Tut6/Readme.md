@@ -1,10 +1,14 @@
-Generating my first in-silico microscopy image.
-1) Generate in-silico monochrome images. 
-Image data files
-term$ bash gen_Pn.sh
+# Tutorial 6 - Generating *in-silico* microsocpy image with different thickness of excitation
 
-2) Generate colored in-silico monochrome image.
-term$ bash gen_Pn_png.sh
+## 1. Generate in-silico monochrome images. 
+```bash
+bash gen_Pn.sh
+```
+
+## 2. Generate colored in-silico monochrome image.
+```bash
+bash gen_Pn_png.sh
+```
 
 
 

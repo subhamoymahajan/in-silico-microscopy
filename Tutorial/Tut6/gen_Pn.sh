@@ -1,7 +1,8 @@
 #!/bin/bash
 
-for PN in 1 10 20 30 40 50
+for PN in 1 5 25
 do
-     sed "s/Lpsf =.*/Lpsf = 15\.0 15\.0 ${PN}\.0/g" parameters.dat > foo.dat 
-     ../../gen_mono -f dp100.gro -p foo.dat -o Pn${PN}_img100
+     sed "s/Plmn\s*=.*/Plmn = 15\.0 15\.0 ${PN}\.0/g" parameters.dat > foo.dat 
+     siliscopy gen_mono --file dp100.gro --paramfile foo.dat --psf PSF_gandy \
+                        --output Pn${PN}_img100
 done
