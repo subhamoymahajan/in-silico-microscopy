@@ -1,11 +1,17 @@
 # Generating *in-silico* microscopy images with different hues.
 
-##Red-green
-siliscopy plot --file img --paramfile param\_rg.dat --method color --timestep 100 --calc specific --output img\_rg\_
-##Orange-Violet
-siliscopy plot --file img --paramfile param\_ov.dat --method color --timestep 100 --calc specific --output img\_ov\_
-##Cyan-Magenta
-siliscopy plot --file img --paramfile param\_cm.dat --method color --timestep 100 --calc specific --output img\_cm\_
+## Red-green
+```bash
+siliscopy plot --file img --paramfile param_rg.dat --method color --timestep 100 --calc specific --output img_rg_
+```
+## Orange-Violet
+```bash
+siliscopy plot --file img --paramfile param_ov.dat --method color --timestep 100 --calc specific --output img_ov_
+```
+## Cyan-Magenta
+```bash
+siliscopy plot --file img --paramfile param_cm.dat --method color --timestep 100 --calc specific --output img_cm_
+```
 
 
 
