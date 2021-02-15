@@ -124,8 +124,11 @@ def main():
                                   params['fs'], options.outname)
             elif options.calc in ["specific", "spec"]: #Calculates for one n'
                 for lambd in params['lam']:
+                    outname = options.outname + '_lam' + str(lambd) + \
+                              '_fs' + str(params['fs']) + '_' + \
+                              str(options.nid) + '.dat'
                     psf_gandy_sep(beta, lambd, params['dlmn'], params['Plmn'], 
-                        params['fs'],options.outname,'w',options.nid)
+                        params['fs'],outname,'w',options.nid)
     
     elif remainder[0]=='gen_mono':
         if options.data!=None: #Data available in a file
