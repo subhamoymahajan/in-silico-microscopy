@@ -21,6 +21,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing as mp
 import sys
+import copy
 small=1E-10
 
 def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=False):
@@ -285,7 +286,198 @@ def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
             for k in range(3):
                 if col_IMG[i,j,k]<-small:
                     col_IMG[i,j,k]=1.0
-    return col_IMG    
+    return col_IMG   
+
+def plot_lumin(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
+    """ Interactively plot small portions of colored the in-silico microscopy
+        image, the relative luminescence, and hue as a funciton in pixel 
+        distance from the central pixel.
+
+    Parameters
+    ----------
+    filename: str
+        Filename header for image data file
+    lam_I0s: array of floats
+        The maximum image intensity of all fluorophore types
+    lams: array of int
+        The wavelength of all flurophore types
+    lam_hues: array of floats
+        The hue in degree of all fluorophore types
+    T: int
+        Number of timesteps to perform an average.
+    ti: int
+        timestep of the image data file. -1 if there is no sense of time
+        (static system).
+    fs: int
+        Scaling factor for wave vector or MS position coordinates.
+    MaxBox: array of ints
+        Contains the number of pixels in the image in l and m directions.
+   
+    Writes
+    ------
+        Ineteractively write the image generated in a custom filename.
+    """
+    col_IMGs=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox)
+    consts=col_IMGs.shape
+    img_hei=3.0
+    img_width=consts[1]*img_hei/consts[0]
+    fig,ax=plt.subplots(1, 1, figsize=(img_width, img_hei))
+    ax.set_xticks([])
+    ax.set_yticks([])
+    plt.axis('off')
+    plt.tight_layout(pad=0)
+    ax.imshow(col_IMGs)
+    plt.show(block=False)
+
+    while True:
+        print("Image dimensions are "+str(consts[0])+','+str(consts[1]))
+        foo = input("Enter the pixel of interest (x,y): ")
+        x,y=[int(x) for x in foo.split()]  
+        width= int(input("Enter width in pixels: "))
+        vals=[x,consts[0]-x,y,consts[1]-y]
+        if min(vals)<width:
+            width=min(vals)
+        d=[]
+        Lumin=[]
+        Hue=[]
+        for i in range(-width,width+1):
+            for j in range(-width,width+1):
+                d.append(np.sqrt(i**2+j**2)) 
+                rgb=copy.deepcopy(col_IMGs[i+x,j+y,:])
+                for k in range(3):
+                   if rgb[k]<=0.03928:
+                       rgb[k]=rgb[k]/12.92
+                   else:
+                       rgb[k]=((rgb[k]+0.055)/1.055)**2.4
+                #Reference
+                hsv=list(colorsys.rgb_to_hsv(rgb[0],rgb[1],rgb[2]))
+                Hue.append(hsv[0]*360)
+                Lumin.append(0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2])
+        fig,ax=plt.subplots(1, 3, figsize=(img_width*3, img_hei))
+        ax[0].set_xticks([])
+        ax[0].set_yticks([])
+        ax[0].axis('off')
+        ax[0].imshow(col_IMGs[x-width:x+width+1,y-width:y+width+1])
+        ax[1].scatter(d,Lumin,c='k')
+        ax[1].set_ylabel('Luminesence')
+        ax[1].set_xlabel('Pixel distance')
+        ax[2].scatter(d,Hue,c='k')
+        ax[2].set_ylabel('Hue (deg)')
+        ax[2].set_xlabel('Pixel distance')
+        plt.tight_layout()
+        plt.show(block=False)
+        save=input("Save figure, contiune or quit (s/c/q)?")
+        if save=='s':
+            outname=input("Save as: ")
+            foo=input("ylim for Lumin: ")
+            ylim1,ylim2 = [float(x) for x in foo.split()]  
+            foo=input("ylim for Hue: ")
+            ylim3,ylim4 = [float(x) for x in foo.split()]  
+            ax[0].set_xticks([])
+            ax[0].set_yticks([])
+            ax[0].axis('off')
+            ax[0].imshow(col_IMGs[x-width:x+width+1,y-width:y+width+1])
+            ax[1].scatter(d,Lumin,c='k')
+            ax[1].set_ylabel('Luminesence')
+            ax[1].set_xlabel('Pixel distance')
+            ax[1].set_ylim(ylim1,ylim2)
+            ax[2].scatter(d,Hue,c='k')
+            ax[2].set_ylabel('Hue (deg)')
+            ax[2].set_xlabel('Pixel distance')
+            ax[2].set_ylim(ylim3,ylim4)
+            plt.tight_layout()
+            plt.savefig(outname,dpi=600)
+            return
+        elif save=='q':
+            return
+
+
+def get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
+    """ Calculates the image intensity for a region image,
+
+    RGB color image is read. Colors are converted to HSV. Hues are changed to be 
+    multiples of 10. Values are increased to 1, and the color is converted to RGB.
+     
+    Parameters
+    ----------
+    filename: str
+        Filename header for image data file
+    lam_I0s: array of floats
+        The maximum image intensity of all fluorophore types
+    lams: array of int
+        The wavelength of all flurophore types
+    lam_hues: array of floats
+        The hue in degree of all fluorophore types
+    T: int
+        Number of timesteps to perform an average.
+    ti: int
+        timestep of the image data file. -1 if there is no sense of time
+        (static system).
+    fs: int
+        Scaling factor for wave vector or MS position coordinates.
+    MaxBox: array of ints
+        Contains the number of pixels in the image in l and m directions.
+   
+    Returns
+    ------- 
+    IMG: 3D ndarray
+        Axis 2 corresponds to red, green and blue channels. Image intensities 
+        between 0 and 1.
+    """
+    col_IMGs=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox)
+    consts=col_IMGs.shape
+    for i in range(consts[0]):
+        for j in range(consts[1]):
+            hsv=list(colorsys.rgb_to_hsv(col_IMGs[i,j,0],col_IMGs[i,j,1],col_IMGs[i,j,2]))
+            hsv[0]=int(hsv[0]*36)/36
+            rgb=list(colorsys.hsv_to_rgb(hsv[0],hsv[1],1)) 
+            col_IMGs[i,j,:]=rgb[:]
+    return col_IMGs   
+
+def plot_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, Bm,
+    scale, dpi=600, outfile=None):
+    """ Plots color image by assigning a specific color for a region.
+   
+    Parameters
+    ----------
+    filename: str
+        Filename header for image data file
+    lam_I0s: array of floats
+        The maximum image intensity of all fluorophore types
+    lams: array of int
+        The wavelength of all flurophore types
+    lam_hues: array of floats
+        The hue in degree of all fluorophore types
+    T: int
+        Number of timesteps to perform an average.
+    ti: int
+        timestep of the image data file. -1 if there is no sense of time
+        (static system).
+    fs: int
+        Scaling factor for wave vector or MS position coordinates.
+    MaxBox: array of ints
+        Contains the number of pixels in the image in l and m directions.
+    Bm: float
+        Width of the image in nm.
+    scale: float
+        Length of scale bar in nm
+    dpi: int
+        Dots per square inch of output image.
+    outfile: str
+        Output filename string
+  
+    Writes
+    ------
+    Writes a "region" image of in-silico microscopy image.
+    """
+    IMG=get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox)
+    IMG=add_scale(IMG, scale, Bm)
+    if outfile!=None:
+        plot_ism(IMG, lam_I0s, lams, T, ti, fs, filename='Reg_'+outfile, \
+                 dpi=dpi)
+    else:
+        plot_ism(IMG, lam_I0s, lams, T, ti, fs, filename=None, dpi=dpi)
+
 
 def plot_grey_img(filename, lam_I0s, lams, T, ti, fs, MaxBox, Bm, scale, 
     dpi=600, outfile=None):

@@ -19,7 +19,7 @@ import setuptools
 
 setuptools.setup(
    name="in-silico-microscopy",
-   version="1.2.0",
+   version="1.2.1",
    author="Subhamoy Mahajan",
    author_email="subhamoygithub@gmail.com",
    description="Toolbox for generating in-silico microscopy images from molecular simulations",

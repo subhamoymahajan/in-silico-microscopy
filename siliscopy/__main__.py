@@ -20,6 +20,7 @@ from siliscopy.gen_psf import *
 from siliscopy.gen_mono import *
 from siliscopy.plot_image import *
 from siliscopy.create_vid import *
+from siliscopy.prop import *
 small=1E-10
 
 def main():
@@ -221,7 +222,38 @@ def main():
                                     params['lam'], params['hue'], params['T'],
                                     params['t0'], params['tmax'],
                                     params['tdiff'], params['fs'], MaxBox, Bm,
-                                    params['scale'], params['dpi'],outname) 
+                                    params['scale'], params['dpi'],outname)
+        elif options.method == 'region':
+            print("hue = "+str(params["hue"]))
+            if options.calc=='show': #show specific
+                plot_region(options.filename, params['I0'], params['lam'],
+                             params['hue'], params['T'], options.timestep, 
+                             params['fs'], MaxBox, Bm, params['scale'], 
+                             params['dpi'])
+    
+            elif options.calc in ["specific", "spec"]: #Save Specific
+                plot_region(options.filename, params['I0'], params['lam'],
+                             params['hue'], params['T'], options.timestep, 
+                             params['fs'], MaxBox, Bm, params['scale'], 
+                             params['dpi'], outfile=outname)
+            
+            elif options.calc == 'all':
+                print('Not implemented!')
+ 
+        elif options.method == 'lumin':
+            print("hue = "+str(params["hue"]))
+            if options.calc=='show': #show specific
+                plot_lumin(options.filename, params['I0'], params['lam'],
+                             params['hue'], params['T'], options.timestep, 
+                             params['fs'], MaxBox)
+    
+            elif options.calc in ["specific", "spec"]: #Save Specific
+                print('Not implemented!')
+            
+            elif options.calc == 'all':
+                print('Not implemented!')
+        else:
+            print('Method implemented') 
 
     elif remainder[0]=='video':
         print("fps = "+str(params['fps']))
@@ -244,6 +276,29 @@ def main():
                         params['tdiff'], params['T'], params['fs'],
                         params['I0'], params['vid_ext'], params['fps'], 
                         params['fourcc'])
-         
+        else:
+            print('Method implemented') 
+    elif remainder[0]=='prop':
+        if options.method == 'maxI':
+            Imax=get_maxI(options.filename, params['lam'], params['fs'])
+            print(Imax)
+        elif options.method == 'predI0':
+            if options.timestep!=None: #Using timestep as number of iterations
+                get_I0s(options.filename, params['lam'],params['fs'],
+                        iterations=options.timestep)
+            else:
+                get_I0s(options.filename, params['lam'], params['fs'])
+
+        elif options.method == 'hist':
+            nor=False
+            if options.calc=='norm':
+                nor=True
+            Imax=get_maxI(options.filename, params['lam'], params['fs'])
+            get_hist(options.filename, params['lam'], params['fs'],
+                     options.outname, maxI=max(Imax), dI=0.1, norm=nor) 
+        else:
+            print('Method implemented')
+    else:
+        print("Function not specified or implemented") 
 if __name__=='__main__':
     main() 
