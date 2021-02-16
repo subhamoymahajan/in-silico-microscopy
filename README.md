@@ -148,7 +148,15 @@ The commands remain the same as monochrome image. Replace the method `mono` with
 >  
 > **_Note4:_** `filename header` is `output header` used in by `gen_mono`.  
 >  
+#### Other Plots
 
+Use the method `lumin` to plot lumination and hue of pixels about a central pixel interactively. 
+
+Use the method `region` to plot a region plot where hues occur in factors of 10 degrees and values are made one. 
+
+These methods will be demonstrated in future tutorial. For now read the documentation.
+
+  
 ### 5. Generate Video
 
 Generates a movie from a set of `JPEG` images.
@@ -172,8 +180,38 @@ siliscopy video --method data \
                 --paramfile [parameter file] \
                 --output [output filename with extension] 
 ```
+### 6. Calculate Properties 
 
-### 6. Parameter File
+Calculate the maximum intensity use the command:
+
+```bash
+siliscopy prop --method maxI  \
+               --file [filename header] \
+               --paramfile [parameter file] \
+```
+
+Predict the maximum intensity to generate images:
+```bash
+siliscopy prop --method predI0  \
+               --file [filename header] \
+               --paramfile [parameter file] \
+               --timestep [iterations]
+```
+> **_Note1:_** The parameter for timestep is used as maximum number of iterations to predict I0.   
+>  
+
+Calculate histogram of image intensities:
+```bash
+siliscopy prop --method hist  \
+               --file [filename header] \
+               --paramfile [parameter file] \
+               --output [output filename]
+```
+
+To create a histogram with normalized count use the options `--calc norm`.
+
+
+### 7. Parameter File
 
 The parameter file should contain the following parameters (Not all are used in every step). 
 
