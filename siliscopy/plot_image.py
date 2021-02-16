@@ -349,7 +349,8 @@ def plot_lumin(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
                        rgb[k]=rgb[k]/12.92
                    else:
                        rgb[k]=((rgb[k]+0.055)/1.055)**2.4
-                #Reference
+                #Reference: https://www.w3.org/Graphics/Color/sRGB.html 
+                #Check the published work for the accurate reference.
                 hsv=list(colorsys.rgb_to_hsv(rgb[0],rgb[1],rgb[2]))
                 Hue.append(hsv[0]*360)
                 Lumin.append(0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2])
@@ -359,7 +360,7 @@ def plot_lumin(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
         ax[0].axis('off')
         ax[0].imshow(col_IMGs[x-width:x+width+1,y-width:y+width+1])
         ax[1].scatter(d,Lumin,c='k')
-        ax[1].set_ylabel('Luminesence')
+        ax[1].set_ylabel('Relative Luminance')
         ax[1].set_xlabel('Pixel distance')
         ax[2].scatter(d,Hue,c='k')
         ax[2].set_ylabel('Hue (deg)')
@@ -378,7 +379,7 @@ def plot_lumin(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
             ax[0].axis('off')
             ax[0].imshow(col_IMGs[x-width:x+width+1,y-width:y+width+1])
             ax[1].scatter(d,Lumin,c='k')
-            ax[1].set_ylabel('Luminesence')
+            ax[1].set_ylabel('Relative Luminance')
             ax[1].set_xlabel('Pixel distance')
             ax[1].set_ylim(ylim1,ylim2)
             ax[2].scatter(d,Hue,c='k')
