@@ -1,4 +1,4 @@
-# In-silico-widefield-microscopy
+# In-silico-microscopy
 
 This open-source software package allows *in-silico* microscopy of molecular simulations such as molecular
 dynamics, monte carlo, etc. The current version can perform widefield microscopy 
