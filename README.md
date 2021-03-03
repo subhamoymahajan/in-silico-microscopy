@@ -239,3 +239,10 @@ The parameter file should contain the following parameters (Not all are used in 
 * `fps`: (int). Frames per second of the output video. (default value is 1)
 * `vid_ext`: (str). The extension of the output video. (default value is .mov)
 * `fourcc`: ('str'). The four character code of the encoder with which video will be created. (default value is 'mp4v') 
+
+# Contributors
+1. Subhamoy Mahajan, PhD student, Mechanical Engineering, University of Alberta, Edmonton, Canada (will graduate by Sep, 2021)
+2. Tian Tang, Professor, Mechanical Engineering, University of Alberta, Edmonton, Canada 
+
+# Funding Sources
+This research was funded by Natural Science and Engineering Research Council of Canada through Tian Tang. My research was also funded by several scholarships, Mitacs Globalink Graduate Fellowship (2016-2019), RR Gilpin Memorial Scholarship (2019), Alberta Graduate Excellence Scholarshipo (2020), Sadler Graduate Scholarship (2020).
