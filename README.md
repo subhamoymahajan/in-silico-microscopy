@@ -245,4 +245,4 @@ The parameter file should contain the following parameters (Not all are used in 
 2. Tian Tang, Professor, Mechanical Engineering, University of Alberta, Edmonton, Canada 
 
 # Funding Sources
-This research was funded by Natural Science and Engineering Research Council of Canada through Tian Tang. My research was also funded by several scholarships, Mitacs Globalink Graduate Fellowship (2016-2019), RR Gilpin Memorial Scholarship (2019), Alberta Graduate Excellence Scholarshipo (2020), Sadler Graduate Scholarship (2020).
+This research was funded by Natural Science and Engineering Research Council of Canada through Tian Tang. My research was also funded by several scholarships, Mitacs Globalink Graduate Fellowship (2016-2019), RR Gilpin Memorial Scholarship (2019), Alberta Graduate Excellence Scholarship (2020), Sadler Graduate Scholarship (2020).
