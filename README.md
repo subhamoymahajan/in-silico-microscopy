@@ -1,4 +1,4 @@
-# In-silico-microscopy
+# *In-silico* microscopy
 
 This open-source software package allows *in-silico* microscopy of molecular simulations such as molecular
 dynamics, monte carlo, etc. The current version can perform widefield microscopy 
@@ -7,6 +7,11 @@ The programs are developed for GROMACS (.gro) files in mind. Please look at the 
 
 If you are using these set of programs for your research publications, don't forget to cite (Cite). This software 
 package is free to use as long as you comply to the license (GPLv3).
+
+## Published Work
+
+This toolbox is based on published work.
+[1] Mahajan S., and Tang T., Meeting experiments at the diffraction barrier: an in-silico widefield fluorescence microscopy, bioRxiv 2021.03.02.433395;  DOI: [10.1101/2021.03.02.433395](https://doi.org/10.1101/2021.03.02.433395) (Currently in peer-review)
 
 ## Installation
 
