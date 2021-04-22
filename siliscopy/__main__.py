@@ -49,8 +49,12 @@ def main():
                       help="The index of n' coordinate. int(n'/dn)")
     parser.add_option('-t', '--timestep', dest="timestep", type="int",
                       help="The timestep of the simulation.")
-    
-    
+    parser.add_option('-a','--threshold', dest="threshold", type="float",
+                      help="Thresold for intensity")    
+    parser.add_option('-b','--lambdaID', dest="lambda_ID", type="int",
+                       help="Index of the wavelength")    
+
+
     options, remainder = parser.parse_args()
     #Read parameters
     if options.pfile !=None:
@@ -89,7 +93,14 @@ def main():
             elif varname=='fourcc':
                 foo=val_string[0].strip()
                 params[varname]=foo[1:-1]
-             
+            elif varname=='pbc':
+                params[varname]=[0,0,0]
+                if 'x' in val_string[0]:
+                    params[varname][0]=1
+                if 'y' in val_string[0]:
+                    params[varname][1]=1
+                if 'z' in val_string[0]:
+                    params[varname][2]=1
         #Reduce the lam variable
         for i in range(10):
             if params['lam'][i]<1:
@@ -97,7 +108,11 @@ def main():
         params['lam']=params['lam'][:i]
         params['hue']=params['hue'][:i]
         params['I0']=params['I0'][:i]
-    
+        MaxBox=[0,0]
+        MaxBox[0]=int(params['maxlen'][(params['opt_axis']+1)%3]/ \
+                      params['dlmn'][0]+small)
+        MaxBox[1]=int(params['maxlen'][(params['opt_axis']+2)%3]/ \
+                      params['dlmn'][1]+small)
     
     if remainder[0]=='gen_psf':
  
@@ -156,11 +171,6 @@ def main():
             outname=options.outname
  
         print("maxlen = "+str(params['maxlen']))
-        MaxBox=[0,0]
-        MaxBox[0]=int(params['maxlen'][(params['opt_axis']+1)%3]/ \
-                      params['dlmn'][0]+small)
-        MaxBox[1]=int(params['maxlen'][(params['opt_axis']+2)%3]/ \
-                      params['dlmn'][1]+small)
         Bm=params['maxlen'][(params['opt_axis']+1)%3] 
 
         if 'dpi' not in params:
@@ -295,9 +305,30 @@ def main():
                 nor=True
             Imax=get_maxI(options.filename, params['lam'], params['fs'])
             get_hist(options.filename, params['lam'], params['fs'],
-                     options.outname, maxI=max(Imax), dI=0.1, norm=nor) 
+                     options.outname, maxI=max(Imax), dI=0.1, norm=nor)
+        elif options.method == 'num_area':
+            foo=params['pbc']
+            pbc=[foo[(params['opt_axis']+1)%3], foo[(params['opt_axis']+2)%3]]
+            sh=False
+            white =True
+            if options.calc=='show':
+                sh = True
+            elif options.calc=='show-test':
+                sh = True
+                white = False
+            elif options.calc=='test':
+                white = False
+            if options.threshold<1:
+                thres=int(options.threshold*255)
+            else:
+                thres=int(options.threshold)
+            get_num_area(options.filename, params['I0'][options.lambda_ID], \
+                          params['lam'][options.lambda_ID], params['T'], \
+                          options.timestep, params['fs'], \
+                          thres, MaxBox, params['dlmn'], \
+                          pbc, options.outname, sh, white ) 
         else:
-            print('Method implemented')
+            print('Method not implemented')
     else:
         print("Function not specified or implemented") 
 if __name__=='__main__':
