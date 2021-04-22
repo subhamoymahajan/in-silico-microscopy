@@ -216,6 +216,30 @@ siliscopy prop --method hist  \
 
 To create a histogram with normalized count use the options `--calc norm`.
 
+Calculate number of particles, area, and binary images:
+```bash
+siliscopy prim --method num_area \
+               --file [filename header] \
+               --paramfile [parameter file] \
+               --calc show \ 
+               --threshold [intensity] \
+               --lambdaID [index of fluorophore] \
+               --output [output filename header]
+```
+Use `calc` value of 'show' to show the figure. This option won't save the file shown. 'show-test' 
+is used for check the area calculation algorithm is working correctly. If the pixels used to 
+calculate particle's area is shown in grey. In this option if this option shows particles in white,
+report the issue. Option 'test' will save the image shown in 'show-test'. Any other option will save
+generated binary image. 
+
+`threshold` is used to set the threshold intensity for particle detection. If the value is below 1 
+the maximum intensity is assumed to be 1 otherwise maximum intensity is assumed to be 255. 
+
+`lambdaID` is used to chose a specific fluorophore. 
+
+`[output filename header].dat` is created which stores area of different particles. Each line contains,
+the particle ID (starting from 0) and its area. `[output filename header].png` is the binary image used 
+to calculate the area. It is created based on the value of `calc`.
 
 ### 7. Parameter File
 
