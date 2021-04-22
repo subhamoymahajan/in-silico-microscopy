@@ -218,10 +218,10 @@ To create a histogram with normalized count use the options `--calc norm`.
 
 Calculate number of particles, area, and binary images:
 ```bash
-siliscopy prim --method num_area \
+siliscopy prop --method num_area \
                --file [filename header] \
                --paramfile [parameter file] \
-               --calc show \ 
+               --calc [show/show-test/test] \ 
                --threshold [intensity] \
                --lambdaID [index of fluorophore] \
                --output [output filename header]
