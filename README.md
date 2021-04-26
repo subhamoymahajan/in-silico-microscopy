@@ -224,6 +224,7 @@ siliscopy prop --method num_area \
                --calc [show/show-test/test] \ 
                --threshold [intensity] \
                --lambdaID [index of fluorophore] \
+               --timestep [timestep] \
                --output [output filename header]
 ```
 Use `calc` value of 'show' to show the figure. This option won't save the file shown. 'show-test' 
