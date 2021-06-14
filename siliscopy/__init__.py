@@ -20,3 +20,4 @@ from siliscopy.gen_mono import *
 from siliscopy.plot_image import *
 from siliscopy.create_vid import *
 from siliscopy.prop import *
+from siliscopy.convert import *

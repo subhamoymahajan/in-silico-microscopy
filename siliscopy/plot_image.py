@@ -24,7 +24,8 @@ import sys
 import copy
 small=1E-10
 
-def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=False):
+def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=False, \
+    opt_axis=None, nidx=None, frame_col=1.0):
     """ Calculates greyscale image
      
     Parameters
@@ -44,10 +45,14 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=False):
         Scaling factor for wave vector or MS position coordinates.
     MaxBox: array of ints
         Contains the number of pixels in the image in l and m directions.
-    whiteframe: Bool, optional
+    frame: Bool, optional
         True keeps the image intensity of white frame as -1. False converts
         the image intensities of -1 to 1. (default is False).
-   
+    opt_axis: int, optional
+        Optical axis 0, 1, and 2 for x, y, and z axis. (default is None)
+    nidx: int, optional    
+        index of n' axis. (default is None)
+
     Returns
     -------
     IMG: 2D ndarray
@@ -60,12 +65,17 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=False):
 
     IMG=np.zeros((MaxBox[0],MaxBox[1]))
     Cnt=np.zeros((MaxBox[0],MaxBox[1]),dtype=int)
+    if nidx != None:
+        xyz='xyz'
+        nstr='_'+xyz[opt_axis]+str(nidx)
+    else:
+        nstr=''
     for i in range(T):
         if ti>=0:
-            fname=filename + str(i+ti) + '_lam' + str(lam) + '_fs' + \
+            fname=filename + str(i+ti) + nstr + '_lam' + str(lam) + '_fs' + \
                   str(fs) + '.dat'
         else:
-            fname=filename+'_lam'+str(lam)+'_fs'+str(fs)+'.dat'
+            fname=filename + nstr + '_lam' + str(lam) + '_fs' + str(fs) + '.dat'
         
         f=open(fname,'r')
         j=0
@@ -88,10 +98,10 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=False):
             if Cnt[j,k]>0:
                 IMG[j,k]=IMG[j,k]/float(Cnt[j,k])
             else:
-                if whiteframe:
+                if frame:
                     IMG[j,k]=-1
                 else:
-                    IMG[j,k]=1 #white background image
+                    IMG[j,k]=frame_col 
     return IMG
 
 def add_scale(IMG, scale, Bm):
@@ -195,11 +205,12 @@ def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None,
                   Istring + '.jpeg'
 
     print('Writing: '+fname)
-    plt.savefig(fname,dpi=dpi,quality=100)
+    plt.savefig(fname,dpi=dpi)
     plt.close()
     return
 
-def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
+def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, \
+    frame_col=1.0, mix_type='mt'):
     """ Calculates the image intensity for a color image,
 
     Parameters
@@ -221,7 +232,12 @@ def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
         Scaling factor for wave vector or MS position coordinates.
     MaxBox: array of ints
         Contains the number of pixels in the image in l and m directions.
-   
+    frame_col= int, optional
+        Color of the frame. (Default is 1 (white)).
+    mix_type: str
+        Algorithm to mix colors. 'mt' for Mahajan and Tang, 'rgb' for Red-
+        Green-Blue. Addition is CMYK is not supported.
+
     Returns
     ------- 
     IMG: 3D ndarray
@@ -231,24 +247,59 @@ def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
     IMGs=[]
     for i in range(len(lams)):
         IMGs.append(get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs,
-                    MaxBox, whiteframe=True))
+                    MaxBox, frame=True))
+    consts=IMGs[0].shape
+    col_IMG=add_color(IMGs,lam_hues, frame_col, mix_type)
+
+    return col_IMG  
+
+def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
+    """ Calculates the image intensity for a color image,
+
+    Parameters
+    ----------
+    IMGs:list of 2D array
+        Monochrome image intensities
+    lam_hues: array of floats
+        The hue in degree of all fluorophore types
+    frame_col: float, optional
+        Color of the frame, 0 is black, 1 is white, anything in between is 
+        gray. (Default is 1.0)
+    mix_type: str
+        Algorithm to mix colors. 'mt' for Mahajan and Tang, 'rgb' for Red-
+        Green-Blue. Addition is CMYK is not supported.
+
+    Returns
+    ------- 
+    IMG: 3D ndarray
+        Axis 2 corresponds to red, green and blue channels. Image intensities 
+        between 0 and 1.
+    frame_col= int, optional
+        Color of the frame. (Default is 1 (white)).
+    """
     consts=IMGs[0].shape
     col_IMG=np.zeros((consts[0],consts[1],3))
+    if mix_type=='rgb':
+        cols=np.zeros((len(lam_hues),3))
+        for lam_id in range(len(lam_hues)):
+            rgb=colorsys.hsv_to_rgb(lam_hues[lam_id]/360,1,1)
+            cols[lam_id,:]=rgb[:]
+
     for i in range(consts[0]):
         for j in range(consts[1]):
             foo=0
-            for lam_id in range(len(lams)):
+            for lam_id in range(len(lam_hues)):
                 if IMGs[lam_id][i,j]>-small:
                     foo=+1
             if foo==0:
                 #if all Img_dat are -1 then res is -1
                 col_IMG[i,j,:]=-1
-            else:
+            elif mix_type=='mt':
                 xres=0
                 yres=0
                 Is=[]
                 ncol=0
-                for lam_id in range(len(lams)):
+                for lam_id in range(len(lam_hues)):
                     if IMGs[lam_id][i,j]>small:
                         # V*e^(i(hue)) #I0 was multiplied when determining 
                         # grey images.
@@ -280,13 +331,154 @@ def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
                 # for colorsys module hres should be belong to [0,1]
                 rgb=list(colorsys.hsv_to_rgb(hres,sres,vres))
                 col_IMG[i,j,:]=rgb[:]
+            elif mix_type=='rgb':
+                rgb=np.zeros(3)
+                for lam_id in range(len(lam_hues)):
+                    rgb+=IMGs[lam_id][i,j]*cols[lam_id,:]
+                for k in range(3):
+                    if rgb[k]>1:
+                        col_IMG[i,j,k]=1.0 
+                    else:
+                        col_IMG[i,j,k]=rgb[k]
+    print('frame_col',frame_col)                     
 
     for i in range(consts[0]):
         for j in range(consts[1]):
             for k in range(3):
                 if col_IMG[i,j,k]<-small:
-                    col_IMG[i,j,k]=1.0
-    return col_IMG   
+                    col_IMG[i,j,k]=frame_col
+
+    return col_IMG  
+
+def add_noise(I,poi_a,gauss_b):#I is single channel
+    """ Adds a Poisson-Gaussian noise to a monochrome image
+
+    Parameters
+    ----------
+    I: 2D array (image)
+        Monochrome image
+    poi_a: float
+        Mean of the Poisson distribution. Should be a positive number.
+    gauss_b: float
+        Vairance of Gaussian distribution. Should be a positive number. Mean
+        of Gaussian distribution is assumed to be 0.
+
+    Returns
+    -------
+    I: Monochrome image with noise
+    """
+    dims=I.shape
+    x0,y0,xL,yL=[0,0,0,0]
+    for i in range(dims[0]):
+        if I[i,int(dims[1]/2)]==-1 and xL==0:
+            x0+=1
+        elif I[i,int(dims[1]/2)]>-0.5:
+            xL+=1       
+    for j in range(dims[1]):
+        if I[int(dims[0]/2),j]==-1 and yL==0:
+            y0+=1
+        elif I[int(dims[0]/2),j]>-0.5:
+            yL+=1       
+    for i in range(x0,x0+xL):
+        for j in range(y0,y0+yL):
+            P=np.random.poisson(lam=255*I[i,j])
+            G=np.random.normal(loc=0.0,scale=gauss_b)
+            I[i,j]=G+poi_a*P/255.0+I[i,j]*(1-poi_a)
+            if I[i,j]>1:
+                I[i,j]=1.0
+            if I[i,j]<0: #Note that the space of i,j here is not the backgroumd
+                I[i,j]=0.0
+    #frame color will be taken care by add_color or separately for monochrome images
+
+    return I
+
+def get_noise_colimg(filename, lams, I0s, hues, fs, T, ti, MaxBox, poi_a, \
+    gauss_b, frame_col=1, mix_type='mt'):
+    """ Generates a color image with noise. 
+
+    Parameter
+    ---------
+    filename: str
+        Filename header for image data file
+    lams: array of int
+        The wavelength of all flurophore types
+    I0s: array of floats
+        The maximum image intensity of all fluorophore types
+    hues: array of floats
+        The hue in degree of all fluorophore types
+    fs: int
+        Scaling factor for wave vector or MS position coordinates.
+    T: int
+        Number of timesteps to perform an average.
+    ti: int
+        timestep of the image data file. -1 if there is no sense of time
+        (static system).
+    MaxBox: array of ints
+        Contains the number of pixels in the image in l and m directions.
+    poi_a: float
+        Mean of the Poisson distribution. Should be a positive number.
+    gauss_b: float
+        Vairance of Gaussian distribution. Should be a positive number. Mean
+        of Gaussian distribution is assumed to be 0.
+    frame: Bool, optional
+        True keeps the image intensity of white frame as -1. False converts
+        the image intensities of -1 to 1. (default is False).
+    mix_type: str
+        Algorithm to mix colors. 'mt' for Mahajan and Tang, 'rgb' for Red-
+        Green-Blue. Addition is CMYK is not supported.
+   
+    Returns
+    -------
+    col_IMG: Color Image with noise.
+    """
+    IMGs=[]
+    for l in range(len(lams)):
+        IMG=get_grey_img(filename,I0s[l],lams[l],T,ti,fs,MaxBox,frame=True)        
+        IMGs.append(add_noise(IMG,poi_a,gauss_b))
+    col_IMG=add_color(IMGs,hues,frame_col,mix_type)
+    return col_IMG
+
+def get_noise_greyimg(filename, lam, I0, fs, T, ti, MaxBox, poi_a, gauss_b,
+    frame_col=1.0):
+    """ Generates a monochrome image with noise. 
+
+    Parameter
+    ---------
+    filename: str
+        Filename header for image data file
+    lam: int
+        Wavelength of the flurophore types
+    I0: array of floats
+        The maximum image intensity of all fluorophore types
+    fs: int
+        Scaling factor for wave vector or MS position coordinates.
+    T: int
+        Number of timesteps to perform an average.
+    ti: int
+        timestep of the image data file. -1 if there is no sense of time
+        (static system).
+    MaxBox: array of ints
+        Contains the number of pixels in the image in l and m directions.
+    poi_a: float
+        Mean of the Poisson distribution. Should be a positive number.
+    gauss_b: float
+        Vairance of Gaussian distribution. Should be a positive number. Mean
+        of Gaussian distribution is assumed to be 0.
+    frame: Bool, optional
+        True keeps the image intensity of white frame as -1. False converts
+        the image intensities of -1 to 1. (default is False).
+    mix_type: str
+        Algorithm to mix colors. 'mt' for Mahajan and Tang, 'rgb' for Red-
+        Green-Blue. Addition is CMYK is not supported.
+   
+    Returns
+    -------
+    IMG: Monochrome image with noise.
+    """
+    IMG=get_grey_img(filename,I0,lam,T,ti,fs,MaxBox,frame=True)        
+    IMG=add_noise(IMG,poi_a,gauss_b)
+    IMG[IMG<-small]=frame_col
+    return IMG
 
 def plot_lumin(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
     """ Interactively plot small portions of colored the in-silico microscopy
@@ -393,11 +585,13 @@ def plot_lumin(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
             return
 
 
-def get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
+def get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, \
+    frame_col=1.0, mix_type='mt'):
     """ Calculates the image intensity for a region image,
 
     RGB color image is read. Colors are converted to HSV. Hues are changed to be 
-    multiples of 10. Values are increased to 1, and the color is converted to RGB.
+    multiples of 10. Values are increased to 1, and the color is converted to 
+    RGB.
      
     Parameters
     ----------
@@ -418,6 +612,11 @@ def get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
         Scaling factor for wave vector or MS position coordinates.
     MaxBox: array of ints
         Contains the number of pixels in the image in l and m directions.
+    frame_col= int, optional
+        Color of the frame. (Default is 1 (white)).
+    mix_type: str
+        Algorithm to mix colors. 'mt' for Mahajan and Tang, 'rgb' for Red-
+        Green-Blue. Addition is CMYK is not supported.
    
     Returns
     ------- 
@@ -425,7 +624,8 @@ def get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
         Axis 2 corresponds to red, green and blue channels. Image intensities 
         between 0 and 1.
     """
-    col_IMGs=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox)
+    col_IMGs=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, \
+        frame_col=frame_col, mix_type=mix_type)
     consts=col_IMGs.shape
     for i in range(consts[0]):
         for j in range(consts[1]):
@@ -481,50 +681,95 @@ def plot_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, Bm,
 
 
 def plot_grey_img(filename, lam_I0s, lams, T, ti, fs, MaxBox, Bm, scale, 
-    dpi=600, outfile=None):
-    """ Plots greyscale or monochrome image with a scale.
+    dpi=600, outfile=None, frame_col=1.0):
+    """ Plots monochrome image with a scale.
     
     See functions get_grey_img, add_scale and plot_ism for more details.
     """
     for i in range(len(lams)):
-        IMG=get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs, MaxBox)
+        IMG=get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs, MaxBox, 
+                         frame_col=frame_col)
         IMG=add_scale(IMG, scale, Bm)
         plot_ism(IMG, [lam_I0s[i]], [lams[i]], T, ti, fs, filename=outfile,
                  dpi=dpi)
 
 def plot_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, Bm, 
-    scale, dpi=600, outfile=None):
+    scale, dpi=600, outfile=None, frame_col=1.0, mix_type='mt'):
     """ Plots coloured image with a scale.
     
     See functions get_col_img, add_scale and plot_ism for more details.
     """
-    IMG=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox)
+    IMG=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, 
+        frame_col, mix_type)
     IMG=add_scale(IMG, scale, Bm)
     plot_ism(IMG,  lam_I0s,  lams,  T,  ti,  fs,  filename=outfile,  dpi=dpi)
 
+def plot_errgrey_img(filename, lam_I0s, lams, T, ti, fs, MaxBox, poi_a,
+    gauss_b, Bm, scale, dpi=600, outfile=None, frame_col=1.0):
+    """ Plots monochrome image with noise and scale.
+    
+    See functions get_col_img, add_scale and plot_ism for more details.
+    """
+    for i in range(len(lams)):
+        IMG=get_noise_greyimg(filename, lams[i], lam_I0s[i], fs, T, ti, MaxBox,
+            poi_a, gauss_b, frame_col=frame_col)
+        IMG=add_scale(IMG, scale, Bm)
+        plot_ism(IMG, lam_I0s[i], lams[i], T, ti, fs, filename=outfile, dpi=dpi)
+
+def plot_errcol_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, poi_a,
+    gauss_b, Bm, scale, dpi=600, outfile=None, frame_col=1.0, mix_type='mt'):
+    """ Plots coloured image with noise and a scale.
+    
+    See functions get_col_img, add_scale and plot_ism for more details.
+    """
+    IMG=get_noise_colimg(filename, lams, lam_I0s, lam_hues, fs, T, ti, MaxBox, 
+        poi_a, gauss_b, frame_col, mix_type)
+    IMG=add_scale(IMG, scale, Bm)
+    plot_ism(IMG, lam_I0s, lams, T, ti, fs, filename=outfile, dpi=dpi)
+
 def plot_grey_serial(filename, lam_I0s, lams, T, t0, tmax, tdiff, fs, MaxBox,
-    Bm, scale, dpi, outname):
-    """ Plots several greyscale or monochrome images serially.
+    Bm, scale, dpi, outname, frame_col):
+    """ Plots several monochrome images serially.
 
     See plot_grey_img for more details.
     """
     for i in range(t0,tmax,tdiff):
-        worker_grey([filename, lam_I0s, lams, T, i, fs, MaxBox, Bm, scale, dpi, 
-                     outname])
+        plot_grey_img(filename, lam_I0s, lams, T, i, fs, MaxBox, Bm, scale, dpi, 
+                      outname, frame_col)
     
 def plot_col_serial(filename, lam_I0s, lams, lam_hues, T, t0, tmax, tdiff, fs, 
-    MaxBox, Bm, scale, dpi, outname):
+    MaxBox, Bm, scale, dpi, outname, frame_col, mix_type):
     """ Plots several coloured images serially.
 
     See plot_col_img for more details.
     """
     for i in range(t0,tmax,tdiff):
-        worker_col([filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, Bm, 
-                    scale, dpi, outname])
+        plot_col_img(filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, Bm, 
+                     scale, dpi, outname, frame_col, mix_type)
+
+def plot_errgrey_serial(filename, lam_I0s, lams, T, t0, tmax, tdiff, fs, MaxBox,
+    poi_a, gauss_b, Bm, scale, dpi, outname, frame_col):
+    """ Plots several monochrome images serially.
+
+    See plot_errgrey_img for more details.
+    """
+    for i in range(t0,tmax,tdiff):
+        plot_errgrey_img(filename, lam_I0s, lams, T, i, fs, MaxBox, poi_a, 
+                         gauss_b, Bm, scale, dpi, outname, frame_col)
+
+def plot_errcol_serial(filename, lam_I0s, lams, lam_hues, T, t0, tmax, tdiff, 
+    fs, MaxBox, Bm, scale, dpi, outname, frame_col, mix_type):
+    """ Plots several coloured images serially.
+
+    See plot_col_img for more details.
+    """
+    for i in range(t0,tmax,tdiff):
+        plot_errcol_img(filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, 
+            poi_a, gauss_b, Bm, scale, dpi, outname, frame_col, mix_type)
 
 def plot_grey_mp(filename, lam_I0s, lams, T, t0, tmax, tdiff, fs, MaxBox, Bm, 
-    scale, dpi, output):
-    """ Plots several greyscale or monochrome images parallelly.
+    scale, dpi, output, frame_col):
+    """ Plots several monochrome images parallelly.
 
     See plot_grey_img for more details.
     """
@@ -532,15 +777,15 @@ def plot_grey_mp(filename, lam_I0s, lams, T, t0, tmax, tdiff, fs, MaxBox, Bm,
     Arguments=[]
     for i in range(t0,tmax,tdiff): 
         Arguments.append([filename, lam_I0s, lams, T, i, fs, MaxBox, Bm, scale, 
-                          dpi, output])
+                          dpi, output, frame_col])
     cpus=mp.cpu_count()
     if len(Arguments)<cpus:
         cpus=len(Arguments)
     pool=mp.Pool(cpus)
-    results=pool.map(worker_grey, Arguments)
+    results=pool.starmap(plot_grey_img,Arguments)
 
 def plot_col_mp(filename, lam_I0s, lams, lam_hues, T, t0, tmax, tdiff, fs, 
-    MaxBox, Bm, scale, dpi, output):
+    MaxBox, Bm, scale, dpi, output, frame_col, mix_type):
     """ Plots several coloured images parallely.
 
     See plot_col_img for more details.
@@ -548,33 +793,43 @@ def plot_col_mp(filename, lam_I0s, lams, lam_hues, T, t0, tmax, tdiff, fs,
     Arguments=[]
     for i in range(t0,tmax,tdiff):
         Arguments.append([filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, 
-                          Bm, scale, dpi, output])
+                          Bm, scale, dpi, output,frame_col,mix_type])
     cpus=mp.cpu_count()
     if len(Arguments)<cpus:
         cpus=len(Arguments)
     pool=mp.Pool(cpus)
-    results=pool.map(worker_col, Arguments)
+    results=pool.starmap(plot_col_img,Arguments)
 
-def worker_grey(Args):
-    """ Runs plot_grey_img for a list of arguments.
+def plot_errgrey_mp(filename, lam_I0s, lams, T, t0, tmax, tdiff, fs, MaxBox, 
+    poi_a, gauss_b, Bm, scale, dpi, output, frame_col):
+    """ Plots several monochrome images with noise parallelly.
 
-    See plot_grey_img for more details
+    See plot_errgrey_img for more details.
     """
-    #             Args[0]  Args[1]  Args[2]  Args[3]  Args[4]  Args[5] 
-    #            filename  lam_I0s    lams      T        ti       fs     
-    plot_grey_img(Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], 
-                  Args[6], Args[7], Args[8], dpi=Args[9], outfile=Args[10])
-               #  Args[6]  Args[7]  Args[8]    Args[9]      Args[10]
-               #  MaxBox      Bm     scale      dpi          output
-def worker_col(Args):
-    """ Runs plot_col_img for a list of arguments.
 
-    See plot_col_img for more details
+    Arguments=[]
+    for i in range(t0,tmax,tdiff): 
+        Arguments.append([filename, lam_I0s, lams, T, i, fs, MaxBox, poi_a,
+                          gauss_b, Bm, scale, dpi, output, frame_col])
+    cpus=mp.cpu_count()
+    if len(Arguments)<cpus:
+        cpus=len(Arguments)
+    pool=mp.Pool(cpus)
+    results=pool.starmap(plot_errgrey_img,Arguments)
+
+def plot_errcol_mp(filename, lams, I0s, hues, fs, T, t0, tmax, tdiff, MaxBox, 
+    poi_a, gauss_b, Bm, scale, dpi, output, frame_col, mix_type ):
+    """ Plots several coloured images with noise parallely.
+
+    See plot_errcol_img for more details.
     """
-    #             Args[0] Args[1]  Args[2]  Args[3]  Args[4]  Args[5]  Args[6]
-    #            filename lam_I0s    lams   lam_hues    T       ti       fs
-    plot_col_img(Args[0], Args[1], Args[2], Args[3], Args[4], Args[5], Args[6],
-                  Args[7], Args[8], Args[9], dpi=Args[10], outfile=Args[11])
-               #  Args[7]  Args[8]  Args[9]    Args[10]       Args[11]
-               #  MaxBox     Bm      scale       dpi           output
+    Arguments=[]
+    for i in range(t0,tmax,tdiff):
+        Arguments.append([filename, I0s, lams, hues, T, i, fs, MaxBox, poi_a,
+                       gauss_b, Bm, scale, dpi, output, frame_col, mix_type])
+    cpus=mp.cpu_count()
+    if len(Arguments)<cpus:
+        cpus=len(Arguments)
+    pool=mp.Pool(cpus)
+    results=pool.starmap(plot_errcol_img, Arguments)
 

@@ -21,6 +21,7 @@ from siliscopy.gen_mono import *
 from siliscopy.plot_image import *
 from siliscopy.create_vid import *
 from siliscopy.prop import *
+from siliscopy.convert import *
 small=1E-10
 
 def main():
@@ -59,21 +60,38 @@ def main():
     #Read parameters
     if options.pfile !=None:
         params={}
+        #################DEFAULT VALUES ####################
         params['lam']=np.zeros(10,dtype=int)
         params['hue']=np.zeros(10)
         params['I0']=np.zeros(10)
         params['fourcc']='mp4v'
         params['fps']=1
         params['vid_ext']='.mov'
+        params['meu']=1.515
+        params['meu0']=1.515
+        params['t_0']=300.0 #nm
+        params['meug']=1.522
+        params['meug0']=1.522
+        params['tg']=320.0 #nm
+        params['tg0']=320.0 #nm
+        params['tsO']=0 #nm
+        params['meus']=1.33 
+        params['NA']=1
+        params['fs']=530
+        #####################################################
         f=open(options.pfile,'r')
         for lines in f:
             foo=lines.split('=')
             varname=foo[0].strip()
             val_string=foo[1].split('/')[0].strip()
             val_string=val_string.split()
-            if varname in ["fs", "T", "dpi", "t0", "tmax", "tdiff", "opt_axis"]:
+            
+            if varname in ["fs", "T", "dpi", "t0", "tmax", "tdiff", "opt_axis",\
+                "add_n","psf_type"]:
                 params[varname]=int(val_string[0])
-            elif varname in ["NA", "meu", "beta", "scale"]:
+            elif varname in ["NA", "meu", "scale", "meu0", "t_0", "meug", \
+                "meug0", "tg", "tg0", "tsO", "meus", "poi", "gauss",\
+                "frame_col"]:
                 params[varname]=float(val_string[0])
             elif varname in ["dlmn", "Plmn","maxlen"]:
                 val_string=[float(x) for x in val_string]
@@ -88,7 +106,7 @@ def main():
                 if varname[3:7]=='_I0_':
                     num=int(varname[7:])
                     params['I0'][num-1]=float(val_string[0])
-            elif varname=='vid_ext':
+            elif varname in ["vid_ext", "mix_type"]:
                 params[varname]=val_string[0].strip()
             elif varname=='fourcc':
                 foo=val_string[0].strip()
@@ -116,47 +134,115 @@ def main():
     
     if remainder[0]=='gen_psf':
  
-        beta=None
-        if 'NA' in params and 'meu' in params:
-            beta=np.arcsin(params['NA']/params['meu'])
-        if 'beta' in params:
-            beta=params['beta']
-        if beta==None:
-            raise Exception("Beta not provided!")
-        
-        print('beta = '+str(beta))
+        print('NA = '+str(params['NA']))
+        print('meu = '+str(params['meu']))
+
         for key in ["lam", "dlmn", "Plmn", "fs"]:
             print(key+' = '+str(params[key]))
 
-        if options.method in ["gandy", "Gandy"]:#Currently the only method
+        if options.method in ["gandy", "Gandy"]:
             if options.calc=='all': #Calculates for all n' coordiantes
                 if options.mprocess==True: #Multiprocessing. 
                     for lambd in params['lam']:
-                        psf_gandy_mp(beta, lambd, params['dlmn'], 
-                            params['Plmn'], params['fs'],options.outname)
+                        psf_gandy_mp(params['NA'], params['meu'], lambd, 
+                            params['dlmn'], params['Plmn'], params['fs'],
+                            options.outname)
                 else: # Calculates Serially 
                     for lambd in params['lam']:
-                        psf_gandy(beta, lambd, params['dlmn'], params['Plmn'], 
+                        psf_gandy(params['NA'], params['meu'], lambd, 
+                                  params['dlmn'], params['Plmn'], 
                                   params['fs'], options.outname)
             elif options.calc in ["specific", "spec"]: #Calculates for one n'
                 for lambd in params['lam']:
                     outname = options.outname + '_lam' + str(lambd) + \
                               '_fs' + str(params['fs']) + '_' + \
                               str(options.nid) + '.dat'
-                    psf_gandy_sep(beta, lambd, params['dlmn'], params['Plmn'], 
-                        params['fs'],outname,'w',options.nid)
+                    psf_gandy_sep(params['NA'], params['meu'], lambd, 
+                        params['dlmn'], params['Plmn'], params['fs'],
+                        outname+'_lam'+str(lambd),'w',options.nid)
+
+        elif options.method in ["GL1991", "GL1992", "GibsonLanni"]:
+            if options.calc=='all': #Calculates for all n' coordiantes
+                if options.mprocess==True: #Multiprocessing. 
+                    for lambd in params['lam']:
+                        psf_GL1991_mp(params['NA'], params['meu'], 
+                            params['meu0'], params['t_0'], params['tsO'], 
+                            params['meus'], params['tg'], params['tg0'], 
+                            params['meug'], params['meug0'], lambd, 
+                            params['dlmn'], params['Plmn'], params['fs'],
+                            options.outname)
+                else: # Calculates Serially 
+                    for lambd in params['lam']:
+                        psf_GL1991(params['NA'], params['meu'], 
+                            params['meu0'], params['t_0'], params['tsO'], 
+                            params['meus'], params['tg'], params['tg0'], 
+                            params['meug'], params['meug0'], lambd, 
+                            params['dlmn'], params['Plmn'], params['fs'], 
+                            options.outname)
+            elif options.calc in ["specific", "spec"]: #Calculates for one n'
+                for lambd in params['lam']:
+                    outname = options.outname + '_lam' + str(lambd) + \
+                              '_fs' + str(params['fs']) + '_' + \
+                              str(options.nid) + '.dat'
+                    psf_GL1991_sep(params['NA'], params['meu'], 
+                        params['meu0'], params['t_0'], params['tsO'], 
+                        params['meus'], params['tg'], params['tg0'], 
+                        params['meug'], params['meug0'], lambd, params['dlmn'], 
+                        params['Plmn'], params['fs'],
+                        options.outname+'_lam'+str(lambd),'w',options.nid)
+
+        elif options.method in ["Mod_Gandy"]:
+            if options.calc=='all': #Calculates for all n' coordiantes
+                if options.mprocess==True: #Multiprocessing. 
+                    for lambd in params['lam']:
+                        psf_Mod_Gandy_mp(params['NA'], params['meu'], 
+                            params['meu0'], params['t_0'], params['tsO'], 
+                            params['meus'], params['tg'], params['tg0'], 
+                            params['meug'], params['meug0'], lambd, 
+                            params['dlmn'], params['Plmn'], params['fs'],
+                            options.outname)
+                else: # Calculates Serially 
+                    for lambd in params['lam']:
+                        psf_Mod_Gandy(params['NA'], params['meu'], 
+                            params['meu0'], params['t_0'], params['tsO'], 
+                            params['meus'], params['tg'], params['tg0'], 
+                            params['meug'], params['meug0'], lambd, 
+                            params['dlmn'], params['Plmn'], params['fs'],
+                            options.outname)
+            elif options.calc in ["specific", "spec"]: #Calculates for one n'
+                for lambd in params['lam']:
+                    outname = options.outname + '_lam' + str(lambd) + \
+                              '_fs' + str(params['fs']) + '_' + \
+                              str(options.nid) + '.dat'
+                    psf_Mod_Gandy_sep(params['NA'], params['meu'], 
+                        params['meu0'], params['t_0'], params['tsO'], 
+                        params['meus'], params['tg'], params['tg0'], 
+                        params['meug'], params['meug0'], lambd, params['dlmn'],
+                        params['Plmn'], params['fs'],
+                        options.outname+'_lam'+str(lambd),'w', options.nid)
     
     elif remainder[0]=='gen_mono':
+        psf_header=options.psfheader
+        tsO=None
+        if params['psf_type']==1:
+            psf_header+='_tsO'+str(params['tsO'])
+            tsO=params['tsO']
         if options.data!=None: #Data available in a file
+            #Generates only slices.
             if options.mprocess==True: #Use multiprocessing
                 # siliscopy gen_mono -d [data] -s
-                gen_mono_c_mp(options.data)
+                gen_mono_c_mp(options.data,tsO=tsO)
             else:#Run serially
                 # siliscopy gen_mono -d [data]
-                gen_mono_c_serial(options.data)
-        else: #No data file
+                gen_mono_c_serial(options.data,tsO=tsO)
+        elif options.method=='volume':
+            gen_mono_c_vol_mp([options.filename, options.pfile, 
+                psf_header,options.outname], params['maxlen'],
+                params['opt_axis'], params['dlmn'], 
+                add_n=params['add_n'])
+        elif options.method=='slice': #No data file
             # siliscopy gen_mono -f [gro] -p [param] -o [out]
-            gen_mono_c([options.filename, options.pfile, options.psfheader, 
+            gen_mono_c([options.filename, options.pfile, psf_header, 
                         options.outname])
     
     elif remainder[0]=='plot':
@@ -203,13 +289,45 @@ def main():
                                      params['tmax'], params['tdiff'], 
                                      params['fs'], MaxBox, Bm, params['scale'], 
                                      params['dpi'], outname)
+        if options.method in ["noise_mono", "noise_grey", "noise_gray"]:
+            if options.calc=='show': #show specific
+                plot_errgrey_img(options.filename, params['I0'], params['lam'],
+                              params['T'], options.timestep, params['fs'],
+                              MaxBox, params['poi'], params['gauss'], Bm, 
+                              params['scale'], params['dpi'])
+    
+            elif options.calc in ["specific", "spec"]: #Specific output
+                plot_errgrey_img(options.filename, params['I0'], params['lam'],
+                              params['T'], options.timestep, params['fs'],
+                              MaxBox, params['poi'], params['gauss'], Bm, 
+                              params['scale'], params['dpi'], outname)
+            
+            elif options.calc == 'all':
+                print('t0 = '+str(params['t0']))
+                print('tmax = '+str(params['tmax']))
+                print('tdiff = '+str(params['tdiff']))
+                if options.mprocess==True: #parallel
+                    plot_errgrey_mp(options.filename, params['I0'], params['lam'],
+                                    params['T'], params['t0'], params['tmax'],
+                                    params['tdiff'], params['fs'], MaxBox, 
+                                    params['poi'], params['gauss'], Bm, 
+                                    params['scale'], params['dpi'], outname)
+                else: #Serial
+                    plot_errgrey_serial(options.filename, params['I0'], 
+                                        params['lam'], params['T'], params['t0'],
+                                        params['tmax'], params['tdiff'], 
+                                        params['fs'], MaxBox, params['poi'], 
+                                        params['gauss'], Bm, params['scale'], 
+                                        params['dpi'], outname)
+
         elif options.method in ["col", "color"]:
             print("hue = "+str(params["hue"]))
             if options.calc=='show': #show specific
                 plot_col_img(options.filename, params['I0'], params['lam'],
                              params['hue'], params['T'], options.timestep, 
                              params['fs'], MaxBox, Bm, params['scale'], 
-                             params['dpi'])
+                             params['dpi'], frame_col=params['frame_col'],
+                             mix_type=params['mix_type'])
     
             elif options.calc in ["specific", "spec"]: #Save Specific
                 plot_col_img(options.filename, params['I0'], params['lam'],
@@ -226,13 +344,60 @@ def main():
                                 params['hue'], params['T'], params['t0'], 
                                 params['tmax'], params['tdiff'], params['fs'], 
                                 MaxBox, Bm, params['scale'], params['dpi'], 
-                                outname)
+                                outname, params['frame_col'], 
+                                params['mix_type'])
+
                 else: #Serial
                     plot_col_serial(options.filename, params['I0'], 
                                     params['lam'], params['hue'], params['T'],
                                     params['t0'], params['tmax'],
                                     params['tdiff'], params['fs'], MaxBox, Bm,
-                                    params['scale'], params['dpi'],outname)
+                                    params['scale'], params['dpi'],
+                                    outname, params['frame_col'],
+                                    params['mix_type'])
+
+        elif options.method in ["noise_col", "noise_color"]:
+            print("hue = "+str(params["hue"]))
+            if options.calc=='show': #show specific
+                plot_errcol_img(options.filename, params['I0'], params['lam'],
+                                params['hue'], params['T'], options.timestep, 
+                                params['fs'], MaxBox, params['poi'], 
+                                params['gauss'], Bm, params['scale'], 
+                                params['dpi'], frame_col = params['frame_col'],
+                                mix_type = params['mix_type'])
+    
+            elif options.calc in ["specific", "spec"]: #Save Specific
+                plot_errcol_img(options.filename, params['I0'], params['lam'],
+                                params['hue'], params['T'], options.timestep, 
+                                params['fs'], MaxBox, params['poi'],
+                                params['gauss'], Bm, params['scale'], 
+                                params['dpi'], outfile = outname, 
+                                frame_col = params['frame_col'],
+                                mix_type = params['mix_type'])
+            
+            elif options.calc == 'all':
+                print('t0 = '+str(params['t0']))
+                print('tmax = '+str(params['tmax']))
+                print('tdiff = '+str(params['tdiff']))
+                if options.mprocess==True: #parallel
+                    plot_errcol_mp(options.filename, params['I0'],
+                                   params['lam'], params['hue'], params['T'], 
+                                   params['t0'], params['tmax'], 
+                                   params['tdiff'], params['fs'],MaxBox, 
+                                   params['poi'], params['gauss'], Bm, 
+                                   params['scale'], params['dpi'], 
+                                   outname, params['frame_col'], 
+                                   params['mix_type'])
+                else: #Serial
+                    plot_errcol_serial(options.filename, params['I0'], 
+                                       params['lam'], params['hue'], 
+                                       params['T'], params['t0'], 
+                                       params['tmax'], params['tdiff'], 
+                                       params['fs'], MaxBox, params['poi'], 
+                                       params['gauss'], Bm, params['scale'],
+                                       params['dpi'], outname,
+                                       params['frame_col'], params['mix_type'])
+
         elif options.method == 'region':
             print("hue = "+str(params["hue"]))
             if options.calc=='show': #show specific
@@ -263,7 +428,7 @@ def main():
             elif options.calc == 'all':
                 print('Not implemented!')
         else:
-            print('Method implemented') 
+            print('Method Not implemented') 
 
     elif remainder[0]=='video':
         print("fps = "+str(params['fps']))
@@ -329,6 +494,35 @@ def main():
                           pbc, options.outname, sh, white ) 
         else:
             print('Method not implemented')
+    elif remainder[0]=="convert":
+        if options.method == "psf2tiff":
+            if options.calc== None:
+                dtype='uint16'
+            else:
+                dtype=options.calc
+            psf_dat2tiff(options.filename, options.outname, params['Plmn'], \
+                params['dlmn'], dtype)
+        
+        elif options.method == "zstack2tiff":
+            if options.calc== None:
+                dtype='uint16'
+            else:
+                dtype=options.calc
+            zmax=int(params['maxlen'][params['opt_axis']]/params['dlmn'][2]+0.5)
+            zstack_dat2tiff(options.filename, options.outname, params['lam'], \
+                params['I0'], params['fs'], options.timestep, params['T'], \
+                MaxBox, zmax, params['opt_axis'], dtype, params['add_n']) 
+
+        elif options.method == "tstack2tiff":
+            if options.calc== None:
+                dtype='uint16'
+            else:
+                dtype=options.calc
+            tstack_dat2tiff(options.filename, options.outname, params['lam'], \
+                params['I0'], params['fs'], params['t0'], params['tmax'], \
+                params['tdiff'], params['T'], MaxBox, dtype) 
+        elif options.method == "img2color":
+            print('not implemented')  
     else:
         print("Function not specified or implemented") 
 if __name__=='__main__':

@@ -178,7 +178,7 @@ def get_num_area(filename, I0, lam, T, ti, fs, threshold, MaxBox, dlmn, pbc, \
     [outname].png:
         The thresholded image (if show=True).
     """
-    IMG_wf=get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, whiteframe=True)
+    IMG_wf=get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=True)
     IMG=[]
     for i in range(len(IMG_wf)):
         foo=IMG_wf[i][IMG_wf[i]>-1E-6]

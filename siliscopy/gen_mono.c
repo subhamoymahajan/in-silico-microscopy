@@ -74,12 +74,14 @@ double min(double a, double b){
    filename: Filename containing PSF data
     ****psf: Pointer containing PSF of all fluorophore types.
      lam_id: ID of fluorophore type
+   psf_type: 0 implies rotational symmetry and symmetry about object focal plane
+             1 implies rotational symmetrt and not symmetric about object focal plane
  */
 
-void read_psf(char filename[30],double  ****psf,int lam_id){
+void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
     FILE *f;
     char line[200], *pend, *pstart;
-    double x,y,z,I;
+    double x,y,z,I,foo;
     int i,j,k;
 
     f=fopen(filename,"r");
@@ -98,30 +100,49 @@ void read_psf(char filename[30],double  ****psf,int lam_id){
         
         // Ignoring lines were l', m', n' is not integral multiple 
         // of dl', dm', dn'. 
-	i=(int)(x/dx[0]+1E-3);
-        if (abs((double)i-x/dx[0])>1E-3){
+        if (x>0){
+  	    i=(int)(x/dx[0]+1E-3);
+        }
+        else {
+            i=(int)(x/dx[0]-1E-3);
+        }
+        
+        if (abs((double)i-x/dx[0])>1E-6){
             printf("x: ignoring PSF line: %d not equal to %f. Difference is %f\n"
                    ,i,x/dx[0],abs((double)i-x/dx[0]));
             continue;
         }
-
-        j=(int)(y/dx[1]+1E-3);
-        if (abs((double)j-y/dx[1])>1E-3){
+        if (y>0){
+            j=(int)(y/dx[1]+1E-3);
+        }
+        else{
+            j=(int)(y/dx[1]-1E-3);
+        }
+  
+        if (abs((double)j-y/dx[1])>1E-6){
             printf("y: ignoring PSF line: %d not equal to %f. Difference is %f\n"
                    ,j,y/dx[1],abs((double)j-y/dx[1]));
             continue;
         }
-
-        k=(int)(z/dx[2]+1E-3);
-        if (abs((double)k-z/dx[2])>1E-3){
-            printf("z: ignoring PSF line: %d not equal to %f. Difference is %f\n"
-                   ,k,z/dx[2],abs((double)k-z/dx[2]));
+        if (z>0){
+            k=(int)(z/dx[2]+1E-3);
+        }
+        else{
+            k=(int)(z/dx[2]-1E-3);
+        }
+        if (abs((double)k-z/dx[2])>1E-6){
+            printf("z: ignoring PSF line: %d not equal to (%f) %f. Difference is %f\n"
+                   ,k,z,z/dx[2],abs((double)k-z/dx[2]));
             continue;
+        }
+        if (psf_type==1){
+            k+=(Npsf[2]-1)/2;
         }
             
         if (k>=Npsf[2]){
             break;
         }
+        
         if ((i<Npsf[0])&&(j<Npsf[1])&&(k<Npsf[2])){
             psf[lam_id][i][j][k]=I;
             psf[lam_id][j][i][k]=I;
@@ -136,42 +157,55 @@ void read_psf(char filename[30],double  ****psf,int lam_id){
  *
  *    ****psf: Point spread function data 
  *     lam_id: ID of fluorophore type
- * ***fooIMG: Image intensity I(l',m') data
+ *  ***fooIMG: Image intensity I(l',m') data
  *        pos: Position of a fluorophore particle
+ *   psf_type: 0 implies rotational symmetry and symmetry about object focal plane
+ *             1 implies rotational symmetrt and not symmetric about object focal plane
  */
 
-void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3]){
+void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3], int psf_type){
 // psf, fooIMG, Npsf, x, MaxBox are in image coordinates-- 
 //      --->    no need to change direction based on opt_axis
 // Nbox, pos, dx are in MD coordinates -- 
 //      --->    need to change direction based on opt_axis
-
     int i, j, a, x[3], xid, yid, Mx, My;
     double tempxy, dz;
-    x[0]=(int)(pos[(opt_axis+1)%3]/dx[0]+1E-3); // l axis
-    x[1]=(int)(pos[(opt_axis+2)%3]/dx[1]+1E-3); // m axis
-    dz=fabs(pos[opt_axis]-focus_cor);// n axis
-
-    //To ensure atom is moved to the closed grid point 
-    tempxy=pos[(opt_axis+1)%3]/dx[0]-(double)x[0]; 
-    if (tempxy>0.5){
-        x[0]++;
+    if (pos[(opt_axis+1)%3]>0){
+        x[0]=(int)(pos[(opt_axis+1)%3]/dx[0]+0.5); // l axis
     }
-    tempxy=pos[(opt_axis+2)%3]/dx[1]-(double)x[1]; 
-    if (tempxy>0.5){
-        x[1]++;
+    else {
+        x[0]=(int)(pos[(opt_axis+1)%3]/dx[0]-0.5); // l axis
     }
-
+    if (pos[(opt_axis+2)%3]>0){
+        x[1]=(int)(pos[(opt_axis+2)%3]/dx[1]+0.5); // m axis
+    }
+    else {
+        x[1]=(int)(pos[(opt_axis+2)%3]/dx[1]-0.5); // m axis
+    }
+   
+    dz=focus_cor-pos[opt_axis];// n axis
     if (pbc[opt_axis]==1){//Check if PBC is applied in optical direction
         if (dz>length[opt_axis]*0.5){
-            dz=fabs(dz-length[opt_axis]); // PBC considerations
+            dz-=length[opt_axis]; // PBC considerations
+        }
+        else if (dz<-length[opt_axis]*0.5){
+            dz+=length[opt_axis]; // PBC considerations
         }
     }
-    x[2]=(int)(dz/dx[2]+1E-3);
+    if (psf_type==0){
+        x[2]=(int)(fabs(dz)/dx[2]+0.5);
+    }
+    else if (psf_type==1){
+        if (dz>0){
+            x[2]=(int)(dz/dx[2]+0.5)+(Npsf[2]-1)/2;
+        }
+        else {
+            x[2]=(int)(dz/dx[2]-0.5)+(Npsf[2]-1)/2;
+        }
+    }
     Mx=(MaxBox[0]-Nbox[0])/2;
     My=(MaxBox[1]-Nbox[1])/2;
-
-    if (abs(x[2])*2<Npsf[2]){
+    if ((x[2]<Npsf[2])&&(x[2]>=0)){
         for (i=-Npsf[0]+1;i<Npsf[0];i++){
             for (j=-Npsf[1]+1;j<Npsf[1];j++){
                 xid=i+x[0];
@@ -190,7 +224,7 @@ void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3]){
                 // To check if the image coordinate exists is in [0,Pl'] or 
                 //  [0,Pm'].
                     fooIMG[lam_id][xid][yid]+= 
-                                        psf[lam_id][abs(i)][abs(j)][abs(x[2])];
+                                        psf[lam_id][abs(i)][abs(j)][x[2]];
                 }
             }
         }
@@ -204,11 +238,13 @@ void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3]){
  *   filename: Name of thr gromacs file
  *  ***fooIMG: Pointer containing image intensities
  *    ****psf: Pointer containing PSF.
+ *   psf_type: 0 implies rotational symmetry and symmetry about object focal plane
+ *             1 implies rotational symmetrt and not symmetric about object focal plane
  */
-void read_gro(char filename[30], double ***fooIMG, double ****psf){
+void read_gro(char filename[30], double ***fooIMG, double ****psf, int psf_type){
     FILE *f;
     int cnt=0, N, i, j;
-    char line[70], atom_name[6], pos_str[9], *pend; //Charcter start pointer
+    char line[200], atom_name[6], pos_str[9], *pend; //Charcter start pointer
     double pos[3];
     f = fopen(filename,"r");
     if (f==NULL){
@@ -216,7 +252,7 @@ void read_gro(char filename[30], double ***fooIMG, double ****psf){
         exit(-1);
     }
 
-    while (fgets(line,70,f)!=NULL){
+    while (fgets(line,200,f)!=NULL){
         if (cnt==1){
             N=atoi(line);
         }
@@ -231,11 +267,10 @@ void read_gro(char filename[30], double ***fooIMG, double ****psf){
                 i++; }
             strncpy(atom_name,line+10+i,5-i);
 	    atom_name[5-i]='\0';
-
             for (i=0;i<nlam;i++){
                 for (j=0;j<nlam_atoms[i];j++){
-                    if (strcmp(atom_name,lam_atoms[i][j])==0){ //atomname matches 
-                        get_intensity(psf,i,fooIMG,pos);//Update get_intensity
+                    if (strcmp(atom_name,lam_atoms[i][j])==0){ //atomname matches
+                        get_intensity(psf,i,fooIMG,pos,psf_type);//Update get_intensity
                         break; //There is only one atom name so we should break.
                     }
                 }
@@ -301,7 +336,7 @@ int main(int argc, char* argv[] )
    -p parameters file (input)
    -psf PSF header name (input)
 *///////////////////////////////Define Variables////////////////////////////////
-    int i, j, k, l, val;
+    int i, j, k, l, val, psf_type=0;
     char infile[50], outfile[50], paramfile[50], filename[70], line[1200], *a, 
          *varname, *pend, outmod[100];
     double maxsize[2]={0.0,0.0};
@@ -309,6 +344,9 @@ int main(int argc, char* argv[] )
 /*  INTEGERS:
     i,j,k,l: are iteration variables
     val: generic value variable 
+    psf_type: 0 implies rotational symmetry and symmetry about object focal plane (Gandy, default)
+              1 implies rotational symmetry not symmetrical about object focal plane (Gibson and Lanni)
+    currently both types are shift-invariant. For Depth-varying PSF different PSF should be read.
 
     CHARACTERS:
     infile: Input .gro structure file name. 
@@ -345,7 +383,7 @@ int main(int argc, char* argv[] )
             printf("paramfile is %s\n",paramfile);
             val++;
         }
-        else if (strcmp(argv[i-1],"-psf")==0){ // Parameters file
+        else if (strcmp(argv[i-1],"-psf")==0){ // PSF header name file
             strcpy(psfheader,argv[i]);
             printf("psfheader is %s\n",psfheader);
             val++;
@@ -448,6 +486,10 @@ int main(int argc, char* argv[] )
             }
             printf("%s = [%f,%f,%f]\n",varname,Lpsf[0],Lpsf[1],Lpsf[2]);   
         }
+        else if(strcmp(varname,"psf_type")==0){
+            psf_type=atoi(a);
+            printf("%s = %d\n",varname,psf_type);
+        }
     }
     fclose(f); 
     ///////////////////////////////////////////////////////////////////////////
@@ -482,6 +524,9 @@ int main(int argc, char* argv[] )
         // dx: voxel size dl, dm and dn
         // Number of voxels in MD simulation box in l, m, n
         Nbox[i]=(int)(length[(opt_axis+i+1)%3]/dx[i]+1E-3); 
+    }
+    if (psf_type==1){
+        Npsf[2]=(int)(Lpsf[2]/dx[2]+1E-4)*2+1;
     }
     // Maximum number of voxels in largest MD simulation box in l and m. 
     MaxBox[0]=(int)(maxl[(opt_axis+1)%3]/dx[0]+1E-3); // Same as B*_l
@@ -572,13 +617,13 @@ int main(int argc, char* argv[] )
     //Read PSF
     for(i=0;i<nlam;i++){
         sprintf(filename,"%s_lam%d_fs%d.dat",psfheader,lam[i],fs);
-        read_psf(filename,psf,i);
+        read_psf(filename,psf,i,psf_type);
         printf("%s: PSF for %d nm read.\n",filename,lam[i]);
     }
     printf("PSF read\nReading Gro\n");
 
     // Read gro and calculate I(l',m')
-    read_gro(infile,fooIMG,psf);
+    read_gro(infile,fooIMG,psf,psf_type);
     printf("Analyzing Gro done\n");
 
     // Writing I(l',m')

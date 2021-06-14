@@ -17,6 +17,7 @@
 
 import os
 import multiprocessing as mp
+from . import convert
 def gen_mono_c(data):
     """ Runs the C-binary to calculate monochome intensities
  
@@ -52,7 +53,7 @@ def read_data(datafile):
         Arguments.append(foo)
     return Arguments 
 
-def gen_mono_c_mp(datafile):
+def gen_mono_c_mp(datafile,ts=None):
     """ Runs gen_mono_c using multiprocessing. Reads the required filenames 
         from a file.
 
@@ -66,10 +67,13 @@ def gen_mono_c_mp(datafile):
     multiple files similar to gen_mono_c
     """
     Arguments=read_data(datafile)
+    if ts!=None:
+        for i in range(len(Arguments)):
+            Arguments[i][2]+='_ts'+str(ts)
     pool=mp.Pool(mp.cpu_count())
     results=pool.map(gen_mono_c,Arguments)
 
-def gen_mono_c_serial(datafile):
+def gen_mono_c_serial(datafile,ts=None):
     """ Runs gen_mon_c serially multiple times, using the filenames acquired
         from a file.
 
@@ -83,5 +87,26 @@ def gen_mono_c_serial(datafile):
     multiple files similar to gen_mono_c
     """
     Arguments=read_data(datafile)
+    if ts!=None:
+        for i in range(len(Arguments)):
+            Arguments[i][2]+='_ts'+str(ts)
     for i in range(len(Arguments)):
         gen_mono_c(Arguments[i])
+
+def gen_mono_c_vol_mp(data,maxlen,opt_axis,dlmn,add_n=1):
+    xyz='xyz'
+    N=int(maxlen[opt_axis]/dlmn[2]+1E-3)
+    N1=int(N/add_n +1E-3)
+    w=open(data[0]+'datalist.dat','w')
+    for i in range(N1):
+        n=round(i*add_n*dlmn[2],4)
+        os.system("sed 's/focus_cor.*/focus_cor = "+str(n)+"/g' "+data[1]+" > " + \
+            data[0]+"foo_param"+str(i*add_n) + ".dat")
+        w.write(data[0] + ','+str(data[0])+'foo_param' + str(i*add_n) + '.dat,' + data[2] + ',' + \
+            data[3]+ '_'+ xyz[opt_axis] + str(i*add_n) + '\n')
+    w.close()
+
+    gen_mono_c_mp(data[0]+'datalist.dat')
+    #Cleanup
+    os.system('rm '+str(data[0])+'foo_param*.dat')
+    os.system('rm '+str(data[0])+'datalist.dat')
