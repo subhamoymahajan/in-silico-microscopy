@@ -20,21 +20,21 @@ import os
 import numpy as np
 import cv2
 
-def gen_vid(begin_name,end_name,vid_ext,fps,t0,tmax,tdiff,fourcc):
+def gen_vid(begin_name,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc):
     """ Generates a video from given begining and ending names of JPEG images.
     
     Parameters
     ----------
     """
     vidname=begin_name+end_name+vid_ext
-    fname=begin_name+str(t0)+end_name+'.jpeg'
+    fname=begin_name+str(tbegin)+end_name+'.jpeg'
     if not os.path.exists(fname):
         raise Exception("File "+fname+" does not exist")
     img0=cv2.imread(fname)
     h,w,l=img0.shape
     fourcc=cv2.VideoWriter_fourcc(*fourcc)
     video=cv2.VideoWriter(vidname,fourcc,fps,(w,h))
-    for i in range(t0,tmax,tdiff):
+    for i in range(tbegin,tmax,tdiff):
         fname=begin_name+str(i)+end_name+'.jpeg'
         if not os.path.exists(fname):
             raise Exception("File "+fname+" does not exist")
@@ -42,18 +42,18 @@ def gen_vid(begin_name,end_name,vid_ext,fps,t0,tmax,tdiff,fourcc):
     video.release()
     print("Writing: "+vidname)
 
-def gen_vid_mono(filename,t0,tmax,tdiff,T,fs,lam_I0s,lams,vid_ext,fps,fourcc):
+def gen_vid_mono(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,lams,vid_ext,fps,fourcc):
     for i in range(len(lams)):
         end_name='_lam'+str(lams[i])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0s[i])
-        gen_vid(filename,end_name,vid_ext,fps,t0,tmax,tdiff,fourcc)
+        gen_vid(filename,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc)
     
-def gen_vid_col(filename,t0,tmax,tdiff,T,fs,lam_I0s,vid_ext,fps,fourcc):
+def gen_vid_col(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,vid_ext,fps,fourcc):
     Istring=''
     for i in range(len(lam_I0s)):
         Istring+='_'+str(lam_I0s[i])
     
     end_name='_fs'+str(fs)+'_T'+str(T)+'_I'+Istring
-    gen_vid(filename,end_name,vid_ext,fps,t0,tmax,tdiff,fourcc)
+    gen_vid(filename,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc)
 
 
 def gen_vid_data(datafile,outname,fps,fourcc):

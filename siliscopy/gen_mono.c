@@ -80,9 +80,9 @@ double min(double a, double b){
 
 void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
     FILE *f;
-    char line[200], *pend, *pstart;
-    double x,y,z,I,foo;
-    int i,j,k;
+    char line[200], *pend;
+    double x,y,z,I;
+    int i,j,k,cnt=0;
 
     f=fopen(filename,"r");
     if (f==NULL){
@@ -106,35 +106,55 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
         else {
             i=(int)(x/dx[0]-1E-3);
         }
-        
-        if (abs((double)i-x/dx[0])>1E-6){
-            printf("x: ignoring PSF line: %d not equal to %f. Difference is %f\n"
-                   ,i,x/dx[0],abs((double)i-x/dx[0]));
-            continue;
+        if (cnt<10){
+            if (fabs((double)i-x/dx[0])>dx[0]*0.1){
+                printf("x: ignoring PSF line: %d not equal to %f. Difference is %f\n"
+                       ,i,x/dx[0],fabs((double)i-x/dx[0]));
+                cnt++;
+                if (cnt==10){
+                    printf("Similar output will not be shown as it repeated 10 times.\n");
+                }
+                continue;
+            }
         }
+
         if (y>0){
             j=(int)(y/dx[1]+1E-3);
         }
         else{
             j=(int)(y/dx[1]-1E-3);
         }
-  
-        if (abs((double)j-y/dx[1])>1E-6){
-            printf("y: ignoring PSF line: %d not equal to %f. Difference is %f\n"
-                   ,j,y/dx[1],abs((double)j-y/dx[1]));
-            continue;
+        if (cnt<10){  
+            if (fabs((double)j-y/dx[1])>dx[1]*0.1){
+                printf("y: ignoring PSF line: %d not equal to %f. Difference is %f\n"
+                       ,j,y/dx[1],fabs((double)j-y/dx[1]));
+                cnt++;
+                if (cnt==10){
+                    printf("Similar output will not be shown as it repeated 10 times.\n");
+                }
+                continue;
+            }
         }
+        
+
         if (z>0){
             k=(int)(z/dx[2]+1E-3);
         }
         else{
             k=(int)(z/dx[2]-1E-3);
         }
-        if (abs((double)k-z/dx[2])>1E-6){
-            printf("z: ignoring PSF line: %d not equal to (%f) %f. Difference is %f\n"
-                   ,k,z,z/dx[2],abs((double)k-z/dx[2]));
-            continue;
+        if (cnt<10){
+            if (fabs((double)k-z/dx[2])>dx[2]*0.1){
+                printf("z: ignoring PSF line: %d not equal to %f. Difference is %f\n"
+                       ,k,z/dx[2],fabs((double)k-z/dx[2]));
+                cnt++;
+                if (cnt==10){
+                    printf("Similar output will not be shown as it repeated 10 times.\n");
+                }
+                continue;
+            }
         }
+
         if (psf_type==1){
             k+=(Npsf[2]-1)/2;
         }
@@ -168,8 +188,8 @@ void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3], i
 //      --->    no need to change direction based on opt_axis
 // Nbox, pos, dx are in MD coordinates -- 
 //      --->    need to change direction based on opt_axis
-    int i, j, a, x[3], xid, yid, Mx, My;
-    double tempxy, dz;
+    int i, j, x[3], xid, yid, Mx, My;
+    double dz;
     if (pos[(opt_axis+1)%3]>0){
         x[0]=(int)(pos[(opt_axis+1)%3]/dx[0]+0.5); // l axis
     }
@@ -203,6 +223,7 @@ void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3], i
             x[2]=(int)(dz/dx[2]-0.5)+(Npsf[2]-1)/2;
         }
     }
+
     Mx=(MaxBox[0]-Nbox[0])/2;
     My=(MaxBox[1]-Nbox[1])/2;
     if ((x[2]<Npsf[2])&&(x[2]>=0)){
@@ -225,6 +246,7 @@ void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3], i
                 //  [0,Pm'].
                     fooIMG[lam_id][xid][yid]+= 
                                         psf[lam_id][abs(i)][abs(j)][x[2]];
+                    //printf("xid=%d yid=%d, i=%d, j=%d, PSF=%f\n",xid,yid,i,j,psf[lam_id][abs(i)][abs(j)][x[2]]);
                 }
             }
         }
@@ -243,7 +265,7 @@ void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3], i
  */
 void read_gro(char filename[30], double ***fooIMG, double ****psf, int psf_type){
     FILE *f;
-    int cnt=0, N, i, j;
+    int cnt=0, N, i, j, bb1=0;
     char line[200], atom_name[6], pos_str[9], *pend; //Charcter start pointer
     double pos[3];
     f = fopen(filename,"r");
@@ -266,7 +288,14 @@ void read_gro(char filename[30], double ***fooIMG, double ****psf, int psf_type)
             while(line[10+i]==' '){
                 i++; }
             strncpy(atom_name,line+10+i,5-i);
-	    atom_name[5-i]='\0';
+            
+            for (j=0;j<5-i;j++){
+                if (atom_name[j]==' '){
+                    break;
+                }
+            }
+	    atom_name[j]='\0';
+
             for (i=0;i<nlam;i++){
                 for (j=0;j<nlam_atoms[i];j++){
                     if (strcmp(atom_name,lam_atoms[i][j])==0){ //atomname matches
@@ -339,7 +368,6 @@ int main(int argc, char* argv[] )
     int i, j, k, l, val, psf_type=0;
     char infile[50], outfile[50], paramfile[50], filename[70], line[1200], *a, 
          *varname, *pend, outmod[100];
-    double maxsize[2]={0.0,0.0};
 
 /*  INTEGERS:
     i,j,k,l: are iteration variables
@@ -426,7 +454,7 @@ int main(int argc, char* argv[] )
             printf("%s = [%f,%f,%f]\n",varname,maxl[0],maxl[1],maxl[2]);   
         }
         else if(strcmp(varname,"pbc")==0){
-            while ((a != NULL)&&(*a != '\n')){
+            while ((*a != '\0')&&(*a != '\n')){
                 i=*a-'x';
                 if ((i<=2)&&(i>=0)){
                    pbc[i]=1;
@@ -448,7 +476,7 @@ int main(int argc, char* argv[] )
                 while(a!=NULL){
                     strcpy(lam_atoms[val][nlam_atoms[val]],a);
                     a=strtok(NULL," \n");
-                    printf("%s ",lam_atoms[val][nlam_atoms[val]]);
+                    printf("'%s' ",lam_atoms[val][nlam_atoms[val]]);
                     nlam_atoms[val]++;
                 }
                 printf("\n");

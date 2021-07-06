@@ -18,7 +18,7 @@
 import os
 import multiprocessing as mp
 from . import convert
-def gen_mono_c(data):
+def gen_mono_c(data,silent=False):
     """ Runs the C-binary to calculate monochome intensities
  
     Parameters
@@ -35,7 +35,11 @@ def gen_mono_c(data):
         Intensity of -1 represents the white frame (absence of molecular
         simulation system).
     """
-    os.system(os.path.dirname(__file__) + '/gen_mono -f ' + data[0] + ' -p ' + 
+    if silent:
+        os.system(os.path.dirname(__file__) + '/gen_mono -f ' + data[0] + ' -p ' + 
+              data[1]+' -psf '+data[2]+' -o '+data[3] +' 1> /dev/null')
+    else:
+        os.system(os.path.dirname(__file__) + '/gen_mono -f ' + data[0] + ' -p ' + 
               data[1]+' -psf '+data[2]+' -o '+data[3])
 
 def read_data(datafile):
@@ -53,7 +57,7 @@ def read_data(datafile):
         Arguments.append(foo)
     return Arguments 
 
-def gen_mono_c_mp(datafile,ts=None):
+def gen_mono_c_mp(datafile,maxlen,opt_axis,dlmn,add_n=1,ts=None):
     """ Runs gen_mono_c using multiprocessing. Reads the required filenames 
         from a file.
 
@@ -70,10 +74,21 @@ def gen_mono_c_mp(datafile,ts=None):
     if ts!=None:
         for i in range(len(Arguments)):
             Arguments[i][2]+='_ts'+str(ts)
-    pool=mp.Pool(mp.cpu_count())
-    results=pool.map(gen_mono_c,Arguments)
+    Arg_slice=[]
+    Arg_vol=[]
+    for i in range(len(Arguments)):
+        if Arguments[i][-1]=='volume':
+            Arg_vol.append(Arguments[i])
+        else: #slice
+            Arg_slice.append(Arguments[i])
 
-def gen_mono_c_serial(datafile,ts=None):
+    pool=mp.Pool(mp.cpu_count())
+    results=pool.map(gen_mono_c,Arg_slice)
+
+    for i in range(len(Arg_vol)):
+        gen_mono_c_vol(Arg_vol[i],maxlen,opt_axis,dlmn,add_n,mprocess=True)
+
+def gen_mono_c_serial(datafile,maxlen, opt_axis, dlmn, add_n=1, ts=None):
     """ Runs gen_mon_c serially multiple times, using the filenames acquired
         from a file.
 
@@ -91,9 +106,13 @@ def gen_mono_c_serial(datafile,ts=None):
         for i in range(len(Arguments)):
             Arguments[i][2]+='_ts'+str(ts)
     for i in range(len(Arguments)):
-        gen_mono_c(Arguments[i])
+        if Arguments[i][-1]=='volume':
+            gen_mono_c_vol(Arguments[i], maxlen, opt_axis, dlmn, add_n, 
+                mprocess=False)
+        else:#slice
+            gen_mono_c(Arguments[i])
 
-def gen_mono_c_vol_mp(data,maxlen,opt_axis,dlmn,add_n=1):
+def gen_mono_c_vol(data,maxlen,opt_axis,dlmn,add_n=1,mprocess=True):
     xyz='xyz'
     N=int(maxlen[opt_axis]/dlmn[2]+1E-3)
     N1=int(N/add_n +1E-3)
@@ -105,8 +124,12 @@ def gen_mono_c_vol_mp(data,maxlen,opt_axis,dlmn,add_n=1):
         w.write(data[0] + ','+str(data[0])+'foo_param' + str(i*add_n) + '.dat,' + data[2] + ',' + \
             data[3]+ '_'+ xyz[opt_axis] + str(i*add_n) + '\n')
     w.close()
-
-    gen_mono_c_mp(data[0]+'datalist.dat')
+    if mprocess==True:
+        gen_mono_c_mp(data[0]+'datalist.dat')
+    else:
+        gen_mono_c_serial(data[0]+'datalist.dat')
+ 
     #Cleanup
     os.system('rm '+str(data[0])+'foo_param*.dat')
     os.system('rm '+str(data[0])+'datalist.dat')
+

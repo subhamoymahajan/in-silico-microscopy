@@ -119,6 +119,7 @@ def psf_gandy_sep(NA, meu, lambd, dlmn, Plmn, fs, outname, otype, nidx):
             w.write(str(l).rjust(10) + str(m).rjust(10) + str(n).rjust(10) + \
                     str(I).rjust(10) + '\n')
     print('n = '+str(n)+' done')
+    w.close()
 
 def worker_gandy(data):
     """Runs psf_gandy_sep. It is used by psf_gandy_mp.
@@ -241,7 +242,7 @@ def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
         NArho=NA*rho
         NArho2=NArho**2  #To reduce computational cost
         cmeu=np.sqrt(meu**2-NArho2) # cos(\theta_meu)
-        OPD=-z*np.sqrt(meus**2-NArho2)*0.001 
+        OPD=-z*np.sqrt(meus**2-NArho2) 
         #OPD is in micrometers. z is in nanometers
         if tsO>1E-6:
             OPD+=tsO*(np.sqrt(meus**2-NArho2) - meu/meus*cmeu)
@@ -259,7 +260,7 @@ def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
         NArho=NA*rho
         NArho2=NArho**2  #To reduce computational cost
         cmeu=np.sqrt(meu**2-NArho2) # cos(\theta_meu)
-        OPD=-z*np.sqrt(meus**2-NArho2)*0.001 
+        OPD=-z*np.sqrt(meus**2-NArho2)
         #OPD is in micrometers. z is in nanometers
         if tsO>1E-6:
             OPD+=tsO*(np.sqrt(meus**2-NArho2) - meu/meus*cmeu)
@@ -277,7 +278,7 @@ def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
     if otype=='w':
         w.write('# NA= '+str(NA) + ', lambda= '+str(lambd)+' nm' + ', dlmn= ('+\
                 str(dlmn[0])+','+str(dlmn[1])+','+str(dlmn[2])+') nm' + \
-                ', Plmn= ('+str(Plmn[0])+','+str(Plmn[1])+','+str(Plmn)+') nm'+\
+                ', Plmn= ('+str(Plmn[0])+','+str(Plmn[1])+','+str(Plmn[2])+') nm'+\
                 ', fs= '+str(fs) + ', meu= '+str(meu) + ', meu0= '+str(meu0) +\
                 ', t0= '+str(t0)+' nm' + ', tsO= '+str(tsO)+' nm' + ', meus= '+\
                 str(meus) + ', tg= '+str(tg)+' nm' + ', tg0= '+str(tg0)+' nm' +\
@@ -302,6 +303,7 @@ def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
             w.write(str(l).rjust(10) + str(m).rjust(10) + str(n).rjust(10) + \
                     ' ' + str(I) + '\n')
     print('n = '+str(n)+' done')
+    w.close()
 
 def psf_GL1991_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
     dlmn, Plmn, fs, outname):
@@ -481,6 +483,7 @@ def psf_Mod_Gandy_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
             w.write(str(l).rjust(10) + str(m).rjust(10) + str(n).rjust(10) + \
                     ' ' + str(I) + '\n')
     print('n = '+str(n)+' done')
+    w.close()
 
 def psf_Mod_Gandy_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
     lambd, dlmn, Plmn, fs, outname):

@@ -26,11 +26,9 @@ python setup.py install --user
 
 Generates a PSF file where each line represents the <img src="https://render.githubusercontent.com/render/math?math=l^'">,  <img src="https://render.githubusercontent.com/render/math?math=m^'">,  <img src="https://render.githubusercontent.com/render/math?math=n^'">, and PSF intensity <img src="https://render.githubusercontent.com/render/math?math=PSF(l^',m^',n^')">. The PSF intensity is only printed for <img src="https://render.githubusercontent.com/render/math?math=m^' \leq l^'">.
 
-Currently the PSF is only evaluated based on R. O. Gandy, **1954**, Proc. Phys. Soc. B, 67, 825-831. 
-
 
 ```bash
-siliscopy gen_psf --method gandy \
+siliscopy gen_psf --method [Gandy/GL1991/Mod_Gandy] \
                  --paramfile [parameter file] \
                  --calc all \
                  --output [output file header] \
@@ -43,6 +41,17 @@ siliscopy gen_psf --method gandy \
 > **_Note3:_** Creates file `output file header`\_lam`lam[i]`\_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.  
 >  
 
+Current version 1.2.2 can generate three PSFs. Depth-invariant PSF (`psf_type = 0`) Gandy (`Gandy`), and depth-variant (`psf_type = 1`) Gibson and Lanni (`GL1991`), and Modified Gandy (`Mod_Gandy`). 
+
+[2] Gandy PSF: R. O. Gandy, Out-of-Focus Diffraction Patterns for Microscope Objectives, *Proc. Phys. Soc. B* **1954**, 67, 825-831.
+[3] Gibson and Lanni PSF: S. F. Gibson, and F. Lanni, Experimental test of an analytical model of aberration in an oil-immersion objective lens used in three-dimensional light microscopy, *J. Opt. Soc. Am. A* **1991**, 8, 1601-1613.
+[4] Gibson and Lanni PSF: S. F. Gibson, and F. Lanni, Experimental test of an analytical model of aberration in an oil-immersion objective lens used in three-dimensional light microscopy, *J. Opt. Soc. Am. A* **1992**, 9, 154-166. (Same as [3] but better images)
+[5] Modified Gandy PSF: Upcoming publication.
+
+> **_Note4:_** The functional form of Gibson and Lanni PSF is changed to be compatible with `siliscopy` and will be reported in the upcoming journal.
+>  
+
+
 ### 2. Generate Monochrome Image Intensity 
 
 Calculate the monochrome image intensity using the convolution between PSF and particle number density (ρ), 
@@ -51,8 +60,11 @@ Calculate the monochrome image intensity using the convolution between PSF and p
 
 The output file consisted of intensity values for <img src="https://render.githubusercontent.com/render/math?math=(l^',m^')"> coordinates. 
 While evaluating <img src="https://render.githubusercontent.com/render/math?math=I">, periodic boundary condition was applied.
-The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> is between 0 and 1 (both included). Intensity of -1 was used in 
-to represent the white frame where molecular simulation system is absent (See Cite for more details).
+The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> is between 0 and 1 (both included). Intensity of -1 was used 
+in to represent the white frame where molecular simulation system is absent (See Ref [1] for more details). 
+The image can be generated for a specific object focal plane (`slice`) or multiple object focal planes (3D image; `volume`) using the method option.
+The default method is `slice`. 
+
 
 Single file:
 
@@ -61,6 +73,7 @@ siliscopy gen_mono --file [GRO file] \
                    --paramfile [parameter file] \
                    --psf [PSF file header]
                    --output [output file header]
+                   --method [slice/volume]
 ```
 
 Multiple file with parallel processing:
@@ -75,17 +88,17 @@ Template of data file:
 Store all filenames, parameter file (can be the same), PSF header file name (can be the same), output file header separated by ','. For each new monochrome image intensity evaluation, write the arguments in a new line. For example,
 
 ```data
-file1.gro,param1.dat,psf.dat,out1
-file2.gro,param2.dat,psf.dat,out2
+file1.gro,param1.dat,psf.dat,out1,method
+file2.gro,param2.dat,psf.dat,out2,method
 ```
 
 > **_Note1:_** Index each output file with an index, which can be the timestep of the simulation.  
 >  
-> **_Note2:_** The file names `output file header`\_lam`lam[i]`\_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from `parameter file`.  
+> **_Note2:_** The file names `output file header`\_lam`lam[i]`\_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from the parameter file.  
 >  
 > **_Note3:_** This runs a C-binary code for faster calculation.    
 >  
-> **_Note4:_** Use parallel processing when the number of files is high. Parallelism is not implemented for files.  
+> **_Note4:_** Use parallel processing when the number of files is high. Parallelism is not implemented for individual files.  
 >  
 > **_Note5:_** `GRO file` must contain only one timestep.  
 >  
@@ -98,23 +111,24 @@ Generate *In-silico* microscopy images. If saved to a file, all images are saved
 
 #### Plot monochrome image
 
-Show specific file
+Show specific image
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [Parameter file] \
-               --method mono \
+               --method [mono/mono3d/mono3dt/noise_mono/noise_mono3d/noise_mono3dt] \
                --timestep [timestep] \
                --calc show
 ```
 
-Save a specific JPEG file:
+Save a specific image:
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [parameter file] \
-               --method mono \
+               --method [mono/mono3d/mono3dt/noise_mono/noise_mono3d/noise_mono3dt] \
                --timestep [timestep] \
                --calc specific \
                --output [output file header] 
+               --type [jpeg/png/tiff8/tiff16]
 ```
 > **_Note1:_** If `--output` is not provided, then `output file header` its taken to be the same as `filename header`  
 >  
@@ -126,25 +140,24 @@ siliscopy plot --file [filename header] \
 >   
 > **_Note5:_** The calculation method `specific` and `spec` yeild the same results.   
 
-Save multiple JPEG files with parallel processing:
+Save multiple images with parallel processing:
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [parameter file] \
-               --method mono \
+               --method [mono/mono3d/mono3dt/noise_mono/noise_mono3d/noise_mono3dt] \
                --calc all \
                --output [output file header]
+               --type [jpeg/png/tiff8/tiff16]
                --multiprocess
 ```
 To calculate it serially remove `--multiprocess`
 
 > **_Note6:_** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.  
 >  
-> **_Note7:_** The method name `gray`, `grey` and `mono` can be used interchangably.  
->  
 
 #### Plot Color Image
 
-The commands remain the same as monochrome image. Replace the method `mono` with `color` or `col`.
+The commands remain the same as monochrome image. Replace the method `mono` with `color`.
  
 > **_Note1:_** If outname is not provided its taken to be the same as `filename header`  
 >  
@@ -254,22 +267,33 @@ The parameter file should contain the following parameters (Not all are used in 
 * `lam_names[i]`: (str str ... str). Atom names of [i]th fluorophore type. Replace [i] with integers strating from 1. Currently 200 names are supported.
 * `dlmn`: (float float float). The voxel dimensions <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> in nm.  
 * `Plmn`: (float float float). The dimensions of the box in nm within which PSF is calculated; <img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">
-* `psfheader`: = PSF\_gandy // starting characters with which PSF was saved (to be removed)
 * `pbc`: (str). Directions in which periodic boundary condition is active. `None`, `x`, `y`, `z`, `xy`, `yz`, `xz`, or `xyz`.
 * `NA`: (float). Numerical aperture.
 * `meu`: (float). Refractive index of immersion oil.
-* `beta`: (float). Maximum half-angle as seen from immersion oil. <img src="https://render.githubusercontent.com/render/math?math=sin^{-1}(NA/\mu)">.
+
 * `T`: (int). Number of consecutive timesteps to average the the *in-silico* microscopy image.
 * `lam_hue[i]`: (float). Hue in degrees of [i]th fluorophore type. Replace [i] with integers starting from 1.
 * `lam_I0_[i]`:  (float). Maximum image intensity of of [i]th fluorophore type. Replace [i] with integers starting from 1.
 * `scale`: (float). Length of scale bar in nm. 
 * `dpi`: (int). Dots per square inch of the output image. The image resolution is also dependent on `dlmn`. 
-* `t0`: (int). Index associated with first timestep (will be included).
+* `tbegin`: (int). Index associated with first timestep (will be included).
 * `tmax`: (int). Index associated with last timestep (will not be included).
 * `tdiff`: (int). Difference in index associated with timestep.
 * `fps`: (int). Frames per second of the output video. (default value is 1)
 * `vid_ext`: (str). The extension of the output video. (default value is .mov)
 * `fourcc`: ('str'). The four character code of the encoder with which video will be created. (default value is 'mp4v') 
+
+Parameters for Gibson-Lanni and Modified-Gandy PSF.
+
+* `meu0`: (float). Refractive index of immersion oil in design condition. 
+* `t0`: (float). Thickness of immersion oil in design condition in nanometer. 
+* `meug`: (float). Refractive index of coverslip. 
+* `meug0`: (float). Refractive index of coverslip in design condition. 
+* `tg`: (float). Thickness of immersion oil in design condition in nanometer. 
+* `tg0`: (float). Thickness of immersion oil in design condition in nanometer. 
+* `meus`: (float). Refractive index of specimen. 
+* `tsO`: (float). Location of object focal plane below the coverslip in nanometers. 
+* `psf_type`: (int). Default value is 0 is for Gandy PSF (Circular symmetry and depth-invariant). Value of 1 is for Gibson-Lanni and Modified-Gandy (Circular symmetry and depth-variant).  
 
 # Contributors
 1. Subhamoy Mahajan, PhD student, Mechanical Engineering, University of Alberta, Edmonton, Canada (will graduate by Sep, 2021)

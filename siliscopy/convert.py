@@ -15,7 +15,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.)
 import numpy as np
-import colorsys
 import os
 import multiprocessing as mp
 import cv2
@@ -146,7 +145,7 @@ def zstack_dat2tiff(filename, outname, lams, I0s, fs, ti, T, MaxBox, zmax, \
         tif.imsave(outname+str(ti) + '_'+xyz[opt_axis] +'_lam'+str(lams[l])+ \
             '_fs'+str(fs) +'_T'+str(T) +'.tiff',img)
         
-def tstack_dat2tiff(filename, outname, lams, I0s, fs, t0, tmax, tdiff, T, \
+def tstack_dat2tiff(filename, outname, lams, I0s, fs, tbegin, tmax, tdiff, T, \
     MaxBox, dtype='uint16'):
     """ Plots Generate a tiff file from multiple time frames for the same 
         zstack (similar to a video). Currently only works for monocolors.
@@ -154,7 +153,7 @@ def tstack_dat2tiff(filename, outname, lams, I0s, fs, t0, tmax, tdiff, T, \
     Looks for image data file 
 
     [filename][ti to ti+T]_lam[lam]_fs[fs].dat for ti>0
-    ti belongs to range(t0,tmax,tdiff)
+    ti belongs to range(tbegin,tmax,tdiff)
 
     Parameter
     ---------
@@ -168,7 +167,7 @@ def tstack_dat2tiff(filename, outname, lams, I0s, fs, t0, tmax, tdiff, T, \
         The maximum image intensity of all fluorophore types
     fs: int
         Scaling factor for wave vector or MS position coordinates.
-    t0: int
+    tbegin: int
         First timestep
     tmax: int
         Last timestep
@@ -185,7 +184,7 @@ def tstack_dat2tiff(filename, outname, lams, I0s, fs, t0, tmax, tdiff, T, \
     ------
     [outname]: A volume tiff image (mono color)
     """
-    ts=np.arange(t0,tmax,tdiff) 
+    ts=np.arange(tbegin,tmax,tdiff) 
     for l in range(len(lams)):
         if dtype=='uint16':
             img=np.zeros((len(ts),MaxBox[1],MaxBox[0]),dtype=np.uint16)
@@ -268,8 +267,7 @@ def mt_mix(Is,lam_hues,small=1.9E-3):
         if sres<0 or sres>1:
             raise Exception("Color's saturation is more than 1")
 
-        # for colorsys module hres should be belong to [0,1]
-        foo=np.array(colorsys.hsv_to_rgb(hres,sres,vres))
+        foo=np.array(plot_image.hsv2rgb(hres,sres,vres))
         foo=[int(x*M) for x in foo]
         rgb=np.zeros(3,dtype=type(Is[0]))
         for i in range(3):
@@ -322,7 +320,7 @@ def imgs2color(filename,outname,imgtype,mixtype,lam_hues,I0s=None):
     if mixtype=='rgb':
         cols=np.zeros((len(lam_hues),3))
         for i in range(len(lam_hues)):
-            rgb=colorsys.hsv_to_rgb(lam_hues[i]/360,1,1)
+            rgb=plot_image.hsv2rgb(lam_hues[i]/360,1,1)
             cols[i,:]=rgb[:]
             print('Hue '+str(lam_hues[i])+' changed to RGB '+str(cols[i,:]))
 
