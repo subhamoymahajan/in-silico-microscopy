@@ -44,11 +44,14 @@ siliscopy gen_psf --method [Gandy/GL1991/Mod_Gandy] \
 Current version 1.2.2 can generate three PSFs. Depth-invariant PSF (`psf_type = 0`) Gandy (`Gandy`), and depth-variant (`psf_type = 1`) Gibson and Lanni (`GL1991`), and Modified Gandy (`Mod_Gandy`). 
 
 [2] Gandy PSF: R. O. Gandy, Out-of-Focus Diffraction Patterns for Microscope Objectives, *Proc. Phys. Soc. B* **1954**, 67, 825-831.
+
 [3] Gibson and Lanni PSF: S. F. Gibson, and F. Lanni, Experimental test of an analytical model of aberration in an oil-immersion objective lens used in three-dimensional light microscopy, *J. Opt. Soc. Am. A* **1991**, 8, 1601-1613.
+
 [4] Gibson and Lanni PSF: S. F. Gibson, and F. Lanni, Experimental test of an analytical model of aberration in an oil-immersion objective lens used in three-dimensional light microscopy, *J. Opt. Soc. Am. A* **1992**, 9, 154-166. (Same as [3] but better images)
+
 [5] Modified Gandy PSF: Upcoming publication.
 
-> **_Note4:_** The functional form of Gibson and Lanni PSF is changed to be compatible with `siliscopy` and will be reported in the upcoming journal.
+> **_Note4:_** The functional form of Gibson and Lanni PSF is changed to be compatible with `siliscopy` and will be reported in the upcoming journal article.
 >  
 
 
@@ -107,9 +110,9 @@ file2.gro,param2.dat,psf.dat,out2,method
 
 ### 3. Plot Images
 
-Generate *In-silico* microscopy images. If saved to a file, all images are saved with `JPEG` file format.
+Generate *In-silico* microscopy images. If saved to a file, all images are saved with `JPEG`, `PNG`, or `TIFF` file format.
 
-#### Plot monochrome image
+#### Monochrome image
 
 Show specific image
 ```bash
@@ -139,6 +142,11 @@ siliscopy plot --file [filename header] \
 > **_Note4:_** `filename header` should be the same as `output header` used in by `gen_mono`.  
 >   
 > **_Note5:_** The calculation method `specific` and `spec` yeild the same results.   
+>
+> **_Note6:_** `tiff8` generates a 8-bit tiff file, whereas `tiff16` generates a 16-bit file.
+>
+> **_Note7:_** `2dt`, `3d`, and `3dt` images can only be generated in `tiff8` or `tiff16` format. 
+>
 
 Save multiple images with parallel processing:
 ```bash
@@ -159,7 +167,7 @@ To calculate it serially remove `--multiprocess`
 
 The commands remain the same as monochrome image. Replace the method `mono` with `color`.
  
-> **_Note1:_** If outname is not provided its taken to be the same as `filename header`  
+> **_Note1:_** If `--output` is not provided, then `output file header` its taken to be the same as `filename header`  
 >  
 > **_Note2:_** The file names `[output file header][timestep]`\_fs`fs`\_T`T`\_I`lam_I0s`.jpeg will be created, where `fs`, `T` are read from `parameter file`. `lam_I0s` is a all `lam_I0[i]` in `parameter file` appended together with a '\_' separator. Example, '\_[lam\_I0[0]]\_[lam\_I0[1]]'.  
 >  
@@ -199,6 +207,9 @@ siliscopy video --method data \
                 --paramfile [parameter file] \
                 --output [output filename with extension] 
 ```
+
+Video can also be generated using the `2dt` and `3dt` options while plotting images.
+
 ### 6. Calculate Properties 
 
 Calculate the maximum intensity use the command:
@@ -229,9 +240,9 @@ siliscopy prop --method hist  \
 
 To create a histogram with normalized count use the options `--calc norm`.
 
-Calculate number of particles, area, and binary images:
+Calculate number of particles, area, volume, and binary images:
 ```bash
-siliscopy prop --method num_area \
+siliscopy prop --method [num_area/num_vol] \
                --file [filename header] \
                --paramfile [parameter file] \
                --calc [show/show-test/test] \ 
