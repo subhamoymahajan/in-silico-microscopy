@@ -16,3 +16,4 @@ lam_I0_1 = 0.1
 lam_I0_2 = 0.1
 scale = 5
 dpi = 600
+psf_type = 0
