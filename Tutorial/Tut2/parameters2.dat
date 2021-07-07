@@ -1,4 +1,4 @@
-fs = 800 
+fs = 530 
 maxlen = 25 25 25 
 focus_cor = 12.5 
 opt_axis = 2 
@@ -16,9 +16,10 @@ lam_I0_1 = 0.13
 lam_I0_2 = 0.25
 scale = 5
 dpi = 600
-t0 = 10
+tbegin = 10
 tmax = 110
 tdiff = 10
 fps = 1
 vid_ext = .mov
 fourcc = 'mp4v'
+psf_type = 0

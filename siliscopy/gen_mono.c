@@ -50,7 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.) */
 int opt_axis, nlam, nlam_atoms[10], fs, lam[10], Npsf[3], Nbox[3], MaxBox[3],
     pbc[3]={0,0,0};
 char lam_atoms[10][200][5], psfheader[100]; 
-double dx[3], focus_cor, length[3], Lpsf[3], maxl[3]; 
+double dx[3], focus_cor, length[3], Lpsf[3], maxl[3], tsO=-1; 
 
 /* function: min
  * -------------
@@ -442,6 +442,10 @@ int main(int argc, char* argv[] )
             fs=atoi(a);
             printf("%s = %d\n",varname,fs);
         }
+        if(strcmp(varname,"tsO")==0){
+            tsO=atof(a);
+            printf("%s = %f\n",varname,tsO);
+        }
         else if(strcmp(varname,"focus_cor")==0){
             focus_cor=atof(a);
             printf("%s = %f\n",varname,focus_cor);   
@@ -644,7 +648,12 @@ int main(int argc, char* argv[] )
     printf("Initialization of PSF Done\n");   
     //Read PSF
     for(i=0;i<nlam;i++){
-        sprintf(filename,"%s_lam%d_fs%d.dat",psfheader,lam[i],fs);
+        if (psf_type==0){
+            sprintf(filename,"%s_lam%d_fs%d.dat",psfheader,lam[i],fs);
+        }
+        else if (psf_type==1) {
+            sprintf(filename,"%s_tsO%g_lam%d_fs%d.dat",psfheader,tsO,lam[i],fs);
+        }
         read_psf(filename,psf,i,psf_type);
         printf("%s: PSF for %d nm read.\n",filename,lam[i]);
     }

@@ -59,33 +59,33 @@ def main():
 
 
     options, remainder = parser.parse_args()
+    params={}
+    #################DEFAULT VALUES ####################
+    params['lam']=np.zeros(10,dtype=int)
+    params['hue']=np.zeros(10)
+    params['I0']=np.zeros(10)
+    params['fourcc']='mp4v'
+    params['fps']=1
+    params['vid_ext']='.mov'
+    params['meu']=1.515
+    params['meu0']=1.515
+    params['t0']=300.0 #nm
+    params['meug']=1.522
+    params['meug0']=1.522
+    params['tg']=320.0 #nm
+    params['tg0']=320.0 #nm
+    params['tsO']=0 #nm
+    params['meus']=1.33 
+    params['NA']=1
+    params['fs']=530
+    params['psf_type']=0
+    params['poi_a']=None
+    params['gauss_b']=None
+    params['frame_col']=1.0
+    params['mix_type']='mt'
+    #####################################################
     #Read parameters
     if options.pfile !=None:
-        params={}
-        #################DEFAULT VALUES ####################
-        params['lam']=np.zeros(10,dtype=int)
-        params['hue']=np.zeros(10)
-        params['I0']=np.zeros(10)
-        params['fourcc']='mp4v'
-        params['fps']=1
-        params['vid_ext']='.mov'
-        params['meu']=1.515
-        params['meu0']=1.515
-        params['t0']=300.0 #nm
-        params['meug']=1.522
-        params['meug0']=1.522
-        params['tg']=320.0 #nm
-        params['tg0']=320.0 #nm
-        params['tsO']=0 #nm
-        params['meus']=1.33 
-        params['NA']=1
-        params['fs']=530
-        params['psf_type']=0
-        params['poi_a']=None
-        params['gauss_b']=None
-        params['frame_col']=1.0
-        params['mix_type']='mt'
-        #####################################################
         f=open(options.pfile,'r')
         for lines in f:
             foo=lines.split('=')
@@ -249,32 +249,23 @@ def main():
                         options.outname+'_lam'+str(lambd),'w', options.nid)
     
     elif remainder[0]=='gen_mono':
-        psf_header=options.psfheader
-        tsO=None
         if options.method == None:
             options.method='slice'
-        if params['psf_type']==1:
-            psf_header+='_tsO'+str(params['tsO'])
-            tsO=params['tsO']
         if options.data!=None: #Data available in a file
             if options.mprocess==True: #Use multiprocessing
                 # siliscopy gen_mono -d [data] -s
-                gen_mono_c_mp(options.data, params['maxlen'], 
-                    params['opt_axis'], params['dlmn'], add_n=params['add_n'],
-                    tsO=tsO)
+                gen_mono_c_mp(options.data)
             else:#Run serially
                 # siliscopy gen_mono -d [data]
-                gen_mono_c_serial(options.data, prams['maxlen'],
-                    params['opt_axis'], parmas['dlmn'], add_n=params['add_n'],
-                    tsO=tsO)
+                gen_mono_c_serial(options.data)
         elif options.method=='volume':
             gen_mono_c_vol([options.filename, options.pfile, 
-                psf_header,options.outname], params['maxlen'],
+                options.psfheader,options.outname], params['maxlen'],
                 params['opt_axis'], params['dlmn'], 
                 add_n=params['add_n'], mprocess=options.mprocess)
         elif options.method=='slice': #Generates one image slice.
             # siliscopy gen_mono -f [gro] -p [param] -o [out]
-            gen_mono_c([options.filename, options.pfile, psf_header, 
+            gen_mono_c([options.filename, options.pfile, options.psfheader, 
                         options.outname])
     
     elif remainder[0]=='plot':

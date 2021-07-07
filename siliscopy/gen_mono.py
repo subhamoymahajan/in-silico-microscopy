@@ -57,7 +57,7 @@ def read_data(datafile):
         Arguments.append(foo)
     return Arguments 
 
-def gen_mono_c_mp(datafile,maxlen,opt_axis,dlmn,add_n=1,ts=None):
+def gen_mono_c_mp(datafile):
     """ Runs gen_mono_c using multiprocessing. Reads the required filenames 
         from a file.
 
@@ -71,9 +71,6 @@ def gen_mono_c_mp(datafile,maxlen,opt_axis,dlmn,add_n=1,ts=None):
     multiple files similar to gen_mono_c
     """
     Arguments=read_data(datafile)
-    if ts!=None:
-        for i in range(len(Arguments)):
-            Arguments[i][2]+='_ts'+str(ts)
     Arg_slice=[]
     Arg_vol=[]
     for i in range(len(Arguments)):
@@ -86,9 +83,9 @@ def gen_mono_c_mp(datafile,maxlen,opt_axis,dlmn,add_n=1,ts=None):
     results=pool.map(gen_mono_c,Arg_slice)
 
     for i in range(len(Arg_vol)):
-        gen_mono_c_vol(Arg_vol[i],maxlen,opt_axis,dlmn,add_n,mprocess=True)
+        gen_mono_c_vol(Arg_vol[i])
 
-def gen_mono_c_serial(datafile,maxlen, opt_axis, dlmn, add_n=1, ts=None):
+def gen_mono_c_serial(datafile):
     """ Runs gen_mon_c serially multiple times, using the filenames acquired
         from a file.
 
@@ -102,18 +99,32 @@ def gen_mono_c_serial(datafile,maxlen, opt_axis, dlmn, add_n=1, ts=None):
     multiple files similar to gen_mono_c
     """
     Arguments=read_data(datafile)
-    if ts!=None:
-        for i in range(len(Arguments)):
-            Arguments[i][2]+='_ts'+str(ts)
     for i in range(len(Arguments)):
         if Arguments[i][-1]=='volume':
-            gen_mono_c_vol(Arguments[i], maxlen, opt_axis, dlmn, add_n, 
-                mprocess=False)
+            gen_mono_c_vol(Arguments[i])
         else:#slice
             gen_mono_c(Arguments[i])
 
-def gen_mono_c_vol(data,maxlen,opt_axis,dlmn,add_n=1,mprocess=True):
+def gen_mono_c_vol(data, maxlen=None, opt_axis=None, dlmn=None, add_n=1,
+    mprocess=True):
     xyz='xyz'
+    if maxlen==None:
+        f=open(data[1],'r')
+        for lines in f:
+            foo=lines.split('=')
+            varname=foo[0].strip()
+            val_string=foo[1].split('/')[0].strip()
+            val_string=val_string.split()
+            if varname == 'maxlen':
+                maxlen=[float(x) for x in val_string]
+            if varname == 'dlmn':
+                dlmn=[float(x) for x in val_string]
+            if varname == 'opt_axis':
+                opt_axis=int(val_string[0])
+            if varname == 'add_n':
+                add_n=int(val_string[0])
+        f.close()
+
     N=int(maxlen[opt_axis]/dlmn[2]+1E-3)
     N1=int(N/add_n +1E-3)
     w=open(data[0]+'datalist.dat','w')

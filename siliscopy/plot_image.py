@@ -408,7 +408,6 @@ def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
                         col_IMG[i,j,k]=1.0 
                     else:
                         col_IMG[i,j,k]=rgb[k]
-    print('frame_col',frame_col)                     
 
     for i in range(consts[0]):
         for j in range(consts[1]):
