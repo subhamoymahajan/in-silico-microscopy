@@ -9,7 +9,7 @@ do
          sed -i "s/focus_cor\s*=.*/focus_cor = $cor/g" foo.dat
          siliscopy plot --file img_${dir_name[$dir]}${cor}_ \
                         --paramfile foo.dat --method color  \
-                        --timestep 100 --calc specific 
+                        --timestep 100 --calc specific --type jpeg 
     done
 done
 rm foo.dat

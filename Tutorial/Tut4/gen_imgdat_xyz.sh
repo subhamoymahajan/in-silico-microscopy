@@ -8,8 +8,8 @@ do
     do
          sed -i "s/focus_cor\s*=.*/focus_cor = $cor/g" foo.dat
          siliscopy gen_mono --file dp100.gro --paramfile foo.dat \
-                            --psf PSF_gandy \
-                            --output img_${dir_name[$dir]}${cor}_100
+                            --psf PSF_gandy --method slice \
+                            --output img_${dir_name[$dir]}${cor}_100  
     done
 done
 rm foo.dat
