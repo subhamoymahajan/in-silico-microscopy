@@ -1,5 +1,5 @@
 T=1 
-fs=800
+fs=530
 lam1=670
 lam2=518
 lam_hue1=30
@@ -11,3 +11,4 @@ opt_axis = 2
 dlmn = 0.1 0.1 0.2 
 maxlen = 25 25 25
 dpi = 600 
+psf_type = 0
