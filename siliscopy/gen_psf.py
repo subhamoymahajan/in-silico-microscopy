@@ -118,7 +118,7 @@ def psf_gandy_sep(NA, meu, lambd, dlmn, Plmn, fs, outname, otype, nidx):
             I=round((H1[0]*H1[0]+H2[0]*H2[0])*A*A,6)
             w.write(str(l).rjust(10) + str(m).rjust(10) + str(n).rjust(10) + \
                     str(I).rjust(10) + '\n')
-    print('n = '+str(n)+' done')
+    print('n = '+str(n)+' done           ',end="\r")
     w.close()
 
 def worker_gandy(data):
@@ -173,7 +173,6 @@ def psf_GL1991(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd, dlmn,\
     Nn=int((int(Plmn[2]/dlmn[2])+1)/2)
     outname = outname + '_tsO' + str(tsO) + '_lam' + str(lambd) + '_fs' + \
         str(fs) + '.dat'
-    print(Nn) 
     for k in range(-Nn,Nn+1):
         psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
             lambd, dlmn, Plmn, fs, outname, 'a', k)       
@@ -302,7 +301,7 @@ def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
             I=I*4.0
             w.write(str(l).rjust(10) + str(m).rjust(10) + str(n).rjust(10) + \
                     ' ' + str(I) + '\n')
-    print('n = '+str(n)+' done')
+    print('n = '+str(n)+' done            ',end="\r")
     w.close()
 
 def psf_GL1991_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
@@ -348,7 +347,6 @@ def psf_Mod_Gandy(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd, \
     Nn=int((int(Plmn[2]/dlmn[2])+1)/2)
     outname = outname + '_tsO' + str(tsO) + '_lam' + str(lambd) + '_fs' + \
         str(fs) + '.dat'
-    print(Nn) 
     for k in range(-Nn,Nn+1):
         psf_Mod_Gandy_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0,\
              lambd, dlmn, Plmn, fs, outname, 'a', k)       
@@ -482,7 +480,7 @@ def psf_Mod_Gandy_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
             I=I*fac
             w.write(str(l).rjust(10) + str(m).rjust(10) + str(n).rjust(10) + \
                     ' ' + str(I) + '\n')
-    print('n = '+str(n)+' done')
+    print('n = '+str(n)+' done          ',end="\r")
     w.close()
 
 def psf_Mod_Gandy_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \

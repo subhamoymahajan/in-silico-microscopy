@@ -1,4 +1,4 @@
-fs = 800 
+fs = 530 
 maxlen = 25 25 25 
 focus_cor = 12.5 
 opt_axis = 2 
@@ -18,3 +18,4 @@ lam_I0_1 = 0.13
 lam_I0_2 = 0.25
 scale = 5
 dpi = 600
+psf_type = 0

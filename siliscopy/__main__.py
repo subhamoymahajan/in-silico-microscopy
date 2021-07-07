@@ -155,7 +155,6 @@ def main():
             if options.calc=='all': #Calculates for all n' coordiantes
                 if options.mprocess==True: #Multiprocessing. 
                     for lambd in params['lam']:
-                        print("Here")
                         psf_gandy_mp(params['NA'], params['meu'], lambd, 
                             params['dlmn'], params['Plmn'], params['fs'],
                             options.outname)

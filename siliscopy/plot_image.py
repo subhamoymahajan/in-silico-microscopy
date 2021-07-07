@@ -191,7 +191,7 @@ def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None,
                 fname=filename + '_fs' + str(fs) + '_T' + str(T) + '_I' + \
                       Istring + '.'+otype
 
-    if otype in ["jpeg", "png"]:
+    if otype in ["jpeg", "png", "JPEG", "PNG"]:
         consts=IMG.shape
         img_width=consts[1]*img_hei/consts[0]
         
@@ -721,7 +721,6 @@ def get_grey_3dimg(filename, lam_I0, lam, T, ti, fs, MaxBox, dlmn, nmax,
 
     return img3d
 
-
 def plot_grey_3dimg(filename, lam_I0s, lams, T, ti, fs, MaxBox, dlmn, nmax,
     opt_axis, add_n=1, outfile=None, frame_col=1.0, otype='tiff8', 
     mprocess=True, noise=False, poi_a=None, gauss_b=None):
@@ -768,7 +767,38 @@ def plot_grey_3dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox
             '_fs'+str(fs) +'_T'+str(T) +'I_'+str(lam_I0) +'.tiff', img3dt, 
             imagej=True, resolution=(1./dlmn[0],1./dlmn[1]), metadata={ 
             'spacing': dlmn[2], 'unit': 'nm', 'finterval': fps, 'axes': 'TZYX'})
-        
+
+def plot_grey_2dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox, 
+    dlmn, nmax, opt_axis, fps, add_n=1, outfile=None, frame_col=1.0, 
+    otype='tiff8', mprocess=True, noise=False, poi_a=None, gauss_b=None):
+    
+    tN=int((tmax-1-tbegin)/tdiff)+1
+    if otype in ["tiff16","tif16"]:
+        img3dt=np.zeros((tN,MaxBox[1],MaxBox[0]),dtype=np.uint16)
+        M=65535
+    elif otype in ["tiff8", "tif8"]:
+        img3dt=np.zeros((tN,MaxBox[1],MaxBox[0]),dtype=np.uint8)
+        M=255
+    
+    #Check if all tiff exists
+    for l in range(len(lams)):
+        for i in range(tN):
+            ti=tbegin+tdiff*i
+            fname=filename+str(ti) + '_lam'+str(lams[l]) + '_fs'+str(fs) + \
+                '_T'+str(T) +'I_'+str(lam_I0) +'.tiff'
+            if os.path.exists(fname):
+                img2d=tif.imread(fname)
+            else:
+                img2d=get_grey_img(filename, lam_I0s[l], lams[l], T, ti, fs, 
+                    MaxBox, frame=False, opt_axis=None, nidx=None, 
+                    frame_col=frame_col, noise=noise, poi_a=poi_a, 
+                    gauss_b=gauss_b)
+                img2d=np.transpose(img2d)
+            img2dt[i,:,:]=img2d[:,:]
+        tif.imwrite(outname+ '_lam'+str(lams[l]) + '_fs'+str(fs) +'_T'+str(T)+ \
+            'I_'+str(lam_I0) +'.tiff', img2dt, imagej=True, 
+            resolution=(1./dlmn[0],1./dlmn[1]), metadata={'unit': 'nm', 
+            'finterval': fps, 'axes': 'TYX'})
 
 def get_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, dlmn, 
     nmax, opt_axis, add_n=1, outfile=None, frame_col=1.0, otype='tiff8', 
@@ -889,6 +919,53 @@ def plot_col_3dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, f
                 frame_col=frame_col, otype=otype, mprocess=mprocess, mix=mix,
                 noise=noise, poi_a=poi_a, gauss_b=gauss_b, mix_type=mix_type)
         img3dt[i,:,:,:,:]=img3d[:,:,:,:]
+    tif.imwrite(outname+'_' +xyz[opt_axis] +'_fs'+str(fs) +'_T'+str(T) +'I' +\
+        Istring +'.tiff', img3dt, resolution=(1./dlmn[0],1./dlmn[1]), 
+        imagej=True, metadata={'spacing': dlmn[2], 'unit': 'nm', 
+        'finterval': fps, 'axes': 'TZCYX'})
+
+def plot_col_2dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, fs, 
+    MaxBox, fps, outfile=None, frame_col=1.0, otype='tiff8', mprocess=True, 
+    noise=False, poi_a=None, gauss_b=None, mix_type='mt', mix=True):
+    
+    tN=int((tmax-1-tbegin)/tdiff)+1
+    C=3 #3 color channels for 'mt' image
+    if mix==False: #Colors are not mixed.
+        C=len(lams)
+    
+    xyz='xyz'
+    if otype in ["tiff16","tif16"]:
+        img2dt=np.zeros((tN,C,MaxBox[1],MaxBox[0]),dtype=np.uint16)
+        M=65535
+    elif otype in ["tiff8", "tif8"]:
+        img2dt=np.zeros((tN,C,MaxBox[1],MaxBox[0]),dtype=np.uint8)
+        M=255
+    Istring=''
+    for i in range(len(lams)):
+        Istring+='_'+str(lam_hues[i])
+
+    #Check if all tiff exists
+    for i in range(tN):
+        ti=tbegin+tdiff*i
+        fname=filename+str(ti) + '_fs'+str(fs) +'_T'+str(T)+\
+            'I'+Istring +'.tiff'
+        if os.path.exists(fname):
+            img2d=tif.imread(fname)
+            img3dt[i,:,:,:]=img2d[:,:,:]
+        elif mix:
+            img2d=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs,
+                MaxBox, frame_col=frame_col, mix_type=mix_type, opt_axis=None,
+                nidx=None, noise=noise, poi_a=poi_a, gauss_b=gauss_b)
+            img2d=np.transpose(img2d,(2,1,0))    
+            img3dt[i,:,:,:]=img2d[:,:,:]
+        else:
+            for j in range(C):
+                img2d=get_grey_img(filename, lam_I0s[j], lams[j], T, ti, fs, 
+                    MaxBox, frame=False, opt_axis=None, nidx=None, 
+                    frame_col=frame_col, noise=noise, poi_a=poi_a, 
+                    gauss_b=gauss_b)
+                img2d=np.tranpose(img2d)
+                img3dt[i,j,:,:]=img2d[:,:]
     tif.imwrite(outname+'_' +xyz[opt_axis] +'_fs'+str(fs) +'_T'+str(T) +'I' +\
         Istring +'.tiff', img3dt, resolution=(1./dlmn[0],1./dlmn[1]), 
         imagej=True, metadata={'spacing': dlmn[2], 'unit': 'nm', 
