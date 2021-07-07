@@ -12,8 +12,8 @@ siliscopy gen_mono --data imggen.dat --multiprocess
 
 ## 3. Render color images
 ```bash
-siliscopy plot --file img --paramfile parameters.dat --method color --calc all --multiprocess
-siliscopy plot --file img --paramfile parameters2.dat --method color --calc all --multiprocess
+siliscopy plot --file img --paramfile parameters.dat --method color --calc all --multiprocess --type jpeg
+siliscopy plot --file img --paramfile parameters2.dat --method color --calc all --multiprocess --type jpeg
 ```
 
 ## 4. Create color videos
