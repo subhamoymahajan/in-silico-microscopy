@@ -80,7 +80,7 @@ double min(double a, double b){
 
 void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
     FILE *f;
-    char line[200], *pend;
+    char line[400], *pend;
     double x,y,z,I;
     int i,j,k,cnt=0;
 
@@ -89,7 +89,7 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
         printf("PSF file %s does not exist\n",filename);
         exit(-1);
     }    
-    while ((fgets(line,200,f)) != NULL ){
+    while ((fgets(line,400,f)) != NULL ){
         if (line[0]=='#'){
             continue;
         }
@@ -668,7 +668,12 @@ int main(int argc, char* argv[] )
     for (l=0;l<nlam;l++)
     {
         FILE *f;
-        sprintf(outmod,"%s_lam%d_fs%d.dat",outfile,lam[l],fs);
+        if (psf_type==0){
+            sprintf(outmod,"%s_lam%d_fs%d.dat",outfile,lam[l],fs);
+        }
+        else if (psf_type==1){
+            sprintf(outmod,"%s_tsO%g_lam%d_fs%d.dat",outfile,tsO,lam[l],fs);
+        }
         printf("output file is %s\n",outmod);
         f=fopen(outmod,"w");
         fprintf(f,"#Lam= %d dx= %f,%f,%f fs= %d\n",lam[l],dx[0],dx[1],dx[2],fs);

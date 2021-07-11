@@ -324,11 +324,11 @@ def psf_GL1991_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
             lambd, dlmn, Plmn, fs, outname+'n'+str(k), 'w', k])
     pool=mp.Pool(mp.cpu_count())
     results=pool.starmap(psf_GL1991_sep,Arguments)
-    os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO'+str(tsO)+'_lam'+str(lambd)+ \
-              '_fs'+str(fs)+'.dat')
+    os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO' + "%g"%tsO + \
+              '_lam'+str(lambd)+ '_fs'+str(fs)+'.dat')
     for k in range(-Nn+1,Nn+1):
         os.system('tail -n +2 ' + outname+'n'+str(k) + ' >> ' + outname+'_tsO'+ \
-                  str(tsO)+'_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
+                  "%g"%tsO + '_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
         os.system('rm '+ outname+'n'+str(k))
 
 def psf_Mod_Gandy(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd, \
@@ -503,10 +503,10 @@ def psf_Mod_Gandy_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
             lambd, dlmn, Plmn, fs, outname+'n'+str(k), 'w', k])
     pool=mp.Pool(mp.cpu_count())
     results=pool.starmap(psf_Mod_Gandy_sep,Arguments)
-    os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO'+str(tsO)+'_lam'+str(lambd)+ \
-              '_fs'+str(fs)+'.dat')
+    os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO'+ "%g"%tsO + \
+              '_lam'+str(lambd)+ '_fs'+str(fs)+'.dat')
     for k in range(-Nn+1,Nn+1):
         os.system('tail -n +2 ' + outname+'n'+str(k) + ' >> ' + outname+'_tsO'+ \
-                  str(tsO)+'_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
+                  "%g"%tsO + '_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
         os.system('rm '+ outname+'n'+str(k))
 

@@ -184,7 +184,7 @@ Use the method `region` to plot a region plot where hues occur in factors of 10 
 These methods will be demonstrated in future tutorial. For now read the documentation.
 
   
-### 5. Generate Video
+### 4. Generate Video
 
 Generates a movie from a set of `JPEG` images.
 
@@ -210,7 +210,7 @@ siliscopy video --method data \
 
 Video can also be generated using the `2dt` and `3dt` options while plotting images.
 
-### 6. Calculate Properties 
+### 5. Calculate Properties 
 
 Calculate the maximum intensity use the command:
 
@@ -266,7 +266,7 @@ the maximum intensity is assumed to be 1 otherwise maximum intensity is assumed 
 the particle ID (starting from 0) and its area. `[output filename header].png` is the binary image used 
 to calculate the area. It is created based on the value of `calc`.
 
-### 7. Parameter File
+### 6. Parameter File
 
 The parameter file should contain the following parameters (Not all are used in every step). 
 
@@ -274,7 +274,7 @@ The parameter file should contain the following parameters (Not all are used in 
 * `maxlen`: (float float float). Maximum molecular simulation box dimensions in nm.
 * `focus_cor`:  (float). The n-coordinate (in gro file) at whic the *in-silico* microscope is focused in nm.
 * `opt_axis`: (int). The direction of the optical axis. 0 => x, 1 => y, 2 => z.
-* `lam[i]`: (int). Wavelenght of [i]th fluorophore type in nm. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. 
+* `lam[i]`: (int). Emission wavelenght of [i]th fluorophore type in vaccum. Unit is nanometers. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. 
 * `lam_names[i]`: (str str ... str). Atom names of [i]th fluorophore type. Replace [i] with integers strating from 1. Currently 200 names are supported.
 * `dlmn`: (float float float). The voxel dimensions <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> in nm.  
 * `Plmn`: (float float float). The dimensions of the box in nm within which PSF is calculated; <img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">
