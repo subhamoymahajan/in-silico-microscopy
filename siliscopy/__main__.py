@@ -79,8 +79,8 @@ def main():
     params['NA']=1
     params['fs']=530
     params['psf_type']=0
-    params['poi_a']=None
-    params['gauss_b']=None
+    params['poi']=None
+    params['gauss']=None
     params['frame_col']=1.0
     params['mix_type']='mt'
     #####################################################
@@ -94,7 +94,7 @@ def main():
             val_string=val_string.split()
             
             if varname in ["fs", "T", "dpi", "tbegin", "tmax", "tdiff", "opt_axis",\
-                "add_n", "psf_type", "nmax"]:
+                "add_n", "psf_type"]:
                 params[varname]=int(val_string[0])
             elif varname in ["NA", "meu", "scale", "meu0", "t0", "meug", \
                 "meug0", "tg", "tg0", "tsO", "meus", "poi", "gauss",\
@@ -138,6 +138,8 @@ def main():
                       params['dlmn'][0]+small)
         MaxBox[1]=int(params['maxlen'][(params['opt_axis']+2)%3]/ \
                       params['dlmn'][1]+small)
+        params['nmax']=int(params['maxlen'][params['opt_axis']]/ \
+                        params['dlmn'][2]+0.5)
     
     if remainder[0]=='gen_psf':
  
@@ -296,16 +298,17 @@ def main():
                 plot_grey_img(filename, params['I0'], params['lam'],
                     params['T'], options.timestep, params['fs'], MaxBox, Bm, 
                     params['scale'], params['dpi'], noise=noise, 
-                    poi_a=params['poi_a'], gauss_b=params['gauss_b'], 
-                    psf_type=params['psf_type'], tsO=params['tsO'])
+                    poi=params['poi'], gauss=params['gauss'], 
+                    psf_type=params['psf_type'], tsO=params['tsO'],
+                    frame_col=params['frame_col'])
     
             elif options.calc in ["specific", "spec"]: #Specific output
                 plot_grey_img(filename, params['I0'], params['lam'],
                     params['T'], options.timestep, params['fs'], MaxBox, Bm, 
                     params['scale'], params['dpi'], outname, noise=noise, 
-                    poi_a=params['poi_a'], gauss_b=params['gauss_b'], 
+                    poi=params['poi'], gauss=params['gauss'], 
                     otype=options.type, psf_type=params['psf_type'], 
-                    tsO=params['tsO'])
+                    tsO=params['tsO'], frame_col=params['frame_col'])
             
             elif options.calc == 'all':
                 print('tbegin = '+str(params['tbegin']))
@@ -315,16 +318,18 @@ def main():
                     plot_grey_mp(filename, params['I0'], params['lam'],
                         params['T'], params['tbegin'], params['tmax'],
                         params['tdiff'], params['fs'], MaxBox, Bm, 
-                        params['scale'], params['dpi'], outname, 1.0,
-                        noise, params['poi_a'], params['gauss_b'], 
-                        options.type, params['psf_type'], params['tsO'])
+                        params['scale'], params['dpi'], outname, 
+                        params['frame_col'], noise, params['poi'],
+                        params['gauss'], options.type, params['psf_type'],
+                        params['tsO'])
                 else: #Serial
                     plot_grey_serial(filename, params['I0'], params['lam'],
                         params['T'], params['tbegin'], params['tmax'], 
                         params['tdiff'], params['fs'], MaxBox, Bm, 
-                        params['scale'], params['dpi'], outname, 1.0, noise, 
-                        params['poi_a'], params['gauss_b'], options.type, 
-                        params['psf_type'], params['tsO'])
+                        params['scale'], params['dpi'], outname, 
+                        params['frame_col'], noise, params['poi'], 
+                        params['gauss'], options.type, params['psf_type'],
+                        params['tsO'])
 
         elif options.method in ["col", "color", "noise_col", "noise_color"]:
             print("hue = "+str(params["hue"]))
@@ -335,17 +340,17 @@ def main():
                     params['hue'], params['T'], options.timestep, params['fs'],
                     MaxBox, Bm, params['scale'], params['dpi'], 
                     frame_col=params['frame_col'], mix_type=params['mix_type'],
-                    otype=options.type, noise=noise, poi_a=params['poi_a'], 
-                    gauss_b=params['gauss_b'], psf_type=params['psf_type'], 
-                    tsO=params['tsO'])               
+                    noise=noise, poi=params['poi'], tsO=params['tsO'], 
+                    gauss=params['gauss'], psf_type=params['psf_type']) 
                                                  
             elif options.calc in ["specific", "s pec"]: #Save Specific
                 plot_col_img(filename, params['I0'], params['lam'],
                     params['hue'], params['T'], options.timestep, params['fs'],
                     MaxBox, Bm, params['scale'], params['dpi'], 
                     outfile=outname, otype=options.type, noise=noise, 
-                    poi_a=params['poi_a'], gauss_b=params['gauss_b'], 
-                    psf_type=params['psf_type'], tsO=params['tsO'])
+                    poi=params['poi'], gauss=params['gauss'], 
+                    psf_type=params['psf_type'], tsO=params['tsO'],
+                    mix_type=params['mix_type'], frame_col=params['frame_col'])
             
             elif options.calc == 'all':
                 print('tbegin = '+str(params['tbegin']))
@@ -357,7 +362,7 @@ def main():
                         params['tmax'], params['tdiff'], params['fs'], MaxBox, 
                         Bm, params['scale'], params['dpi'], outname, 
                         params['frame_col'], params['mix_type'],noise, 
-                        params['poi_a'], params['gauss_b'], options.type,
+                        params['poi'], params['gauss'], options.type,
                         params['psf_type'], params['tsO'])
 
                 else: #Serial
@@ -366,8 +371,34 @@ def main():
                         params['tmax'], params['tdiff'], params['fs'], MaxBox,
                         Bm, params['scale'], params['dpi'], outname, 
                         params['frame_col'], params['mix_type'], noise, 
-                        params['poi_a'], params['gauss_b'], options.type, 
+                        params['poi'], params['gauss'], options.type, 
                         params['psf_type'], params['tsO'])
+
+        elif options.method in ["mono2dt", "grey2dt", "gray2dt", \
+            "noise_mono2dt", "noise_grey2dt", "noise_gray2dt"]:
+             
+            if options.method[:6]=="noise_":
+                noise=True
+            plot_grey_2dtimg(filename, params['I0'], params['lam'], params['T'],
+                params['tbegin'], params['tmax'], params['tdiff'], params['fs'],
+                MaxBox, params['dlmn'], params['fps'], outfile=outname, 
+                mprocess=options.mprocess, noise=noise, poi=params['poi'], 
+                otype=options.type, gauss=params['gauss'], 
+                psf_type=params['psf_type'], tsO=params['tsO'])
+
+        elif options.method in ["col2dt", "color2dt", "noise_col2dt", 
+            "noise_color2dt"]:
+             
+            if options.method[:6]=="noise_":
+                noise=True
+            plot_col_2dtimg(filename, params['I0'], params['lam'],params['hue'],
+                params['T'], params['tbegin'], params['tmax'], params['tdiff'], 
+                params['fs'], MaxBox, params['fps'],params['dlmn'], noise=noise,
+                outfile=outname, otype=options.type, mprocess=options.mprocess, 
+                poi=params['poi'], gauss=params['gauss'], 
+                psf_type=params['psf_type'], tsO=params['tsO'], 
+                mix_type=params['mix_type'])
+
 
         elif options.method in ["mono3d", "grey3d", "gray3d", "noise_mono3d", \
             "noise_grey3d", "noise_gray3d"]:
@@ -377,12 +408,11 @@ def main():
             plot_grey_3dimg(filename, params['I0'], params['lam'], params['T'],
                 options.timestep, params['fs'], MaxBox, params['dlmn'], 
                 params['nmax'], params['opt_axis'], add_n=params['add_n'], 
-                outfile=outname, noise=noise, frame_col=1.0, otype=options.type, 
-                mprocess=options.mprocess, poi_a=params['poi_a'], 
-                gauss_b=params['gauss_b'], psf_type=params['psf_type'], 
-                tsO=params['tsO'])
+                outfile=outname, poi=params['poi'], tsO=params['tsO'],
+                otype=options.type, mprocess=options.mprocess, noise=noise,
+                gauss=params['gauss'], psf_type=params['psf_type']) 
 
-        elif options.method in ["col3d", "colo3d", "noise_col3d", 
+        elif options.method in ["col3d", "color3d", "noise_col3d", 
             "noise_color3d"]:
              
             if options.method[:6]=="noise_":
@@ -391,8 +421,8 @@ def main():
                 params['T'], options.timestep, params['fs'], MaxBox, 
                 params['dlmn'], params['nmax'], params['opt_axis'], 
                 add_n=params['add_n'], outfile=outname, noise=noise, 
-                frame_col=1.0, otype=options.type, mprocess=options.mprocess, 
-                poi_a=params['poi_a'], gauss_b=params['gauss_b'],
+                otype=options.type, mprocess=options.mprocess, 
+                poi=params['poi'], gauss=params['gauss'],
                 psf_type=params['psf_type'], tsO=params['tsO'])
 
         elif options.method in ["mono3dt", "grey3dt", "gray3dt", "noise_mono3dt",\
@@ -404,23 +434,22 @@ def main():
                 params['tbegin'], params['tmax'], params['tdiff'], params['fs'],
                 MaxBox, params['dlmn'], params['nmax'], params['opt_axis'],
                 params['fps'], add_n=params['add_n'], noise=noise, 
-                outfile=outname, frame_col=1.0, otype=options.type,
-                mprocess=options.mprocess, poi_a=params['poi_a'], 
-                gauss_b=params['gauss_b'], psf_type=params['psf_type'], 
-                tsO=params['tsO'])
+                outfile=outname, otype=options.type, mprocess=options.mprocess, 
+                poi=params['poi'], gauss=params['gauss'], 
+                psf_type=params['psf_type'], tsO=params['tsO'])
 
-        elif options.method in ["col3dt", "colo3dt", "noise_col3dt", 
+        elif options.method in ["col3dt", "color3dt", "noise_col3dt", 
             "noise_color3dt"]:
              
             if options.method[:6]=="noise_":
                 noise=True
-            plot_col_3dimg(filename, params['I0'], params['lam'], params['hue'],
-                params['T'], options.timestep, params['fs'], MaxBox, 
-                params['dlmn'], params['nmax'], params['opt_axis'], 
-                params['fps'], frame_col=1.0, add_n=params['add_n'], 
+            plot_col_3dtimg(filename, params['I0'], params['lam'], params['hue'],
+                params['T'], params['tbegin'], params['tmax'], params['tdiff'],
+                params['fs'], MaxBox, params['dlmn'], params['nmax'], 
+                params['opt_axis'], params['fps'], add_n=params['add_n'], 
                 outfile=outname, noise=noise, otype=options.type, 
-                mprocess=options.mprocess, poi_a=params['poi_a'], 
-                gauss_b=params['gauss_b'], psf_type=params['psf_type'],
+                mprocess=options.mprocess, poi=params['poi'], 
+                gauss=params['gauss'], psf_type=params['psf_type'], 
                 tsO=params['tsO'])
     
         elif options.method == 'region':

@@ -293,6 +293,7 @@ The parameter file should contain the following parameters (Not all are used in 
 * `fps`: (int). Frames per second of the output video. (default value is 1)
 * `vid_ext`: (str). The extension of the output video. (default value is .mov)
 * `fourcc`: ('str'). The four character code of the encoder with which video will be created. (default value is 'mp4v') 
+* `add_n`: (int). For 3D image generate, slices are generated every `n=dlmn[2]*add_n`.  
 
 Parameters for Gibson-Lanni and Modified-Gandy PSF.
 

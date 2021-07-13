@@ -38,6 +38,7 @@ def gen_mono_c(data,silent=False):
     if silent:
         os.system(os.path.dirname(__file__) + '/gen_mono -f ' + data[0] + ' -p ' + 
               data[1]+' -psf '+data[2]+' -o '+data[3] +' 1> /dev/null')
+        print('Writing: '+data[3]+'         ',end='\r')
     else:
         os.system(os.path.dirname(__file__) + '/gen_mono -f ' + data[0] + ' -p ' + 
               data[1]+' -psf '+data[2]+' -o '+data[3])
@@ -74,13 +75,13 @@ def gen_mono_c_mp(datafile):
     Arg_slice=[]
     Arg_vol=[]
     for i in range(len(Arguments)):
-        if Arguments[i][-1]=='volume':
+        if Arguments[i][-1].strip()=='volume':
             Arg_vol.append(Arguments[i])
         else: #slice
-            Arg_slice.append(Arguments[i])
+            Arg_slice.append([Arguments[i],True])
 
     pool=mp.Pool(mp.cpu_count())
-    results=pool.map(gen_mono_c,Arg_slice)
+    results=pool.starmap(gen_mono_c,Arg_slice)
 
     for i in range(len(Arg_vol)):
         gen_mono_c_vol(Arg_vol[i])
@@ -133,7 +134,7 @@ def gen_mono_c_vol(data, maxlen=None, opt_axis=None, dlmn=None, add_n=1,
         os.system("sed 's/focus_cor.*/focus_cor = "+str(n)+"/g' "+data[1]+" > " + \
             data[0]+"foo_param"+str(i*add_n) + ".dat")
         w.write(data[0] + ','+str(data[0])+'foo_param' + str(i*add_n) + '.dat,' + data[2] + ',' + \
-            data[3]+ '_'+ xyz[opt_axis] + str(i*add_n) + '\n')
+            data[3]+ '_'+ xyz[opt_axis] + str(i*add_n) + ',slice\n')
     w.close()
     if mprocess==True:
         gen_mono_c_mp(data[0]+'datalist.dat')

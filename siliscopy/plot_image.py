@@ -26,8 +26,8 @@ import os
 small=1E-10
 
 def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=False, \
-    opt_axis=None, nidx=None, frame_col=1.0, noise=False, poi_a=None, 
-    gauss_b=None, psf_type=0, tsO=None):
+    opt_axis=None, nidx=None, frame_col=1.0, noise=False, poi=None, 
+    gauss=None, psf_type=0, tsO=None):
     """ Calculates greyscale image
      
     Parameters
@@ -49,7 +49,7 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=False, \
         Contains the number of pixels in the image in l and m directions.
     frame: Bool, optional
         True keeps the image intensity of white frame as -1. False converts
-        the image intensities of -1 to 1. (default is False).
+        the image intensities of -1 to frame_col. (default is False).
     opt_axis: int, optional
         Optical axis 0, 1, and 2 for x, y, and z axis. (default is None)
     nidx: int, optional    
@@ -80,7 +80,7 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=False, \
                   str(fs) + '.dat'
         else:
             fname=filename + nstr + tstr + '_lam' + str(lam) + '_fs' + str(fs) + '.dat'
-        print('Reading: '+fname) 
+        print('Reading: '+fname+'      ',end='\r') 
         f=open(fname,'r')
         j=0
         for lines in f:
@@ -97,6 +97,7 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=False, \
                     Cnt[j,k]+=1
                 # else its white frame - do nothing
             j+=1                            
+        f.close()
     for j in range(len(IMG)):
         for k in range(len(IMG[0])):
             if Cnt[j,k]>0:
@@ -107,7 +108,7 @@ def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=False, \
                 else:
                     IMG[j,k]=frame_col
     if noise:
-        IMG=add_noise(IMG,poi_a,gauss_b) 
+        IMG=add_noise(IMG,poi,gauss) 
     return IMG
 
 def add_scale(IMG, scale, Bm):
@@ -137,7 +138,8 @@ def add_scale(IMG, scale, Bm):
     return IMG
 
 def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None, 
-    show=False, gcolmap='gray', dpi=600, otype='jpeg', psf_type=0, tsO=None):
+    show=False, gcolmap='gray', dpi=600, otype='jpeg', psf_type=0, tsO=None,
+    frame_col=1.0):
     """ Plots in-silico microscopy image.
     
     Parameters
@@ -174,6 +176,7 @@ def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None,
         Writes the in-silico microscopy image if show is False and filename 
         is not None
     """
+    consts=IMG.shape
     if filename!=None:
         Istring=''
         for i in range(len(lam_I0)):
@@ -197,9 +200,8 @@ def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None,
                       Istring + '.'+otype
 
     if otype in ["jpeg", "png", "JPEG", "PNG"]:
-        consts=IMG.shape
         img_width=consts[1]*img_hei/consts[0]
-        
+        IMG[IMG<0]=frame_col
         fig,ax=plt.subplots(1, 1, figsize=(img_width, img_hei))
         if len(consts)==2: #Greyscale
             ax.imshow(IMG, vmin=0, vmax=1, cmap=gcolmap)
@@ -218,26 +220,26 @@ def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None,
         plt.close()
 
     elif otype in ["tiff8", "tif8"]:
-        IMG=IMG*255
-        IMG=IMG.astype('uint8')
+        IMG=intensity2image(IMG,255,'uint8')
         if len(consts)==2: #Greyscale
             tif.imwrite(fname[:-1],IMG,photometric='minisblack')
         else: #Color
             tif.imwrite(fname[:-1],IMG,photometric='rgb',)
+        print('Writing: '+fname[:-1])
 
     elif otype in ["tiff16", "tif16"]:
-        IMG=IMG*65535
-        IMG=IMG.astype('uint16')
+        IMG=intensity2image(IMG,65535,'uint16')
         if len(consts)==2: #Greyscale
             tif.imwrite(fname[:-1],IMG,photometric='minisblack')
         else: #Color
             tif.imwrite(fname[:-1],IMG,photometric='rgb')
+        print('Writing: '+fname[-1])
   
     return
 
 def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, 
-    frame_col=1.0, mix_type='mt', opt_axis=None, nidx=None, noise=False, 
-    poi_a=None, gauss_b=None, psf_type=0, tsO=None):
+    mix_type='mt', opt_axis=None, nidx=None, noise=False,  poi=None, 
+    gauss=None, psf_type=0, tsO=None):
     """ Calculates the image intensity for a color image,
 
     Parameters
@@ -271,14 +273,15 @@ def get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox,
         Axis 2 corresponds to red, green and blue channels. Image intensities 
         between 0 and 1.
     """
-    IMGs=[]
+    IMGs=np.zeros((MaxBox[0],MaxBox[1],len(lams)))
     for i in range(len(lams)):
-        IMGs.append(get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs, MaxBox, 
-            frame=True, opt_axis=opt_axis, nidx=nidx, noise=noise, poi_a=poi_a, 
-            gauss_b=gauss_b, psf_type=psf_type, tsO=tsO))
-    consts=IMGs[0].shape
-    col_IMG=add_color(IMGs,lam_hues, frame_col, mix_type)
-
+        foo=get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs, MaxBox, 
+            frame=True, opt_axis=opt_axis, nidx=nidx, noise=noise, poi=poi, 
+            gauss=gauss, psf_type=psf_type, tsO=tsO)
+        IMGs[:,:,i]=foo[:,:]
+    if mix_type=='none':
+        return IMGs
+    col_IMG=add_color(IMGs,lam_hues, -1, mix_type)
     return col_IMG  
 
 def hsv2rgb(h, s, v):
@@ -332,7 +335,7 @@ def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
 
     Parameters
     ----------
-    IMGs:list of 2D array
+    IMGs:3D numpy array
         Monochrome image intensities
     lam_hues: array of floats
         The hue in degree of all fluorophore types
@@ -351,7 +354,7 @@ def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
     frame_col= int, optional
         Color of the frame. (Default is 1 (white)).
     """
-    consts=IMGs[0].shape
+    consts=IMGs.shape
     col_IMG=np.zeros((consts[0],consts[1],3))
     if mix_type=='rgb':
         cols=np.zeros((len(lam_hues),3))
@@ -363,7 +366,7 @@ def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
         for j in range(consts[1]):
             foo=0
             for lam_id in range(len(lam_hues)):
-                if IMGs[lam_id][i,j]>-small:
+                if IMGs[i,j,lam_id]>-small:
                     foo=+1
             if foo==0:
                 #if all Img_dat are -1 then res is -1
@@ -374,14 +377,14 @@ def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
                 Is=[]
                 ncol=0
                 for lam_id in range(len(lam_hues)):
-                    if IMGs[lam_id][i,j]>small:
+                    if IMGs[i,j,lam_id]>small:
                         # V*e^(i(hue)) #I0 was multiplied when determining 
                         # grey images.
-                        xres+=IMGs[lam_id][i,j]*np.cos(lam_hues[lam_id]* \
+                        xres+=IMGs[i,j,lam_id]*np.cos(lam_hues[lam_id]* \
                                                        2*np.pi/360)   
-                        yres+=IMGs[lam_id][i,j]*np.sin(lam_hues[lam_id]* \
+                        yres+=IMGs[i,j,lam_id]*np.sin(lam_hues[lam_id]* \
                                                        2*np.pi/360)
-                        Is.append(IMGs[lam_id][i,j])
+                        Is.append(IMGs[i,j,lam_id])
                         ncol+=1
 
                 if ncol==0: #No fluorescence; black background (by default)
@@ -407,7 +410,7 @@ def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
             elif mix_type=='rgb':
                 rgb=np.zeros(3)
                 for lam_id in range(len(lam_hues)):
-                    rgb+=IMGs[lam_id][i,j]*cols[lam_id,:]
+                    rgb+=IMGs[i,j,lam_id]*cols[lam_id,:]
                 for k in range(3):
                     if rgb[k]>1:
                         col_IMG[i,j,k]=1.0 
@@ -422,16 +425,16 @@ def add_color(IMGs, lam_hues, frame_col=1.0, mix_type='mt'):
 
     return col_IMG  
 
-def add_noise(I,poi_a,gauss_b):#I is single channel
+def add_noise(I,poi,gauss):#I is single channel
     """ Adds a Poisson-Gaussian noise to a monochrome image
 
     Parameters
     ----------
     I: 2D array (image)
         Monochrome image
-    poi_a: float
+    poi: float
         Mean of the Poisson distribution. Should be a positive number.
-    gauss_b: float
+    gauss: float
         Vairance of Gaussian distribution. Should be a positive number. Mean
         of Gaussian distribution is assumed to be 0.
 
@@ -454,8 +457,8 @@ def add_noise(I,poi_a,gauss_b):#I is single channel
     for i in range(x0,x0+xL):
         for j in range(y0,y0+yL):
             P=np.random.poisson(lam=255*I[i,j])
-            G=np.random.normal(loc=0.0,scale=gauss_b)
-            I[i,j]=G+poi_a*P/255.0+I[i,j]*(1-poi_a)
+            G=np.random.normal(loc=0.0,scale=gauss)
+            I[i,j]=G+poi*P/255.0+I[i,j]*(1-poi)
             if I[i,j]>1:
                 I[i,j]=1.0
             if I[i,j]<0: #Note that the space of i,j here is not the backgroumd
@@ -463,6 +466,12 @@ def add_noise(I,poi_a,gauss_b):#I is single channel
     #frame color will be taken care by add_color or separately for monochrome images
 
     return I
+
+def intensity2image(I,maxI,dtype):
+    I=I*maxI
+    I[I>maxI]=maxI
+    I[I<0]=0
+    return I.astype(dtype)
 
 def plot_lumin(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox):
     """ Interactively plot small portions of colored the in-silico microscopy
@@ -609,7 +618,7 @@ def get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, \
         between 0 and 1.
     """
     col_IMGs=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, \
-        frame_col=frame_col, mix_type=mix_type)
+        mix_type=mix_type)
     consts=col_IMGs.shape
     for i in range(consts[0]):
         for j in range(consts[1]):
@@ -620,7 +629,7 @@ def get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, \
     return col_IMGs   
 
 def plot_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, Bm,
-    scale, dpi=600, outfile=None):
+    scale, dpi=600, outfile=None, frame_col=1.0):
     """ Plots color image by assigning a specific color for a region.
    
     Parameters
@@ -658,14 +667,15 @@ def plot_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, Bm,
     IMG=get_region(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox)
     IMG=add_scale(IMG, scale, Bm)
     if outfile!=None:
-        plot_ism(IMG, lam_I0s, lams, T, ti, fs, filename='Reg_'+outfile, \
-                 dpi=dpi)
+        plot_ism(IMG, lam_I0s, lams, T, ti, fs, filename='Reg_'+outfile, 
+                 dpi=dpi, frame_col=frame_col)
     else:
-        plot_ism(IMG, lam_I0s, lams, T, ti, fs, filename=None, dpi=dpi)
+        plot_ism(IMG, lam_I0s, lams, T, ti, fs, filename=None, dpi=dpi, 
+                 frame_col=frame_col)
 
 
 def plot_grey_img(filename, lam_I0s, lams, T, ti, fs, MaxBox, Bm, scale, 
-    dpi=600, outfile=None, frame_col=1.0, noise=False, poi_a=None, gauss_b=None,
+    dpi=600, outfile=None, frame_col=1.0, noise=False, poi=None, gauss=None,
     otype='jpeg', psf_type=0, tsO=None):
     """ Plots monochrome image with a scale.
     
@@ -673,30 +683,53 @@ def plot_grey_img(filename, lam_I0s, lams, T, ti, fs, MaxBox, Bm, scale,
     """
     for i in range(len(lams)):
         IMG=get_grey_img(filename, lam_I0s[i], lams[i], T, ti, fs, MaxBox, 
-            frame_col=frame_col, noise=noise, poi_a=poi_a, gauss_b=gauss_b, 
+            frame=True, noise=noise, poi=poi, gauss=gauss, 
             psf_type=psf_type, tsO=tsO)
-        IMG=add_scale(IMG, scale, Bm)
+        if otype in ['jpeg', 'png']:
+            IMG=add_scale(IMG, scale, Bm)
         plot_ism(IMG, [lam_I0s[i]], [lams[i]], T, ti, fs, filename=outfile,
-                 dpi=dpi, otype=otype, psf_type=psf_type, tsO=tsO)
+                 dpi=dpi, otype=otype, psf_type=psf_type, tsO=tsO,
+                 frame_col=frame_col)
 
 def plot_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, Bm, 
     scale, dpi=600, outfile=None, frame_col=1.0, mix_type='mt', noise=False,
-    poi_a=None, gauss_b=None, otype='jpeg',psf_type=0, tsO=None):
+    poi=None, gauss=None, otype='jpeg',psf_type=0, tsO=None):
     """ Plots coloured image with a scale.
     
     See functions get_col_img, add_scale and plot_ism for more details.
     """
     IMG=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, 
-        frame_col, mix_type, noise=noise, poi_a=poi_a, gauss_b=gauss_b,
-        psf_type=psf_type, tsO=tsO)
-    IMG=add_scale(IMG, scale, Bm)
-    plot_ism(IMG,  lam_I0s,  lams,  T,  ti,  fs,  filename=outfile,  dpi=dpi, 
-        otype=otype, psf_type=psf_type, tsO=tsO)
+        mix_type, noise=noise, poi=poi, gauss=gauss, psf_type=psf_type, 
+        tsO=tsO)
+    if otype in ['jpeg', 'png']:
+        IMG=add_scale(IMG, scale, Bm)
+    if mix_type=='none': #will only plot tiff.
+        if otype in ['tiff16', 'tif16']:
+            IMG=intensity2image(IMG,65535,'uint16')
+        else:
+            IMG=intensity2image(IMG,255,'uint8')
+        IMG=np.transpose(IMG,(2,0,1))
+        Istring=''
+        for i in range(len(lam_I0s)):
+            Istring+='_'+str(round(lam_I0s[i],4))
+        tstr=''
+        if psf_type==1:
+            tstr='_tsO'+"%g"%tsO
+        if ti>=0:#dynamic gro structure 
+            fname=outfile + str(ti) + tstr + '_fs' + str(fs) + '_T' + str(T) + \
+                  '_I' + Istring +'.tiff'
+        else:# static gro structure
+            fname=outfile + tstr + '_fs' + str(fs) + '_T' + str(T) + '_I' + \
+                  Istring + '.tiff'
+        print('Writing: '+fname)
+        tif.imwrite(fname,IMG,photometric='minisblack')
+    else:    
+        plot_ism(IMG,  lam_I0s,  lams,  T,  ti,  fs,  filename=outfile,  dpi=dpi, 
+            otype=otype, psf_type=psf_type, tsO=tsO, frame_col=frame_col)
 
 def get_grey_3dimg(filename, lam_I0, lam, T, ti, fs, MaxBox, dlmn, nmax,
-    opt_axis, add_n=1, outfile=None, frame_col=1.0, otype='tiff8',
-    mprocess=True, noise=False, poi_a=None, gauss_b=None, psf_type=0, 
-    tsO=None):
+    opt_axis, add_n=1, outfile=None, otype='tiff8', mprocess=True, noise=False,
+    poi=None, gauss=None, psf_type=0, tsO=None):
 
     nN=int(nmax/add_n)
     xyz='xyz'
@@ -710,46 +743,46 @@ def get_grey_3dimg(filename, lam_I0, lam, T, ti, fs, MaxBox, dlmn, nmax,
         Arguments=[]
         for n in range(nN):
             Arguments.append((filename, lam_I0, lam, T, ti, fs, MaxBox, True, \
-                opt_axis, n*add_n, -1, noise, poi_a, gauss_b, psf_type, tsO))
+                opt_axis, n*add_n, 0, noise, poi, gauss, psf_type, tsO))
         pool=mp.Pool(mp.cpu_count())
         results=pool.starmap(get_grey_img,Arguments)
     else: #Serial
         results=[]
         for n in range(nN):
             results.append(get_grey_img(filename, lam_I0, lam, T, ti, fs,
-                MaxBox, True, opt_axis, n*add_n, -1, noise, poi_a, gauss_b,
+                MaxBox, True, opt_axis, n*add_n, 0, noise, poi, gauss,
                 psf_type, tsO))
 
-    for z in range(zN):
-        foo=results[z]*M
-        foo[foo>M]=M
-        foo[foo<0]=int(frame_col*M)
+    for n in range(nN):
+        foo=intensity2image(results[n],M,type(img3d[0,0,0]))
         foo=np.transpose(foo)
-        img3d[zN-z-1,:,:]=foo[:,:]
+        img3d[nN-n-1,:,:]=foo[:,:]
 
     return img3d
 
 def plot_grey_3dimg(filename, lam_I0s, lams, T, ti, fs, MaxBox, dlmn, nmax,
-    opt_axis, add_n=1, outfile=None, frame_col=1.0, otype='tiff8', 
-    mprocess=True, noise=False, poi_a=None, gauss_b=None, psf_type=0, tsO=None):
+    opt_axis, add_n=1, outfile=None, otype='tiff8', mprocess=True, noise=False,
+    poi=None, gauss=None, psf_type=0, tsO=None):
 
     tstr=''
+    xyz='xyz'
     if psf_type==1:
         tstr='_tsO'+"%g"%tsO
     for l in range(len(lams)):
         img3d=get_grey_3dimg(filename, lam_I0s[l], lams[l], T, ti, fs, MaxBox,
             dlmn, nmax, opt_axis, add_n=add_n, outfile=outfile, otype=otype,
-            frame_col=frame_col, mprocess=mprocess, noise=noise, poi_a=poi_a,
-            gauss_b=gauss_b, psf_type=psf_type, tsO=tsO)
-        tif.imwrite(outname+str(ti) + '_'+xyz[opt_axis] + tstr + '_lam' + \
-            str(lams[l]) + '_fs'+str(fs) +'_T'+str(T) +'I_'+str(lam_I0) + \
-            '.tiff', img3d, imagej=True, resolution=(1./dlmn[0],1./dlmn[1]), \
-             metadata={'spacing': dlmn[2], 'unit': 'nm', 'axes': 'ZYX'})
+            mprocess=mprocess, noise=noise, poi=poi, gauss=gauss, 
+            psf_type=psf_type, tsO=tsO)
+        oname=outfile +str(ti) +'_'+xyz[opt_axis] +tstr +'_lam'+str(lams[l]) +\
+            '_fs'+str(fs) +'_T'+str(T) +'_I'+str(lam_I0s[l]) +'.tiff'
+        print('Writing: '+oname)
+        tif.imwrite(oname, img3d, imagej=True, resolution=(1./dlmn[0], 
+             1./dlmn[1]), metadata={'spacing': dlmn[2], 'unit': 'nm', 
+             'axes': 'ZYX'})
     
-def plot_grey_3dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox, 
-    dlmn, nmax, opt_axis, fps, add_n=1, outfile=None, frame_col=1.0, 
-    otype='tiff8', mprocess=True, noise=False, poi_a=None, gauss_b=None, 
-    psf_type=0, tsO=None):
+def plot_grey_3dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, 
+    MaxBox, dlmn, nmax, opt_axis, fps, add_n=1, outfile=None, otype='tiff8', 
+    mprocess=True, noise=False, poi=None, gauss=None, psf_type=0, tsO=None):
     
     nN=int(nmax/add_n)
     tN=int((tmax-1-tbegin)/tdiff)+1
@@ -765,37 +798,35 @@ def plot_grey_3dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox
     if psf_type==1:
         tstr='_tsO'+"%g"%tsO
     #Check if all tiff exists
+    nname=''
+    if noise:
+        nname='noise_'
     for l in range(len(lams)):
         for i in range(tN):
             ti=tbegin+tdiff*i
-            fname=filename+str(ti) + '_'+xyz[opt_axis] +tstr +'_lam' + \
-                str(lams[l]) +'_fs'+str(fs) +'_T'+str(T) +'I_'+str(lam_I0) + \
-                '.tiff'
-            if os.path.exists(fname):
-                img3d=tif.imread(fname)
-            else:
-                img3d=get_grey_3dimg(filename, lam_I0s[l], lams[l], T, ti, fs, 
-                    MaxBox, dlmn, nmax, opt_axis, add_n=add_n, outfile=outfile, 
-                    otype=otype, frame_col=frame_col, mprocess=mprocess, 
-                    noise=noise, poi_a=poi_a, gauss_b=gauss_b, 
-                    psf_type=psf_type, tsO=tsO)
+            img3d=get_grey_3dimg(filename, lam_I0s[l], lams[l], T, ti, fs, 
+                MaxBox, dlmn, nmax, opt_axis, add_n=add_n, outfile=outfile, 
+                otype=otype, mprocess=mprocess, noise=noise, poi=poi, 
+                gauss=gauss, psf_type=psf_type, tsO=tsO)
             img3dt[i,:,:,:]=img3d[:,:,:]
-        tif.imwrite(outname+'_' +xyz[opt_axis] +tstr +'_lam'+str(lams[l]) + \
-            '_fs'+str(fs) +'_T'+str(T) +'I_'+str(lam_I0) +'.tiff', img3dt, 
-            imagej=True, resolution=(1./dlmn[0],1./dlmn[1]), metadata={ 
-            'spacing': dlmn[2], 'unit': 'nm', 'finterval': fps, 'axes': 'TZYX'})
+        oname=outfile +str(tbegin)+'-'+str(tmax) + '_'+xyz[opt_axis] +tstr + \
+            '_lam'+str(lams[l]) +'_fs'+str(fs) +'_T'+str(T) +'_I'+ \
+            str(lam_I0s[l]) +'.tiff'
+        print('Writing: '+oname)
+        tif.imwrite(oname, img3dt, imagej=True, resolution=(1./dlmn[0], 
+            1./dlmn[1]), metadata={'spacing': dlmn[2], 'unit': 'nm', 
+            'finterval': fps, 'axes': 'TZYX'})
 
-def plot_grey_2dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox, 
-    dlmn, nmax, opt_axis, fps, add_n=1, outfile=None, frame_col=1.0, 
-    otype='tiff8', mprocess=True, noise=False, poi_a=None, gauss_b=None, 
-    psf_type=0, tsO=None):
+def plot_grey_2dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, 
+    MaxBox, dlmn, fps, outfile=None, otype='tiff8', mprocess=True, noise=False,
+    poi=None, gauss=None, psf_type=0, tsO=None):
     
     tN=int((tmax-1-tbegin)/tdiff)+1
     if otype in ["tiff16","tif16"]:
-        img3dt=np.zeros((tN,MaxBox[1],MaxBox[0]),dtype=np.uint16)
+        img2dt=np.zeros((tN,MaxBox[1],MaxBox[0]),dtype=np.uint16)
         M=65535
     elif otype in ["tiff8", "tif8"]:
-        img3dt=np.zeros((tN,MaxBox[1],MaxBox[0]),dtype=np.uint8)
+        img2dt=np.zeros((tN,MaxBox[1],MaxBox[0]),dtype=np.uint8)
         M=255
     tstr=''
     if psf_type==1:
@@ -804,31 +835,27 @@ def plot_grey_2dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox
     for l in range(len(lams)):
         for i in range(tN):
             ti=tbegin+tdiff*i
-            fname=filename+str(ti) + '_lam'+str(lams[l]) +tstr +'_fs'+str(fs) +\
-                '_T'+str(T) +'I_'+str(lam_I0) +'.tiff'
-            if os.path.exists(fname):
-                img2d=tif.imread(fname)
-            else:
-                img2d=get_grey_img(filename, lam_I0s[l], lams[l], T, ti, fs, 
-                    MaxBox, frame=False, opt_axis=None, nidx=None, 
-                    frame_col=frame_col, noise=noise, poi_a=poi_a, 
-                    gauss_b=gauss_b, psf_type=psf_type, tsO=tsO)
-                img2d=np.transpose(img2d)
+            img2d=get_grey_img(filename, lam_I0s[l], lams[l], T, ti, fs, 
+                MaxBox, frame=True, frame_col=0, noise=noise, poi=poi, 
+                gauss=gauss, psf_type=psf_type, tsO=tsO)
+            img2d=intensity2image(img2d,M,type(img2dt[0,0,0]))
+            img2d=np.transpose(img2d)
             img2dt[i,:,:]=img2d[:,:]
-        tif.imwrite(outname+ '_lam'+str(lams[l]) +tstr +'_fs'+str(fs) +'_T' + \
-            str(T) +'I_'+str(lam_I0) +'.tiff', img2dt, imagej=True, 
-            resolution=(1./dlmn[0],1./dlmn[1]), metadata={'unit': 'nm', 
-            'finterval': fps, 'axes': 'TYX'})
+        oname=outfile +str(tbegin)+'-'+str(tmax) +tstr +'_lam'+str(lams[l]) + \
+            '_fs'+str(fs) +'_T'+str(T) +'_I'+str(lam_I0s[l]) +'.tiff'
+        print('Writing: '+oname)
+        tif.imwrite(oname, img2dt, imagej=True, resolution=(1./dlmn[0], 
+            1./dlmn[1]), metadata={'unit': 'nm', 'finterval': fps, 
+            'axes': 'TYX'})
 
 def get_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, dlmn, 
-    nmax, opt_axis, add_n=1, outfile=None, frame_col=1.0, otype='tiff8', 
-    mprocess=True, noise=False, poi_a=None, gauss_b=None, mix_type='mt',
-    mix=True, psf_type=0, tsO=None):
+    nmax, opt_axis, add_n=1, outfile=None, otype='tiff8', mprocess=True, 
+    noise=False, poi=None, gauss=None, mix_type='mt', psf_type=0, tsO=None):
 
     nN=int(nmax/add_n)
     xyz='xyz'
     C=3 #3 color channels for 'mt' image
-    if mix==False: #Colors are not mixed.
+    if mix_type=='none': #Colors are not mixed.
         C=len(lams)
     if otype in ["tiff16","tif16"]:
         img3d=np.zeros((nN,C,MaxBox[1],MaxBox[0]),dtype=np.uint16)
@@ -837,84 +864,58 @@ def get_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, dlmn,
         img3d=np.zeros((nN,C,MaxBox[1],MaxBox[0]),dtype=np.uint8)
         M=255
 
-    if mix:
-        if mprocess==True: #Multiprocess
-            Arguments=[]
-            for n in range(nN):
-                Arguments.append((filename, lam_I0s, lams, lam_hues, T, ti, fs, 
-                    MaxBox, frame_col, mix_type, opt_axis, n*add_n, noise, poi_a, 
-                    gauss_b, psf_type, tsO))
-            pool=mp.Pool(mp.cpu_count())
-            results=pool.starmap(get_col_img,Arguments)
-        else: #Serial
-            results=[]
-            for n in range(nN):
-                results.append(get_col_img(filename, lam_I0s, lams, lam_hues, 
-                    T, ti, fs, MaxBox, frame_col, mix_type, opt_axis, n*add_n, 
-                    noise, poi_a, gauss_b, psf_type, tsO))
-        
-        for z in range(zN):
-            foo=results[z]*M
-            foo[foo>M]=M
-            foo[foo<0]=int(frame_col*M) #foo has x, y, c
-            foo=np.transpose(foo,(2,1,0)) # not foo has c, y, x
-            img3d[zN-z-1,:,:,:]=foo[:,:,:] #TODO: Check if order is correct.
-
-    else:
-        for l in range(len(lams)):
-            if mprocess==True: #Multiprocess
-                Arguments=[]
-                for n in range(nN):
-                    Arguments.append((filename, lam_I0s[l], lams[l], T, ti, fs, 
-                        MaxBox, True, opt_axis, n*add_n, -1, noise, poi_a, 
-                        gauss_b, psf_type, tsO))
-                pool=mp.Pool(mp.cpu_count())
-                results=pool.starmap(get_grey_img,Arguments)
-            else: #Serial
-                results=[]
-                for n in range(nN):
-                    results.append(get_grey_img(filename, lam_I0s[l], lams[l], 
-                        T, ti, fs, MaxBox, True, opt_axis, n*add_n, -1, noise,
-                        poi_a, gauss_b, psf_type, tsO))
-        
-            for z in range(zN):
-                foo=results[z]*M
-                foo[foo>M]=M
-                foo[foo<0]=int(frame_col*M)
-                foo=np.transpose(foo)
-                img3d[zN-z-1,l,:,:]=foo[:,:] #TODO: Check if order is correct.
+    if mprocess==True: #Multiprocess
+        Arguments=[]
+        for n in range(nN):
+            Arguments.append((filename, lam_I0s, lams, lam_hues, T, ti, fs, 
+                MaxBox, mix_type, opt_axis, n*add_n, noise, poi, gauss,
+                psf_type, tsO))
+        pool=mp.Pool(mp.cpu_count())
+        results=pool.starmap(get_col_img,Arguments)
+    else: #Serial
+        results=[]
+        for n in range(nN):
+            results.append(get_col_img(filename, lam_I0s, lams, lam_hues, 
+                T, ti, fs, MaxBox, mix_type, opt_axis, n*add_n, 
+                noise, poi, gauss, psf_type, tsO))
+    
+    for n in range(nN):
+        foo=intensity2image(results[n],M,type(img3d[0,0,0,0])) # foo has x, y, c
+        foo=np.transpose(foo,(2,1,0)) # new foo has c, y, x
+        img3d[nN-n-1,:,:,:]=foo[:,:,:] 
 
     return img3d
 
 def plot_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, dlmn, 
-    nmax, opt_axis, add_n=1, outfile=None, frame_col=1.0, otype='tiff8', 
-    mprocess=True, noise=False, poi_a=None, gauss_b=None, mix_type='mt',
-    mix=True, psf_type=0, tsO=None):
+    nmax, opt_axis, add_n=1, outfile=None, otype='tiff8', mprocess=True, 
+    noise=False, poi=None, gauss=None, mix_type='mt', psf_type=0, tsO=None):
     
     Istring=''
+    xyz='xyz'
     for i in range(len(lams)):
-        Istring+='_'+lam_I0s[i]
+        Istring+='_'+str(lam_I0s[i])
     tstr=''
     if psf_type==1:
         tstr='_tsO'+"%g"%tsO
     img3d=get_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox,
-        dlmn, nmax, opt_axis, add_n=add_n, outfile=outfile, frame_col=frame_col,
-        otype=otype, mprocess=mprocess, noise=noise, poi_a=poi_a, 
-        gauss_b=gauss_b, mix_type=mix_type, mix=mix, psf_type=psf_type, tsO=tsO)
-    tif.imwrite(outname+str(ti) + '_'+xyz[opt_axis] +tstr +'_fs'+str(fs) +'_T'+\
-        str(T) +'I'+Istring+'.tiff', img3d, imagej=True, 
-        resolution=(1./dlmn[0],1./dlmn[1]), metadata={'spacing': dlmn[2], 
-        'unit': 'nm', 'axes': 'ZCYX'})
+        dlmn, nmax, opt_axis, add_n=add_n, outfile=outfile, otype=otype, 
+        mprocess=mprocess, noise=noise, poi=poi, gauss=gauss, 
+        mix_type=mix_type, psf_type=psf_type, tsO=tsO)
+    oname=outfile+str(ti) + '_'+xyz[opt_axis] +tstr +'_fs'+str(fs) +'_T' + \
+        str(T) +'_I'+Istring+'.tiff'
+    print('Writing: '+oname)
+    tif.imwrite(oname, img3d, imagej=True, resolution=(1./dlmn[0],1./dlmn[1]),
+        metadata={'spacing': dlmn[2], 'unit': 'nm', 'axes': 'ZCYX'})
 
-def plot_col_3dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, fs, 
-    MaxBox, dlmn, nmax, opt_axis, fps, add_n=1, outfile=None, frame_col=1.0, 
-    otype='tiff8', mprocess=True, noise=False, poi_a=None, gauss_b=None, 
-    mix_type='mt', mix=True, psf_type=0, tsO=None):
+def plot_col_3dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, 
+    fs, MaxBox, dlmn, nmax, opt_axis, fps, add_n=1, outfile=None, otype='tiff8', 
+    mprocess=True, noise=False, poi=None, gauss=None, mix_type='mt', 
+    psf_type=0, tsO=None):
     
     nN=int(nmax/add_n)
     tN=int((tmax-1-tbegin)/tdiff)+1
     C=3 #3 color channels for 'mt' image
-    if mix==False: #Colors are not mixed.
+    if mix_type=='none': #Colors are not mixed.
         C=len(lams)
     
     xyz='xyz'
@@ -926,37 +927,32 @@ def plot_col_3dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, f
         M=255
     Istring=''
     for i in range(len(lams)):
-        Istring+='_'+str(lam_hues[i])
+        Istring+='_'+str(lam_I0s[i])
     tstr=''
     if psf_type==1:  
         tstr='_tsO'+"%g"%tsO
     #Check if all tiff exists
     for i in range(tN):
         ti=tbegin+tdiff*i
-        fname=filename+str(ti) + '_'+xyz[opt_axis] +tstr +'_fs'+str(fs) + \
-            '_T'+str(T) +'I'+Istring +'.tiff'
-        if os.path.exists(fname):
-            img3d=tif.imread(fname)
-        else:
-            img3d=get_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs,
-                MaxBox, dlmn, nmax, opt_axis, add_n=add_n, outfile=outfile, 
-                frame_col=frame_col, otype=otype, mprocess=mprocess, mix=mix,
-                noise=noise, poi_a=poi_a, gauss_b=gauss_b, mix_type=mix_type, 
-                psf_type=psf_type, tsO=tsO)
+        img3d=get_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs,
+            MaxBox, dlmn, nmax, opt_axis, add_n=add_n, outfile=outfile, 
+            otype=otype, mprocess=mprocess, noise=noise, poi=poi,
+            gauss=gauss, mix_type=mix_type, psf_type=psf_type, tsO=tsO)
         img3dt[i,:,:,:,:]=img3d[:,:,:,:]
-    tif.imwrite(outname+'_' +xyz[opt_axis] +tstr +'_fs'+str(fs) +'_T'+str(T)+ \
-        'I'+Istring +'.tiff', img3dt, resolution=(1./dlmn[0],1./dlmn[1]), 
-        imagej=True, metadata={'spacing': dlmn[2], 'unit': 'nm', 
-        'finterval': fps, 'axes': 'TZCYX'})
+    oname=outfile +str(tbegin)+'-'+str(tmax) +'_' +xyz[opt_axis] +tstr + \
+        '_fs'+str(fs) +'_T'+str(T)+ '_I'+Istring +'.tiff'
+    print('Writing: '+oname)
+    tif.imwrite(oname, img3dt, resolution=(1./dlmn[0],1./dlmn[1]), imagej=True,
+        metadata={'spacing': dlmn[2], 'unit': 'nm', 'finterval': fps, 
+        'axes': 'TZCYX'})
 
-def plot_col_2dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, fs, 
-    MaxBox, fps, outfile=None, frame_col=1.0, otype='tiff8', mprocess=True, 
-    noise=False, poi_a=None, gauss_b=None, mix_type='mt', mix=True, psf_type=0,
-    tsO=None):
+def plot_col_2dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, 
+    fs, MaxBox, fps, dlmn, outfile=None, otype='tiff8', mprocess=True, noise=False, 
+    poi=None, gauss=None, mix_type='mt', psf_type=0, tsO=None):
     
     tN=int((tmax-1-tbegin)/tdiff)+1
     C=3 #3 color channels for 'mt' image
-    if mix==False: #Colors are not mixed.
+    if mix_type=='none': #Colors are not mixed.
         C=len(lams)
     
     xyz='xyz'
@@ -968,41 +964,30 @@ def plot_col_2dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, f
         M=255
     Istring=''
     for i in range(len(lams)):
-        Istring+='_'+str(lam_hues[i])
+        Istring+='_'+str(lam_I0s[i])
     tstr=''
     if psf_type==1:
         tstr='_tsO'+"%g"%tsO
     #Check if all tiff exists
     for i in range(tN):
         ti=tbegin+tdiff*i
-        fname=filename+str(ti) + tstr + '_fs'+str(fs) +'_T'+str(T)+\
-            'I'+Istring +'.tiff'
-        if os.path.exists(fname):
-            img2d=tif.imread(fname)
-            img3dt[i,:,:,:]=img2d[:,:,:]
-        elif mix:
-            img2d=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs,
-                MaxBox, frame_col=frame_col, mix_type=mix_type, opt_axis=None,
-                nidx=None, noise=noise, poi_a=poi_a, gauss_b=gauss_b,
-                psf_type=psf_type, tsO=tsO)
-            img2d=np.transpose(img2d,(2,1,0))    
-            img3dt[i,:,:,:]=img2d[:,:,:]
-        else:
-            for j in range(C):
-                img2d=get_grey_img(filename, lam_I0s[j], lams[j], T, ti, fs, 
-                    MaxBox, frame=False, opt_axis=None, nidx=None, 
-                    frame_col=frame_col, noise=noise, poi_a=poi_a, 
-                    gauss_b=gauss_b, psf_type=psf_type, tsO=tsO)
-                img2d=np.tranpose(img2d)
-                img3dt[i,j,:,:]=img2d[:,:]
-    tif.imwrite(outname+'_' +xyz[opt_axis] + tstr + '_fs'+str(fs) +'_T' + \
-        str(T) +'I'+Istring +'.tiff', img3dt, 
-        resolution=(1./dlmn[0],1./dlmn[1]), imagej=True, 
-        metadata={'spacing': dlmn[2], 'unit': 'nm', 'finterval': fps, 
-        'axes': 'TZCYX'})
+        img2d=get_col_img(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox,
+            mix_type=mix_type, noise=noise, poi=poi, tsO=tsO, gauss=gauss, 
+            psf_type=psf_type)
+         
+        img2d=intensity2image(img2d,M,type(img2dt[0,0,0,0]))
+        img2d=np.transpose(img2d,(2,1,0))    
+        img2dt[i,:,:,:]=img2d[:,:,:]
+    
+    oname=outfile +str(tbegin)+'-'+str(tmax) +tstr +'_fs'+str(fs) +'_T' + \
+          str(T) +'_I'+Istring +'.tiff'
+    print('Writing: '+oname)
+    tif.imwrite(oname, img2dt, resolution=(1./dlmn[0],1./dlmn[1]), imagej=True, 
+        metadata={ 'unit': 'nm', 'finterval': fps,
+        'axes': 'TCYX'})
 
 def plot_grey_serial(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox,
-    Bm, scale, dpi, outname, frame_col, noise, poi_a, gauss_b, otype, psf_type, 
+    Bm, scale, dpi, outname, frame_col, noise, poi, gauss, otype, psf_type, 
     tsO):
     """ Plots several monochrome images serially.
 
@@ -1010,12 +995,12 @@ def plot_grey_serial(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox
     """
     for i in range(tbegin,tmax,tdiff):
         plot_grey_img(filename, lam_I0s, lams, T, i, fs, MaxBox, Bm, scale, dpi, 
-                      outname, frame_col, noise, poi_a, gauss_b, otype, psf_type,
+                      outname, frame_col, noise, poi, gauss, otype, psf_type,
                       tsO)
 
     
 def plot_col_serial(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, fs, 
-    MaxBox, Bm, scale, dpi, outname, frame_col, mix_type, noise, poi_a, gauss_b, 
+    MaxBox, Bm, scale, dpi, outname, frame_col, mix_type, noise, poi, gauss, 
     otype, psf_type, tsO):
     """ Plots several coloured images serially.
 
@@ -1023,11 +1008,11 @@ def plot_col_serial(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, f
     """
     for i in range(tbegin,tmax,tdiff):
         plot_col_img(filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, Bm, 
-            scale, dpi, outname, frame_col, mix_type, noise, poi_a, gauss_b, 
+            scale, dpi, outname, frame_col, mix_type, noise, poi, gauss, 
             otype, psf_type, tsO)
 
 def plot_grey_mp(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox, Bm, 
-    scale, dpi, output, frame_col, noise, poi_a, gauss_b, otype, psf_type, tsO):
+    scale, dpi, output, frame_col, noise, poi, gauss, otype, psf_type, tsO):
     """ Plots several monochrome images parallelly.
 
     See plot_grey_img for more details.
@@ -1036,7 +1021,7 @@ def plot_grey_mp(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox, Bm
     Arguments=[]
     for i in range(tbegin,tmax,tdiff): 
         Arguments.append([filename, lam_I0s, lams, T, i, fs, MaxBox, Bm, scale, 
-                          dpi, output, frame_col, noise, poi_a, gauss_b, otype,
+                          dpi, output, frame_col, noise, poi, gauss, otype,
                           psf_type, tsO])
     cpus=mp.cpu_count()
     if len(Arguments)<cpus:
@@ -1045,7 +1030,7 @@ def plot_grey_mp(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs, MaxBox, Bm
     results=pool.starmap(plot_grey_img,Arguments)
 
 def plot_col_mp(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, fs, 
-    MaxBox, Bm, scale, dpi, output, frame_col, mix_type, noise, poi_a, gauss_b,
+    MaxBox, Bm, scale, dpi, output, frame_col, mix_type, noise, poi, gauss,
     otype, psf_type, tsO):
     """ Plots several coloured images parallely.
 
@@ -1054,7 +1039,7 @@ def plot_col_mp(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff, fs,
     Arguments=[]
     for i in range(tbegin,tmax,tdiff):
         Arguments.append([filename, lam_I0s, lams, lam_hues, T, i, fs, MaxBox, 
-            Bm, scale, dpi, output,frame_col,mix_type, noise, poi_a, gauss_b, 
+            Bm, scale, dpi, output,frame_col, mix_type, noise, poi, gauss, 
             otype,psf_type,tsO])
     cpus=mp.cpu_count()
     if len(Arguments)<cpus:

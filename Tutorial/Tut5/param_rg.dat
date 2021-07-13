@@ -12,3 +12,4 @@ dlmn = 0.1 0.1 0.2
 maxlen = 25 25 25
 dpi = 600 
 psf_type = 0
+mix_type = mt
