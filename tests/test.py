@@ -337,10 +337,7 @@ class TestMonoGeneration(unittest.TestCase):
                      'maxlen': [1.2, 1.2, 1.2], 'focus_cor': 0, 'opt_axis': 2}
 
     def tearDown(self):
-        for a in ['out_lam1_fs1.dat','out_lam2_fs1.dat', 'psf_lam1_fs1.dat', 
-            'psf_lam2_fs1.dat', 'param.dat', 'pos.gro']:
-            if os.path.exists(a):
-                os.remove(a)
+        os.system('rm -f out*.dat psf*.dat param.dat pos.gro')
 
     def test_img1(self): #In-focus image for psf_type=0
         #Also Checks 'white image frame', pbc = in xy with z as optical axis
@@ -380,7 +377,6 @@ class TestMonoGeneration(unittest.TestCase):
         self.assertTrue((abs(IMG1-IMG1_0)<1E-6).all())
         self.assertTrue((abs(IMG2-IMG2_0)<1E-6).all())
  
-
     def test_img2(self): 
         # Checks if correct PSF is read when dlmn in parameter file is coarser 
         # than the dlmn used to generate PSF. 
@@ -490,8 +486,8 @@ class TestMonoGeneration(unittest.TestCase):
                        [0,0,0.2,0.5],[0.2,0,0.2,0.4],[0.2,0.2,0.2,0.3],
                        [0,0,-0.2,0.2],[0.2,0,-0.2,0.1],[0.2,0.2,-0.2,0.05]])
        
-        writePSF('psf_lam1_fs1.dat',PSF1)
-        writePSF('psf_lam2_fs1.dat',PSF2)
+        writePSF('psf_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat',PSF1)
+        writePSF('psf_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat',PSF2)
 
         #Write Parameter file
         self.params['psf_type']=1
@@ -504,8 +500,8 @@ class TestMonoGeneration(unittest.TestCase):
      
         #Generate image data
         siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
-        IMG1=readIMG('out_lam1_fs1.dat')
-        IMG2=readIMG('out_lam2_fs1.dat')
+        IMG1=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat')
+        IMG2=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat')
         self.assertEqual(IMG1.shape,(6,6))
         self.assertEqual(IMG2.shape,(6,6))
         
@@ -534,8 +530,8 @@ class TestMonoGeneration(unittest.TestCase):
 
         PSF2=np.array([[0,0,0,0.3],[0.2,0,0,0.2],[0.2,0.2,0,0.1]])
        
-        writePSF('psf_lam1_fs1.dat',PSF1)
-        writePSF('psf_lam2_fs1.dat',PSF2)
+        writePSF('psf_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat',PSF1)
+        writePSF('psf_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat',PSF2)
 
         #Write Parameter file
         self.params['psf_type']=1
@@ -550,8 +546,8 @@ class TestMonoGeneration(unittest.TestCase):
         #Generate image data
         siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
 
-        IMG1=readIMG('out_lam1_fs1.dat')
-        IMG2=readIMG('out_lam2_fs1.dat')
+        IMG1=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat')
+        IMG2=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat')
         self.assertEqual(IMG1.shape,(6,6))
         self.assertEqual(IMG2.shape,(6,6))
         
@@ -578,8 +574,8 @@ class TestMonoGeneration(unittest.TestCase):
              [0,0,0.2,0.5],[0.2,0,0.2,0.4],[0.2,0.2,0.2,0.3],
              [0,0,-0.2,0.2],[0.2,0,-0.2,0.1],[0.2,0.2,-0.2,0.05]])
        
-        writePSF('psf_lam1_fs1.dat',PSF1)
-        writePSF('psf_lam2_fs1.dat',PSF2)
+        writePSF('psf_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat',PSF1)
+        writePSF('psf_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat',PSF2)
 
         #Write Parameter file
         self.params['psf_type']=1
@@ -595,8 +591,8 @@ class TestMonoGeneration(unittest.TestCase):
         #Generate image data
         siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
 
-        IMG1=readIMG('out_lam1_fs1.dat')
-        IMG2=readIMG('out_lam2_fs1.dat')
+        IMG1=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat')
+        IMG2=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat')
         self.assertEqual(IMG1.shape,(6,6))
         self.assertEqual(IMG2.shape,(6,6))
         
@@ -767,18 +763,18 @@ class TestPlotImage(unittest.TestCase):
             os.remove('img'+str(i)+'_z20_lam100_fs1.dat')  
 
     def test_add_color(self):
-        IMGs=np.zeros((5,3,2))
+        IMGs=np.zeros((3,2,5))
         #Check hue-value addition
-        IMGs[:,0,0]=[1,1,0,0,0] #red+yellow
-        IMGs[:,0,1]=[1,0,0,0,1] #red+violet
+        IMGs[0,0,:]=[1,1,0,0,0] #red+yellow
+        IMGs[0,1,:]=[1,0,0,0,1] #red+violet
         #Check saturation
-        IMGs[:,1,0]=[0.5,0,0,0.1,0] #red+cyan
+        IMGs[1,0,:]=[0.5,0,0,0.1,0] #red+cyan
         #3-color addition
-        IMGs[:,1,1]=[0.1,0,0.3,0,0.5] #red+green+violet
+        IMGs[1,1,:]=[0.1,0,0.3,0,0.5] #red+green+violet
         #4-color addition
-        IMGs[:,2,0]=[0.9,0.6,0.6,0,0.3] 
+        IMGs[2,0,:]=[0.9,0.6,0.6,0,0.3] 
         #5-color addition
-        IMGs[:,2,1]=[0.5,0.5,0.5,0.9,0.8]
+        IMGs[2,1,:]=[0.5,0.5,0.5,0.9,0.8]
 
         hues=[0,60,120,180,270] #red, yellow, green, cyan, violet
         newIMGs=siliscopy.plot_image.add_color(IMGs,hues)
