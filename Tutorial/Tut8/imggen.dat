@@ -1,0 +1,11 @@
+dp10.gro,parameters.dat,PSF_gandy,img10,volume
+dp20.gro,parameters.dat,PSF_gandy,img20,volume
+dp30.gro,parameters.dat,PSF_gandy,img30,volume
+dp40.gro,parameters.dat,PSF_gandy,img40,volume
+dp50.gro,parameters.dat,PSF_gandy,img50,volume
+dp60.gro,parameters.dat,PSF_gandy,img60,volume
+dp70.gro,parameters.dat,PSF_gandy,img70,volume
+dp80.gro,parameters.dat,PSF_gandy,img80,volume
+dp90.gro,parameters.dat,PSF_gandy,img90,volume
+dp100.gro,parameters.dat,PSF_gandy,img100,volume
+dp110.gro,parameters.dat,PSF_gandy,img110,volume
