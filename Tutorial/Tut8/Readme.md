@@ -1,5 +1,12 @@
 # Tutorial 8: Generating images with different data-type
 
+## Extract files
+
+```bash
+tar -xzf Intensities.tar.gz
+tar -xzf Struct.tar.gz
+```
+
 ## Generate 2D image
 
 PNG:
@@ -34,6 +41,12 @@ siliscopy plot --file img --paramfile parameters.dat --method mono2dt \
                --calc specific --output img --type tiff8 
 siliscopy plot --file img --paramfile parameters.dat --method color2dt \
                --calc specific --output img --type tiff8 
+```
+
+## Generate Volume image intensities
+
+```bash
+siliscopy gen_mono --data imggen.dat --multiprocess
 ```
 
 ## Generate 3D image

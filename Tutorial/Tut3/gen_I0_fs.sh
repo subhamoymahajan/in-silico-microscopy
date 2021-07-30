@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 for fs in 400 530
 do
     for I0 in 0.1 0.2 0.3

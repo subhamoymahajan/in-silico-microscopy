@@ -7,7 +7,7 @@ bash gen_Pn.sh
 
 ## 2. Generate colored in-silico monochrome image.
 ```bash
-bash gen_Pn_png.sh
+bash gen_Pn_jpeg.sh
 ```
 
 
