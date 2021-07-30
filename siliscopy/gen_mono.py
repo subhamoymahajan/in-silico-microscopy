@@ -26,6 +26,9 @@ def gen_mono_c(data,silent=False):
     data: array for strings
         data[0] is Gro filename, data[1] is parameter filename, data[2] is PSF 
         file name header, and data[3] is output file name header.
+    silent: bool
+        True would suppress the default output of gen_mono C binary file.
+        (default False)
 
     Writes
     ------
@@ -108,6 +111,28 @@ def gen_mono_c_serial(datafile):
 
 def gen_mono_c_vol(data, maxlen=None, opt_axis=None, dlmn=None, add_n=1,
     mprocess=True):
+    """ Calculates image intensity for multiple slices, which is equivalent
+        to a 3D image.
+
+    Parameters
+    ----------
+    data: list of str
+        A list of string containing input file header, parameter filename, psf 
+        filename header, and output filename header.
+    maxlen: list of floats
+        Maximum box length of the system. (default None)
+    opt_axis: int
+        Optical axis for in-silico microscope (default None)
+    dlmn: list of float
+        Voxel dimensions (default None)
+    add_n: int
+        There are maxlen[opt_axis]/dlmn[2] volume slices. Every `add_n` slices 
+        is calculated. (default 1)
+    mprocess: bool
+        If true multiprocessing is used to calculate the 3D image intensity.
+        (default True)
+    """
+
     xyz='xyz'
     if maxlen==None:
         f=open(data[1],'r')

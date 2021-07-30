@@ -15,6 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.)
 import numpy as np
+import tifffile as tif
 from .plot_image import get_grey_img
 def get_maxI(filename, lams, fs):
     """ Get maximum intensity from I(l',m'). 
@@ -56,10 +57,10 @@ def get_I0s(filename, lams, fs, iterations=10):
 
     filename: str
         Starting string of filename of image intensity files.
-    lams: array of int
-        Wavelength of all fluorophore types.
-    fs: int
-        Full-Width-at-Half-Maximum (FWHM) scaling factor.
+    lams: 
+        See ''get_maxI''
+    fs: 
+        See ''get_maxI''
     iterations: int, optional
         number of iterations of I0 prediction
     """
@@ -83,10 +84,10 @@ def get_hist(filename, lams, fs, outname, maxI=20, dI=0.1,norm=False):
     ----------
     filename: str
         Starting string of filename of image intensity files.
-    lams: array of int
-        Wavelength of all fluorophore types.
-    fs: int
-        Full-Width-at-Half-Maximum (FWHM) scaling factor.
+    lams: 
+        See ''get_maxI''
+    fs: 
+        See ''get_maxI''
     outname: str
         Output filename
     maxI: float, optional
@@ -135,138 +136,327 @@ def get_hist(filename, lams, fs, outname, maxI=20, dI=0.1,norm=False):
         w.write('\n')
     w.close()
 
-def get_num_area(filename, I0, lam, T, ti, fs, threshold, MaxBox, dlmn, pbc, \
-    outname, show=False, white=False):
+def get_num_area(filename, threshold, dlmn, pbc, outname, min_pix=0):
     """ Calculates number of particles and their area
 
     Parameters
     ----------
     filename: str
-        Starting string of filename of image intensity files.
-    I0: float
-        The maximum image intensity
-    lam: array of int
-        Wavelength of the fluorophore type to threshold.
-    T: int
-        Number of timesteps to perform an average.
-    ti: int
-        timestep of the image data file. -1 if there is no sense of time
-        (static system).
-    fs: int
-        Full-Width-at-Half-Maximum (FWHM) scaling factor.
+        Filename of 2D or 2DT image intensity tiff files.
     threshold: int
         An integer between 0-255. Image intensity above thresold/255 implies
         the presence of the particle. Periodic boundary conditions are applied.
-    MaxBox: array of ints
-        Contains the number of pixels in the image in l and m directions.
-    dlmn: array of floats
-        Delta l', Delta m', and Delta n'. Voxel size.
     pbc: array of ints
         1 if pbc condition is applied and 0 otherwise. First element for l', 
        and second element for m' 
     outname: str
         Output file name.
-    show: Boolean, optional
-        If true the Particles are shown. (default is False)
-    white: Boolean, optional
-        If true particles are shown as white or else shown as gray. (default is
-        False)
+    min_pix: int, optional
+        Any group of pixles containing less than min_pix pixels are not 
+        considered as particles.
+
     Writes
     ------
-    [outname].dat:  
-        Each line containing particle ID and area.
-    [outname].png:
-        The thresholded image (if show=True).
+    bin_[filename]:
+        Binary image of the input image, showing particles in white, background
+        is black. 
+    [outname]:
+        Each line contains, timestep (based on tiff), number of particles and 
+        total cross-sectional area.
+  
     """
-    IMG_wf=get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=True)
-    IMG=[]
-    for i in range(len(IMG_wf)):
-        foo=IMG_wf[i][IMG_wf[i]>-1E-6]
-        if len(foo)>0:
-            foo=[int(x+1-threshold/255) for x in foo]
-            IMG.append(foo)
-    ly=len(IMG)
-    lx=len(IMG[0])
-    particles=[]
-    #axis 0 is particle ID, axis 2 contains particle position i*lx+j
-    for i in range(ly):
-        for j in range(lx):
-            if IMG[i][j]==0:
+    #####TIFF 
+    IMG=tif.imread(filename) #Should be a TYX tiff file i.e. 2DT monochrome
+    fps=1 
+    consts=IMG.shape
+    if len(consts)==2:
+        foo=np.zeros((1,consts[0],consts[1]),dtype=IMG.dtype)
+        foo[0,:,:]=IMG[:,:]
+        IMG=foo
+        consts=IMG.shape
+    ###Binary image
+    if IMG.dtype==np.uint8:
+        M=255
+    elif IMG.dtype==np.uint16:
+        M=65535
+
+    IMG[IMG<threshold]=0
+    IMG[IMG>threshold]=M
+    Bin=np.zeros(consts,dtype=IMG.dtype) 
+    w=open(outname,'w')
+    lx,ly=[consts[2],consts[1]]
+    for t in range(consts[0]):
+        max_label=1
+        boundary=[]
+        equiv={}
+        IMG2=np.zeros(consts[1:],dtype=int)
+        for j in range(consts[1]):
+            for i in range(consts[2]):
+                if IMG[t,j,i]==0:
+                    continue
+                labels=[0,0] #i, j
+                if i>0:
+                    labels[0]=IMG2[j,i-1]
+                if j>0:
+                    labels[1]=IMG2[j-1,i]
+                #PBC
+                if i==consts[2]-1 and pbc[0]==1:
+                    labels[1]=IMG2[0,i]
+                if j==consts[1]-1 and pbc[1]==1:
+                    labels[0]=IMG2[j,0]
+                
+                if labels[0]==0 and labels[1]!=0:
+                    IMG2[j,i]=labels[1]
+                elif labels[1]==0 and labels[0]!=0:
+                    IMG2[j,i]=labels[0]
+                elif labels[0]==labels[1] and labels[0]!=0:
+                    IMG2[j,i]=labels[0]
+                elif labels[0]*labels[1]>0 and labels[0]!=labels[1]:
+                    IMG2[j,i]=labels[0]
+                    #label1 = label0
+                    foo1=min(labels[0],labels[1])
+                    foo2=max(labels[0],labels[1])
+                    equiv=add_equiv(equiv,foo1,foo2)
+                else:
+                    IMG2[j,i]=max_label
+                    max_label+=1
+                if i==0 or i==consts[2]-1:
+                    if pbc[0]==0:
+                        if IMG2[j,i] not in boundary:
+                            boundary.append(IMG2[j,i])
+                if j==0 or j==consts[1]-1:
+                    if pbc[1]==0:
+                        if IMG2[j,i] not in boundary:
+                            boundary.append(IMG2[j,i])
+        for k in range(max_label):
+            if k not in equiv:
                 continue
-            idx=i*lx+j
-            surr=[]
-            if pbc[1]==1: #pbc in m'
-                surr+=[i*lx+(j+1)%lx, i*lx+(j-1)%lx]
+            IMG2[IMG2==k]=equiv[k]
+        bound_new=[]
+        for k in range(len(boundary)):
+            if boundary[k] in equiv:
+                if equiv[boundary[k]] not in bound_new:
+                    bound_new.append(equiv[boundary[k]])
+        tot_area=0
+        n=0 
+        for k in range(1,max_label):
+            if k in equiv:
+                continue
+            if k in bound_new:
+                IMG2[IMG2==k]=0
+                continue
+            A=np.where(IMG2==k)
+            if len(A[0])>min_pix:
+                tot_area+=len(A[0])
+                n+=1
             else:
-                surr+=[i*lx+j+1, i*lx+j-1]
-            if pbc[0]==1: #pbc in l'
-                surr+=[((i+1)%ly)*lx+j, ((i-1)%ly)*lx+j]
-            else:
-                surr+=[(i-1)*lx+j, (i+1)*lx+j]
-            surr=set(surr)
-            add_in=[]
-            for n in range(len(particles)):
-                common=particles[n].intersection(surr)
-                if len(common)>0:
-                    add_in.append(n)
-            if len(add_in)>0:
-                particles[add_in[0]].add(idx)
-                for k in range(len(add_in)-1,0,-1):
-                    particles[add_in[0]] |= particles[add_in[k]]
-                    particles.pop(add_in[k])
-            else:
-                particles.append(set([idx]))
+                IMG2[A]=0
+        IMG2[IMG2>0]=255
+        IMG2=IMG2.astype(IMG.dtype)
+        Bin[t,:,:]=IMG2[:,:] 
+        w.write(str(t)+','+str(n)+','+str(float(tot_area)*dlmn[0]*dlmn[1])+'\n')
+        print('t = '+str(t)+'      ',end='\r')  
+    tif.imwrite('bin_'+filename,Bin,imagej=True, resolution=(1./dlmn[0], 
+            1./dlmn[1]), metadata={'unit': 'nm', 'finterval': fps, 
+            'axes': 'TYX'}) 
 
-    tot_area=0
-    w=open(outname+'.dat','w')
-    for i in range(len(particles)):
-        area=len(particles[i])*dlmn[0]*dlmn[1]
-        tot_area+=area
-        print('Particle: '+str(i)+' Area: '+str(area))
-        w.write(str(i)+','+str(round(area,6))+'\n')
-    print('Total Particle: '+str(len(particles))+' Avg area: '+ \
-          str(tot_area/len(particles)))
+def add_equiv(equiv,foo1,foo2):
+    """ Add new equivalence relation.
     
-    import matplotlib.pyplot as plt
-    
-    #Plot the particles as grey. If the algorithm fails, white color  
-    #will be visible.
-    for n1 in range(len(particles)):
-        A=list(particles[n1])
-        for n2 in range(len(A)):
-            a=A[n2]
-            i=int(a/lx)
-            j=a-i*lx
-            if white:
-                IMG[i][j]=255
+    Parameters
+    ----------
+    equiv: dictionary
+        Contains all equivalence relations a->b such that a > b.
+    foo1: int
+    foo2: int
+        foo2->foo1 and foo2 > foo1.
+
+    Returns
+    -------
+    equiv: New simplified equivalence relation dictionary.
+    """
+    if foo1 in equiv and foo2 in equiv: #If foo2->a2, foo1->a1 exists and 
+        # foo2->foo1 is to be added. Let a1 be the smallest of a1,a2,foo1,foo2.
+        # foo2->a1, foo1->a1, a2->a1.
+        a=min(foo1,foo2,equiv[foo1],equiv[foo2])
+        for b in [foo1,foo2,equiv[foo1],equiv[foo2]]:
+            if b!=a:
+                equiv[b]=a
+        
+    elif foo2 in equiv: #foo2->a exists and foo2->foo1 is to be added.
+        if foo1<equiv[foo2]: # if a is larger than foo1. 
+        #foo2->foo1 and a->foo1
+            equiv[equiv[foo2]]=foo1
+            equiv[foo2]=foo1
+        elif foo1>equiv[foo2]: # if a is smaller than foo1. 
+        #foo2->a and foo1->a.
+            equiv[foo1]=equiv[foo2]
+
+    elif foo1 in equiv: # foo1->a exists and foo2->foo1. So foo2->a.
+        equiv[foo2]=equiv[foo1]
+    else: #neither foo1, foo2 is present so simply add foo1->foo2
+        equiv[foo2]=foo1
+    equiv=simp_equiv(equiv)
+    return equiv
+
+def simp_equiv(equiv):
+    """ Simplifies an equivalnce dictionary
+
+    Maxes sure a->b is such that b is the lowest possible number.
+    """
+    for key in equiv:
+        foo=equiv[key]
+        while True: #iteratively, if a->b and b->c, then a->c
+            if foo in equiv:
+                foo=equiv[foo]
             else:
-                IMG[i][j]=128
+                break
+        equiv[key]=foo
+    return equiv
 
-    #Add the white frame.
-    dh=len(IMG_wf)-len(IMG)
-    dw=len(IMG_wf[0])-len(IMG[0])
+def get_num_vol(filename, threshold, dlmn, pbc, outname, min_pix=0):
+    """ Calculates number of particles and their area
 
-    for i in range(len(IMG_wf)):
-        if IMG_wf[i][int(dw/2)+5]>0:
-            break
-    for j in range(len(IMG_wf)):
-        if IMG_wf[int(dh/2)+5][j]>0:
-            break
-    IMG_new=np.ones((len(IMG_wf),len(IMG_wf[0])),dtype=int)
-    IMG_new=IMG_new*255
-    IMG_new[i:len(IMG)+i,j:len(IMG[0])+j]=IMG
-     
-    
-    img_width=len(IMG_new[1])*3.0/len(IMG_new[0])
-    fig,ax=plt.subplots(1,1,figsize=(img_width,3))
-    plt.imshow(IMG_new,vmin=0,vmax=255,cmap='gray')
-    ax.set_xticks([])
-    ax.set_yticks([])
-    plt.axis('off')
-    plt.tight_layout(pad=0)
-    if show:
-        plt.show()
+    Parameters
+    ----------
+    filename: str
+        Filename of 3D or 3DT monochrome image intensity tiff file. Or it should
+        be a .dat file containing file names of different 2D or 2DT monochrome
+        image intensity tiff files.
+    threshold: int
+        An integer between 0-255. Image intensity above thresold/255 implies
+        the presence of the particle. Periodic boundary conditions are applied.
+    pbc: array of ints
+        1 if pbc condition is applied and 0 otherwise. First element for l', 
+        , second element for m' and third for n'.
+    outname: str
+        Output file name.
+    min_pix: int, optional
+        Any group of pixles containing less than min_pix pixels are not 
+        considered as particles.
+
+    Writes
+    ------
+    bin_[filename]:
+        Binary image of the input image, showing particles in white, background
+        is black. 
+    [outname]:
+        Each line contains, timestep (based on tiff), number of particles and 
+        total cross-sectional area.
+  
+    """
+    #####TIFF 
+    if filename[-4:]=='.dat':
+        f=open(filename,'r')
+        IMG=[]
+        for lines in f:
+            IMG.append(tif.imread(lines.strip()))
+        IMG=np.array(IMG)
+        consts=IMG.shape
+        if len(consts)==3: #it is in ZYX ; many 2D
+            IMG=np.array([IMG])
+        if len(consts)==4: #ZTYX  ; many 2DT
+            IMG=np.transpose(IMG,(1,0,2,3))#TZYX 
     else:
-        plt.savefig(outname+'.png',dpi=1200)
-     
+        IMG=tif.imread(filename)
+        consts=IMG.shape
+        if len(consts)==3: #ZYX ; 3D
+            IMG=np.array([IMG])
+        #if len(consts)==4: #TZYK ; 3DT
+
+    fps=1 
+    consts=IMG.shape
+
+    IMG[IMG<threshold]=0
+    IMG[IMG>threshold]=np.iinfo(IMG.dtype).max
+    Bin=np.zeros(consts,dtype=IMG.dtype) 
+    w=open(outname,'w')
+    lx,ly,lz=consts[3],consts[2],consts[1]
+    for t in range(consts[0]):
+        max_label=1
+        boundary=[]
+        equiv={}
+        IMG2=np.zeros(consts[1:],dtype=int)
+        for k in range(consts[1]):
+            for j in range(consts[2]):
+                for i in range(consts[3]):
+                    if IMG[t,k,j,i]==0:
+                        continue
+                    labels=[0,0,0]
+                    if i>0:
+                        labels[0]=IMG2[k,j,i-1]
+                    if j>0:
+                        labels[1]=IMG2[k,j-1,i]
+                    if k>0:
+                        labels[2]=IMG2[k-1,j,i] 
+
+                    #PBC
+                    if i==consts[3]-1 and pbc[0]==1:
+                        labels[0]=IMG2[k,0,i]
+                    if j==consts[2]-1 and pbc[1]==1:
+                        labels[1]=IMG2[k,j,0]
+                    if k==consts[1]-1 and pbc[2]==1:
+                        labels[2]=IMG2[0,j,i]
+
+
+                    idx=np.where(labels==0)
+                    if len(idx[0])>0:#connected to at least one of voxel
+                        IMG2[k,j,i]=labels[idx[0][0]]
+                    else:
+                        IMG2[k,j,i]=max_label
+                        max_label+=1
+
+                    if len(idx[0])>1: #connected to more than one voxels
+                        #Need to add equivalence relations
+                        #Either two are equal or all are equal.
+                        foo=[[k,j,i-1],[k,j-1,i],[k-1,j,i]]                       
+                        eq_lab=sorted([IMG2[foo[i][0],foo[i][1],foo[i][2]] \
+                                      for i in idx[0]])
+                        #Largest -> Smallest
+                        equiv=add_equiv(equiv,eq_lab[0],eq_lab[-1])
+                        #Mid -> Smalles or same as prev
+                        equiv=add_equiv(equiv,eq_lab[0],eq_lan[1])
+
+                    if (i==0 or i==consts[3]-1) and pbc[0]==0:
+                        if IMG2[k,j,i] not in boundary:
+                            boundary.append(IMG2[k,j,i])
+                    elif (j==0 or j==consts[2]-1) and pbc[1]==0:
+                        if IMG2[k,j,i] not in boundary:
+                            boundary.append(IMG2[k,j,i])
+                    elif (k==0 or k==consts[1]-1) and pbc[2]==0:
+                        if IMG2[k,j,i] not in boundary:
+                            boundary.append(IMG2[k,j,i])
+
+        for l in range(max_label):
+            if l not in equiv:
+                continue
+            IMG2[IMG2==l]=equiv[l]
+        bound_new=[]
+        for l in range(len(boundary)):
+            if boundary[l] in equiv:
+                if equiv[boundary[l]] not in bound_new:
+                    bound_new.append(equiv[boundary[l]])
+        tot_vol=0
+        n=0 
+        for l in range(1,max_label):
+            if l in equiv: 
+                continue
+            if l in bound_new:
+                IMG2[IMG2==l]=0
+                continue
+            A=np.where(IMG2==l)
+            if len(A[0])>min_pix:
+                tot_vol+=len(A[0])
+                n+=1
+            else:
+                IMG2[A]=0
+
+        IMG2[IMG2>0]=255
+        IMG2=IMG2.astype(IMG.dtype)
+        Bin[t,:,:]=IMG2[:,:] 
+        w.write(str(t)+','+str(n)+','+str(float(tot_vol)*dlmn[0]*dlmn[1]*dn)+'\n')
+        print('t = '+str(t)+'      ',end='\r')  
+    tif.imwrite('bin_'+filename,Bin,imagej=True, resolution=(1./dlmn[0], 
+            1./dlmn[1]), metadata={'spacing':dn, 'unit': 'nm', 'finterval': fps, 
+            'axes': 'TZYX'}) 
 

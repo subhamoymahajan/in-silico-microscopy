@@ -77,135 +77,106 @@ def psf_dat2tiff(filename,outname,Plmn,dlmn,dtype='uint16'):
                     PSF[z0+k*z,y0+j*y,x0+i*x]=I
     tif.imsave(outname,PSF)
 
-def zstack_dat2tiff(filename, outname, lams, I0s, fs, ti, T, MaxBox, zmax, \
-    opt_axis, dtype='uint16', add_z=1):
-    """ Plots Generate a tiff file from multiple zstack images (volume image). 
-        currently only works for monocolors.
-    
-    Looks for image data file 
-    [filename][ti to ti+T]_[x/y/z][nidx]_lam[lam]_fs[fs].dat for ti>0
-     or [filename]_[x/y/z][nidx]_lam[lam]_fs[fs].dat if ti < 0.
+def zstack2tiff(datafile, outname, dn):
+    """ Generate a tiff file from multiple z-slice tiffs. 
 
     Parameter
     ---------
-    filename: str
-        Filename header for image data file.
+    datafile: str
+        File containing n index and corresponding tiff file names
     outname: str
         Outname header for the tiff file. 
-    lams: array of int
-        The wavelength of all flurophore types
-    I0s: array of floats
-        The maximum image intensity of all fluorophore types
-    fs: int
-        Scaling factor for wave vector or MS position coordinates.
-    ti: int
-        timestep of the image data file. -1 if there is no sense of time
-        (static system).
-    T: int
-        Number of timesteps to perform an average.
-    MaxBox: array of ints
-        Contains the number of pixels in the image in l and m directions.
-    zmax: int
-        Max number of zstacks. zmax is ideally length of the system in z (or n)
-        direction, divided by the voxel lenght in the same direction.
-        int(maxlen[opt_axis]/dlmn[2]+1E-3)
-    opt_axis: int
-        Optical axis 0, 1, and 2 for x, y, and z axis.
-    dtype: str, optional
-        Datatype of output tiff. (Default is 'uint16')
-    add_z: int, optional    
-        Adds 1 zstack for every [add_z] zstacks. (default is 1)
-        
+    dn: float
+        Distance between two consecutive z-slice images.
     Writes
     ------
-    [outname]: A volume tiff image (mono color)
+    [outname]: A volume tiff image
     """ 
-    zN=int(zmax/add_z)
-    xyz='xyz'
-    for l in range(len(lams)):
-        if dtype=='uint16':
-            img=np.zeros((zN,MaxBox[1],MaxBox[0]),dtype=np.uint16)
-            M=65535
-        if dtype=='uint8':
-            img=np.zeros((zN,MaxBox[1],MaxBox[0]),dtype=np.uint8)
-            M=255
-        Arguments=[]
-        for z in range(zN):
-            Arguments.append((filename,I0s[l],lams[l],T,ti,fs,MaxBox,\
-                True, opt_axis,z*add_z))
 
-        pool=mp.Pool(mp.cpu_count())
-        results=pool.starmap(plot_image.get_grey_img,Arguments)
-        for z in range(zN):
-            foo=results[z]*M
-            foo[foo>M]=M
-            foo[foo<0]=0
-            foo=np.transpose(foo)
-            img[zN-z-1,:,:]=foo[:,:] 
-        tif.imsave(outname+str(ti) + '_'+xyz[opt_axis] +'_lam'+str(lams[l])+ \
-            '_fs'+str(fs) +'_T'+str(T) +'.tiff',img)
+    f=open(datafile,'r')
+    data=[]
+    for lines in f:
+        foo=lines.strip()
+        foo=foo.split(',')
+        data.append(foo)
+    nN=len(data)
+    #Read Meta data.
+    img_data=tif.TiffFile(data[0][1])
+    res=(float(img_data.pages[0].tags['XResolution'].value[0]),
+         float(img_data.pages[0].tags['YResolution'].value[0]))
+    metaD={'spacing': dn, 'unit':'nm'}
+    foo=img_data.pages[0].tags['ImageDescription']
+    foo=foo.split('\n')
+    foo=[ x.split() for x in foo]
+    for i in range(len(foo)):
+        if foo[i][0]=='finterval':
+            metaD['finterval']=int(foo[i][1])
+
+    axes=img_data.pages[0].axes
+    sha=img_data.asarray().shape
+    if 'T' in axes:
+        metaD['axes']='TZ'+axes[1:]
+        consts=tuple([sha[0],nN]+list(sha[1:]))
+        ### Create image   
+        IMG=np.zeros(consts,dtype=img0.dtype)
+        if len(sha)==4: #TCYX
+            for n in range(nN):
+                IMG[:,int(data[n][0]),:,:,:]=tif.imread(data[n][1])
+        elif len(sha)==3: #TYX
+            for n in range(nN):
+                IMG[:,int(data[n][0]),:,:]=tif.imread(data[n][1])
+
+    else:
+        metaD['axes']='Z'+axes
+        consts=tuple([nN]+list(sha[1:]))
+        ### Create image   
+        IMG=np.zeros(consts,dtype=img0.dtype)
+        for n in range(nN):
+            IMG[int(data[n][0])]=tif.imread(data[n][1])
+
+    tif.imwrite(outname, IMG, resolution=res, imagej=True, metadata=metaD)
         
-def tstack_dat2tiff(filename, outname, lams, I0s, fs, tbegin, tmax, tdiff, T, \
-    MaxBox, dtype='uint16'):
-    """ Plots Generate a tiff file from multiple time frames for the same 
-        zstack (similar to a video). Currently only works for monocolors.
+def tstack2tiff(datafile, outname):
+    """ Generate a tiff file from multiple time frames.
     
-    Looks for image data file 
-
-    [filename][ti to ti+T]_lam[lam]_fs[fs].dat for ti>0
-    ti belongs to range(tbegin,tmax,tdiff)
-
     Parameter
     ---------
-    filename: str
-        Filename header for image data file.
+    datafile: str
+        File containing n index and corresponding tiff file names
     outname: str
         Outname header for the tiff file. 
-    lams: array of int
-        The wavelength of all flurophore types
-    I0s: array of floats
-        The maximum image intensity of all fluorophore types
-    fs: int
-        Scaling factor for wave vector or MS position coordinates.
-    tbegin: int
-        First timestep
-    tmax: int
-        Last timestep
-    tdiff: int
-        Timestep interval
-    T: int
-        Number of timesteps to perform an average.
-    MaxBox: array of ints
-        Contains the number of pixels in the image in l and m directions.
-    dtype: str, optional
-        Datatype of output tiff. (Default is 'uint16')
         
     Writes
     ------
-    [outname]: A volume tiff image (mono color)
+    [outname]: A timelapse tiff image.
     """
-    ts=np.arange(tbegin,tmax,tdiff) 
-    for l in range(len(lams)):
-        if dtype=='uint16':
-            img=np.zeros((len(ts),MaxBox[1],MaxBox[0]),dtype=np.uint16)
-            M=65535
-        if dtype=='uint8':
-            img=np.zeros((len(ts),MaxBox[1],MaxBox[0]),dtype=np.uint8)
-            M=255
-        Arguments=[]
-        for t in ts:
-            Arguments.append((filename,I0s[l],lams[l],T,t,fs,MaxBox,\
-                True, None, None))
-        pool=mp.Pool(mp.cpu_count())
-        results=pool.starmap(plot_image.get_grey_img,Arguments)
-        for i in range(len(ts)):
-            foo=results[i]*M
-            foo[foo>M]=M
-            foo[foo<0]=0
-            foo=np.transpose(foo)
-            img[i,:,:]=foo[:,:] 
-        tif.imsave(outname+'_tstack' + '_lam'+str(lams[l])+ \
-            '_fs'+str(fs) +'_T'+str(T) +'.tiff',img)
+    f=open(datafile,'r')
+    data=[]
+    for lines in f:
+        foo=lines.strip()
+        foo=foo.split(',')
+        data.append(foo)
+    tN=len(data)
+
+
+    img_data=tif.TiffFile(data[0][1])
+    res=(float(img_data.pages[0].tags['XResolution'].value[0]),
+         float(img_data.pages[0].tags['YResolution'].value[0]))
+    metaD={'unit':'nm'}
+    foo=img_data.pages[0].tags['ImageDescription']
+    foo=foo.split('\n')
+    foo=[ x.split() for x in foo]
+    for i in range(len(foo)):
+        if foo[i][0]=='spacing':
+            metaD['spacing']=int(foo[i][1])
+    axes=img_data.pages[0].axes
+    metaD['axes']='T'+axes
+      
+    IMG=np.zeros(tuple([tN]+list(img_data.asarray().shape)),dtype=img0.dtype)
+    for t in range(tN):
+        IMG[int(data[t][0])]=tif.imread(data[n][1])
+
+    tif.imwrite(outname, IMG, resolution=res, imagej=True, metadata=metaD)
 
 def rgb_mix(Is,cols):
     if type(Is[0])==np.uint16:
@@ -278,74 +249,99 @@ def mt_mix(Is,lam_hues,small=1.9E-3):
         return rgb
 
 
-def imgs2color(filename,outname,imgtype,mixtype,lam_hues,I0s=None):
-    fnames=[]
-    if os.path.exists(filename):
-        if imgtype in ["tif1", "tiff1"]:
-            IMGs=tif.imread(filename)
-            dims=IMGs[0,:,:].shape #Assumes all shapes are the same
-        elif imgtype in ["tif2", "tiff2"]:
-            IMGs=tif.imread(filename)
-            dims=IMGs[:,:,0].shape #Assumes all shapes are the same
+def imgs2color(datafile,outname,imgtype,mixtype,lam_hues,dpi=1200):
+
+    f=open(datafile,'r')
+    data=[]
+    for lines in f:
+        foo=lines.strip()
+        foo=foo.split(',')
+        data.append(foo)
+    IMGs=[]
+    cols=3
+    if mix_type=='nomix':
+        cols=len(data)
+
+    print("Color mixing can lose precision!")
+    if imgtype in ["tif", "tiff"]:
+        #TZCYX / TCYX / ZCYX / CYX 
+        img_data=tif.TiffFile(data[0][1])
+        res=(float(img_data.pages[0].tags['XResolution'].value[0]),
+             float(img_data.pages[0].tags['YResolution'].value[0]))
+        metaD={'unit':'nm'}
+        foo=img_data.pages[0].tags['ImageDescription']
+        foo=foo.split('\n')
+        foo=[ x.split() for x in foo]
+        for i in range(len(foo)):
+            if foo[i][0]=='spacing':
+                metaD['spacing']=int(foo[i][1])
+            if foo[i][0]=='finterval':
+                metaD['spacing']=int(foo[i][1])
+        axes=img_data.pages[0].axes
+        sha=IMGs[0].shape
+        if axes[0:2]=='TZ':
+            metaD['axes']=axes[0:2]+'C'+axes[2:]
+            new_sha=tuple(list(sha[0:2])+[cols]+list(sha[2:]))
+        elif axes[0]=='T' or axes[0]=='Z':
+            metaD['axes']=axes[0]+'C'+axes[1:]
+            new_sha=tuple([sha[0],cols]+list(sha[1:]))
         else:
-            IMGs=cv2.imread(filename)
-            dims=IMGs[:,:,0].shape #Assumes all shapes are the same
+            metaD['axes']='C'+axes
+            new_sha=tuple([cols]+list(sha[:]))
+
+        for i in range(len(data)):
+            foo=tif.imread(data[i][1])
+            dtype=foo.dtype
+            foo=foo.astype('float')
+            foo=foo/255.0
+            IMGs.append(foo) #Lams (TZYX / TYX / ZYX / YX) 
+        IMGs=np.array(IMGs)
+        if mixtype=='nomix':
+            if axes=='TZYX':
+                colIMG=np.transpose(IMGs,(1,2,0,3,4))
+            elif axes=='TYX' or axes=='ZYX':
+                colIMG=np.transpose(IMGs,(1,0,2,3))
+        else:  #mt , rgb
+            colIMG=np.zeros(new_sha)
+            if axes=='TZYX':
+                for t in range(new_sha[0]):
+                    for z in range(new_sha[1]):
+                        foo=np.transpose(IMGs[:,t,z,:,:],(2,1,0))
+                        foo=plot_image.add_color(foo,lam_hues,0,mixtype) #XYC
+                        foo=np.transpose(foo,(2,1,0)) #CYX
+                        colIMG[t,z,:,:,:]=foo[:,:,:]
+            elif axes=='TYX' or axes=='ZYX':
+                for z in range(new_sha[1]):
+                    foo=np.transpose(IMGs[:,z,:,:],(2,1,0))
+                    foo=plot_image.add_color(foo,lam_hues,0,mixtype) #XYC
+                    foo=np.transpose(foo,(2,1,0)) #CYX
+                    colIMG[z,:,:,:]=foo[:,:,:]
+            elif axes=='YX':
+                foo=np.transpose(IMGs[:,:,:],(2,1,0))
+                foo=plot_image.add_color(foo,lam_hues,0,mixtype) #XYC
+                foo=np.transpose(foo,(2,1,0)) #CYX
+                colIMG[:,:,:]=foo[:,:,:]
+        tif.imwrite(outname,colIMG,resolution=res, imagej=True, metadata=metaD) 
     else:
-        i=0
-        while True:
-            if os.path.exists(filename+str(i)+'.'+imgtype):
-                fnames.append(filename+str(i)+'.'+imgtype)
-                i+=1
-            else:
-                break
-        if imgtype in ["tiff1", "tif1"]:
-            foo=tif.imread(fnames[0])
-            dims=foo.shape #Assumes all shapes are the same
-            IMGs=np.zeros((len(fnames),dims[0],dims[1]),dtype=type(foo[0,0]))
-            for i in range(len(fnames)):
-                IMGs[i,:,:]=tif.imread(fnames[i])
-        elif imgtype in ["tiff2", "tif2"]:
-            foo=tif.imread(fnames[0])
-            dims=foo.shape #Assumes all shapes are the same
-            IMGs=np.zeros((dims[0],dims[1],len(fnames)),dtype=type(foo[0,0]))
-            for i in range(len(fnames)):
-                IMGs[:,:,i]=tif.imread(fnames[i])
-        else:
-            foo=cv2.imread(fnames[0],0)
-            dims=foo.shape #Assumes all shapes are the same
-            IMGs=np.zeros((dims[0],dims[1],len(fnames)),dtype=type(foo[0,0]))
-            for i in range(len(fnames)):
-                IMGs[:,:,i]=cv2.imread(fnames[i],0)
+        for i in range(len(data)):
+            foo=cv2.imread(data[i][1])
+            dtype=foo.dtype
+            foo=foo.astype('float')
+            foo=foo/255.0
+            IMGs.append(foo)  #L XY
+        IMGs=np.array(IMGs)
+        IMGs=np.transpose(IMGs,(1,2,0)) #XYL
+        consts=IMGs.shape
+        print('White frame will not be calculated properly!')
+        colIMG=plot_image.add_color(IMGs,lam_hues,frame_color=1.0,mix_type=mixtype)
+        img_width=consts[1]*3/consts[0]
 
-    if mixtype=='rgb':
-        cols=np.zeros((len(lam_hues),3))
-        for i in range(len(lam_hues)):
-            rgb=plot_image.hsv2rgb(lam_hues[i]/360,1,1)
-            cols[i,:]=rgb[:]
-            print('Hue '+str(lam_hues[i])+' changed to RGB '+str(cols[i,:]))
-
-    print(dims)
-    mixIMG=np.zeros((dims[0],dims[1],3)) #output is going to be png
-    for i in range(dims[0]):
-        for j in range(dims[1]):
-            if imgtype in ["tiff1", "tif1"]:
-                Is=IMGs[:,i,j]
-            elif imgtype in ["tiff2", "tif2"]:
-                Is=IMGs[i,j,:]
-            else:
-                Is=IMGs[i,j,:]
-                Is=Is[::-1]
-            if I0s!=None:
-                Is=np.multiply(Is,I0s)
-            if mixtype=='rgb':
-                col=rgb_mix(Is,cols)
-            elif mixtype=='mt':
-                col=mt_mix(Is,lam_hues)
-            mixIMG[i,j,:]=col[::-1]
-    cv2.imwrite(outname+'.png',mixIMG)
-
-           
-#def monotiff_2color(filename,lams,hues):        
-        
-        
-
+        fig,ax=plt.subplots(1, 1, figsize=(img_width, img_hei))
+        ax.imshow(colIMG)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        plt.axis('off')
+        plt.tight_layout(pad=0)
+        print('Writing: '+outname)
+        plt.savefig(outname,dpi=dpi)
+        plt.close()

@@ -7,6 +7,7 @@ import os
 import importlib
 import ctypes
 import copy
+import cv2
 
 class TestPSFGeneration(unittest.TestCase):
     def setUp(self):
@@ -792,5 +793,58 @@ class TestPlotImage(unittest.TestCase):
         #5-color
         self.assertTrue((abs(newIMGs[2,1,:]-np.array([0.5,0.9,0.8375138173]))<1E-6).all())
 
+    def test_plot_ism(self): #Checks the shape of images produced.
+        #Grey 2d, dynamic
+        img0=np.random.random((2,4))
+        sha0=img0.shape
+        siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,3,4,filename='out',dpi=1)
+        #
+        #def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None, 
+        #   show=False, gcolmap='gray', dpi=600, otype='jpeg', psf_type=0, tsO=None,
+        #   frame_col=1.0):
+        #
+        img1=cv2.imread('out3_lam2_fs4_T1_I0.1.jpeg')
+        sha1=img1.shape
+        print(sha0,sha1)
+        self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
+        os.system('rm -f *.jpeg')
+    
+    #    #Grey 2d, static: Expected to be the same. Removed to keep test.py fast.
+    #    siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,-1,4,filename='out',dpi=1)
+    #    img1=cv2.imread('out_lam2_fs4_I0.1.jpeg')
+    #    sha1=img1.shape
+    #    print(sha0,sha1)
+    #    self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
+    #    os.system('rm -f *.jpeg')
+    #    #Color 2d, dynamic
+    #    siliscopy.plot_image.plot_ism(img0,[0.1,0.2,0.3],[2,3,4],1,5,6,filename='out',dpi=1)
+    #    img1=cv2.imread('out5_fs6_T1_I_0.1_0.2_0.3.jpeg')
+    #    sha1=img1.shape
+    #    print(sha0,sha1)
+    #    self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
+    #    os.system('rm -f *.jpeg')
+    #    #Color 2d, static
+    #    siliscopy.plot_image.plot_ism(img0,[0.1,0.2,0.3],[2,3,4],1,-1,6,filename='out',dpi=1)
+    #    img1=cv2.imread('out_fs6_I_0.1_0.2_0.3.jpeg')
+    #    sha1=img1.shape
+    #    print(sha0,sha1)
+    #    self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
+    #    os.system('rm -f *.jpeg')
+        #Grey 2d, dynamic, tiff
+        siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,3,4,filename='out',dpi=1, otype='tif8')
+        img1=cv2.imread('out3_lam2_fs4_T1_I0.1.tif')
+        sha1=img1.shape
+        print(sha0,sha1)
+        self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
+        os.system('rm -f *.tif')
+
+        #color 2d, dynamic, tiff
+        siliscopy.plot_image.plot_ism(img0,[0.1,0.2],[2,3],1,4,5,filename='out',dpi=1, otype='tif8')
+        img1=cv2.imread('out4_fs5_T1_I_0.1_0.2.tif')
+        sha1=img1.shape
+        print(sha0,sha1)
+        self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
+        os.system('rm -f *.tif')
+    
 if __name__ == '__main__':
     unittest.main()
