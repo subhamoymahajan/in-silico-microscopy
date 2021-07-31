@@ -75,7 +75,58 @@ def psf_dat2tiff(filename,outname,Plmn,dlmn,dtype='uint16'):
                 for k in [-1,1]:
                     PSF[z0+k*z,x0+i*x,y0+j*y]=I
                     PSF[z0+k*z,y0+j*y,x0+i*x]=I
-    tif.imsave(outname,PSF)
+    tif.imsave(outname,PSF,resolution=(1./dlmn[0],1./dlmn[1]),imagej=True,
+               metadata={'axes':'CYX', 'unit':'nm' })
+
+def psf_dat2tiff2(filename,outname,Plmn,dlmn,dtype='uint16'):
+    """ Converts PSF.dat to PSF.tiff. 0-0.2 is black to red, 0.2-0.8 is red hue 
+        to blue hue (0 to 240 degrees), and 0.8 to 1 is blue to white. All other 
+        properties are same as ''psf_dat2tiff''
+       
+    """
+    f=open(filename,'r')
+    N=[int(Plmn[i]/dlmn[i]+1E-10)*2-1 for i in range(3)]
+    if dtype=='uint16':
+        PSF=np.zeros((N[2],3,N[1],N[0]),dtype=np.uint16)
+    elif dtype=='uint8':
+        PSF=np.zeros((N[2],3,N[1],N[0]),dtype=np.uint8)
+    else:
+        raise exception("Type error")
+
+    x0,y0,z0=[int((a-1)/2) for a in N]
+    
+    for lines in f:
+        if len(lines)==0:
+            continue
+        if lines[0]=='#':
+            continue
+        foo=lines.split()
+        xyz=[float(foo[i])/dlmn[i] for i in range(3)]
+        xyz_int=[int(a+1E-6) for a in xyz]
+        for i in range(3):
+            if abs(xyz[i]-xyz_int[i])>1E-6:
+                continue #not part of the dlmn
+        x,y,z=xyz_int
+        I=float(foo[3])
+        if I<0.2:
+            rgb=plot_image.hsv2rgb(0,1,I/0.2)            
+        elif I<0.8:
+            rgb=plot_image.hsv2rgb(2*(I-0.2)/1.8,1,1)
+        else:
+            rgb=plot_image.hsv2rgb(2./3.,(1-I)/0.2,1) #2/3 is blue
+
+        if dtype=='uint16':
+            col=(np.array(rgb)*65535).astype(np.uint16) 
+        elif dtype=='uint8':
+            col=(np.array(rgb)*255).astype(np.uint8)
+
+        for i in [-1,1]:
+            for j in [-1,1]:
+                for k in [-1,1]:
+                    PSF[z0+k*z,:,x0+i*x,y0+j*y]=col[:]
+                    PSF[z0+k*z,:,y0+j*y,x0+i*x]=col[:]
+    tif.imsave(outname,PSF,resolution=(1./dlmn[0],1./dlmn[1]),imagej=True,
+               metadata={'spacing':dlmn[2], 'axes':'ZCYX', 'unit':'nm' })
 
 def zstack2tiff(datafile, outname, dn):
     """ Generate a tiff file from multiple z-slice tiffs. 

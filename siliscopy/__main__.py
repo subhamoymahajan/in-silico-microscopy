@@ -556,6 +556,13 @@ def main():
                 dtype=options.calc
             psf_dat2tiff(options.filename, options.outname, params['Plmn'], \
                 params['dlmn'], dtype)
+        if options.method == "psf2tiff2":
+            if options.calc== None:
+                dtype='uint16'
+            else:
+                dtype=options.calc
+            psf_dat2tiff2(options.filename, options.outname, params['Plmn'], \
+                params['dlmn'], dtype)
         
         elif options.method == "zstack2tiff":
             if options.calc== None:

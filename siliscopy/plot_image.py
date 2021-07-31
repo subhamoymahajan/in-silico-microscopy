@@ -334,7 +334,7 @@ def hsv2rgb(h, s, v):
     if h<1/6.:
         return A1,A2,A3
     elif h<2/6.:
-        return A2,A1,A2
+        return A2,A1,A3
     elif h<3/6.:
         return A3,A1,A2
     elif h<4/6.:
