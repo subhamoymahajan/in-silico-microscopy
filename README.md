@@ -308,7 +308,7 @@ Parameters for Gibson-Lanni and Modified-Gandy PSF.
 * `psf_type`: (int). Default value is 0 is for Gandy PSF (Circular symmetry and depth-invariant). Value of 1 is for Gibson-Lanni and Modified-Gandy (Circular symmetry and depth-variant).  
 
 # Contributors
-1. Subhamoy Mahajan, PhD student, Mechanical Engineering, University of Alberta, Edmonton, Canada (will graduate by Sep, 2021)
+1. Subhamoy Mahajan, PhD student, Mechanical Engineering, University of Alberta, Edmonton, Canada
 2. Tian Tang, Professor, Mechanical Engineering, University of Alberta, Edmonton, Canada 
 
 # Funding Sources
