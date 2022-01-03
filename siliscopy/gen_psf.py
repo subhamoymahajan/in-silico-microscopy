@@ -149,6 +149,7 @@ def psf_gandy_mp(NA, meu, lambd, dlmn, Plmn, fs, outname):
                           k])
     pool=mp.Pool(mp.cpu_count())
     results=pool.map(worker_gandy,Arguments)
+    pool.close()
     os.system('mv ' + outname + 'n0 ' + outname + '_lam' + str(lambd) + \
               '_fs' + str(fs) + '.dat')
     for k in range(1,Nn):
@@ -324,6 +325,7 @@ def psf_GL1991_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
             lambd, dlmn, Plmn, fs, outname+'n'+str(k), 'w', k])
     pool=mp.Pool(mp.cpu_count())
     results=pool.starmap(psf_GL1991_sep,Arguments)
+    pool.close()
     os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO' + "%g"%tsO + \
               '_lam'+str(lambd)+ '_fs'+str(fs)+'.dat')
     for k in range(-Nn+1,Nn+1):
@@ -503,6 +505,7 @@ def psf_Mod_Gandy_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
             lambd, dlmn, Plmn, fs, outname+'n'+str(k), 'w', k])
     pool=mp.Pool(mp.cpu_count())
     results=pool.starmap(psf_Mod_Gandy_sep,Arguments)
+    pool.close()
     os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO'+ "%g"%tsO + \
               '_lam'+str(lambd)+ '_fs'+str(fs)+'.dat')
     for k in range(-Nn+1,Nn+1):
@@ -510,3 +513,18 @@ def psf_Mod_Gandy_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
                   "%g"%tsO + '_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
         os.system('rm '+ outname+'n'+str(k))
 
+def psf_gauss(sig_r,sig_n,dlmn,Plmn,outname,lambd,fs):
+    Nl=int((int(Plmn[0]/dlmn[0])+1)/2)+1
+    Nn=int((int(Plmn[2]/dlmn[2])+1)/2)+1
+    outname = outname + '_lam' + str(lambd) + '_fs' + str(fs) + '.dat'
+    w=open(outname,'w')
+    for k in range(Nn):
+        n=round(k*dlmn[2],6)
+        for i in range(Nl):
+            l=round(i*dlmn[0],6)
+            for j in range(i+1):
+                m=round(j*dlmn[1],6)
+                I=np.exp(-(l*l+m*m)*0.5/(sig_r*sig_r)-(n*n)*0.5/(sig_n*sig_n))
+                w.write(str(l).rjust(10) + str(m).rjust(10) + \
+                    str(n).rjust(10) + ' ' + str(I) + '\n')
+    w.close()

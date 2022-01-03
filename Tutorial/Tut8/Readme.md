@@ -38,9 +38,9 @@ siliscopy plot --file img --paramfile parameters2.dat --method color \
 
 ```bash
 siliscopy plot --file img --paramfile parameters.dat --method mono2dt \
-               --calc specific --output img --type tiff8 
+               --calc specific --output img --type tiff8 --multiprocess 
 siliscopy plot --file img --paramfile parameters.dat --method color2dt \
-               --calc specific --output img --type tiff8 
+               --calc specific --output img --type tiff8 --multiprocess
 ```
 
 ## Generate Volume image intensities
@@ -101,9 +101,9 @@ siliscopy plot --file img --paramfile param_noise2.dat --method noise_color \
 
 ```bash
 siliscopy plot --file img --paramfile param_noise.dat --method noise_mono2dt \
-               --calc specific --output noise_img --type tiff8 
+               --calc specific --output noise_img --type tiff8 --multiprocess 
 siliscopy plot --file img --paramfile param_noise.dat --method noise_color2dt \
-               --calc specific --output noise_img --type tiff8 
+               --calc specific --output noise_img --type tiff8 --multiprocess
 ```
 
 3D image:

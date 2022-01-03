@@ -8,10 +8,11 @@ import importlib
 import ctypes
 import copy
 import cv2
+import tifffile as tif
 
 class TestPSFGeneration(unittest.TestCase):
     def setUp(self):
-        warnings.simplefilter('ignore', category=ResourceWarning)
+        warnings.simplefilter("ignore")
         #beta=1 rad
         self.NA=1.
         self.meu=1./np.sin(1.)
@@ -35,7 +36,6 @@ class TestPSFGeneration(unittest.TestCase):
             os.remove('test.dat')
 
     def test_Gandy_r(self):
-        print(self.NA)
         PSF0=[]
         PSF0.append(1.)
         #Calculated the definite integral for PSF using WolframAlpha
@@ -51,6 +51,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1 
+        f.close()
 
     def test_Gandy_n(self): #n' = 1
         PSF0=[]
@@ -68,6 +69,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1 
+        f.close()
         
     def test_GL1991_r(self): #OPD = 0
         PSF0=[1.]
@@ -85,6 +87,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_GL1991_n(self): #OPD only due to n'
         PSF0=[0.643715]
@@ -102,6 +105,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_GL1991_tsO(self): #OPD only due to tsO
         PSF0=[0.997761]
@@ -119,6 +123,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_GL1991_meug(self): #OPD only due to tsO
         PSF0=[0.999982]
@@ -136,6 +141,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_GL1991_tg(self): #OPD only due to tsO
         PSF0=[0.997761]
@@ -153,6 +159,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_GL1991_toil(self): #OPD only due to tsO
         PSF0=[0.997761]
@@ -170,6 +177,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
 ##############################################
     def test_Mod_Gandy_r(self): #OPD = 0
@@ -188,6 +196,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_Mod_Gandy_n(self): #OPD only due to n'
         PSF0=[0.638634]
@@ -205,6 +214,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_Mod_Gandy_tsO(self): #OPD only due to tsO
         PSF0=[0.997601]
@@ -222,6 +232,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_Mod_Gandy_meug(self): #OPD only due to tsO
         PSF0=[0.999982]
@@ -239,6 +250,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_Mod_Gandy_tg(self): #OPD only due to tg
         PSF0=[0.997601]
@@ -256,6 +268,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
     def test_Mod_Gandy_toil(self): #OPD only due to toil
         PSF0=[0.997601]
@@ -273,6 +286,7 @@ class TestPSFGeneration(unittest.TestCase):
             foo=lines.split()
             self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
             i+=1
+        f.close()
 
 def readIMG(filename):
     f=open(filename,'r')
@@ -284,6 +298,7 @@ def readIMG(filename):
         foo=[float(x) for x in foo ] 
         data.append(foo)
     data=np.array(data)
+    f.close()
     return data
 
 def writePSF(filename,PSF):
@@ -422,11 +437,6 @@ class TestMonoGeneration(unittest.TestCase):
         IMG2_0[0,:5]=[0.1,0.,0.,0.1,0.2]
         IMG2_0[1,:5]=[0.05,0.,0.,0.05,0.1]
         IMG2_0[4,:5]=[0.05,0.,0.,0.05,0.1]
-
-        print('IMG1',IMG1)
-        print('IMG1_0',IMG1_0)
-        print('IMG2',IMG2)
-        print('IMG2_0',IMG2_0)
 
         self.assertTrue((abs(IMG1-IMG1_0)<1E-6).all())
         self.assertTrue((abs(IMG2-IMG2_0)<1E-6).all())
@@ -622,14 +632,6 @@ def writeIMG(filename,I):
     f.close()
 
 class TestPlotImage(unittest.TestCase):
-    @classmethod
-    def setUpClass(self):
-        pass
-
-    @classmethod
-    def tearDownClass(self):
-        pass
-
     def setUp(self):
         self.I1=np.ones((6,6))*-1
         self.I1[2,2]=0.3
@@ -639,7 +641,9 @@ class TestPlotImage(unittest.TestCase):
         self.I3[1:4,1:4]=[[0.15, 0.25, 0.35],[0.45,0.55,0.65],[0.75,0.85,0.95]]
 
     def tearDown(self):
-        pass
+        os.system('rm -f img*.dat')
+        os.system('rm -f *.tiff')
+        os.system('rm -f *.jpeg')
 
     def test_noise(self):
         I1=copy.deepcopy(self.I1)
@@ -760,8 +764,6 @@ class TestPlotImage(unittest.TestCase):
         Itrue=np.ones((6,6))*-1
         Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],[0.75,0.625,0.725]]
         self.assertTrue((abs(IMG-Itrue)<1E-6).all())
-        for i in range(10,13):
-            os.remove('img'+str(i)+'_z20_lam100_fs1.dat')  
 
     def test_add_color(self):
         IMGs=np.zeros((3,2,5))
@@ -779,7 +781,6 @@ class TestPlotImage(unittest.TestCase):
 
         hues=[0,60,120,180,270] #red, yellow, green, cyan, violet
         newIMGs=siliscopy.plot_image.add_color(IMGs,hues)
-        print(newIMGs)
         #red+yellow=orange
         self.assertTrue((abs(newIMGs[0,0,:]-np.array([1,0.5,0]))<1E-6).all())
         #red+violet
@@ -795,9 +796,9 @@ class TestPlotImage(unittest.TestCase):
 
     def test_plot_ism(self): #Checks the shape of images produced.
         #Grey 2d, dynamic
-        img0=np.random.random((2,4))
+        img0=np.random.random((4,8)) #XY
         sha0=img0.shape
-        siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,3,4,filename='out',dpi=1)
+        siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,3,4,filename='out',dpi=2)
         #
         #def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None, 
         #   show=False, gcolmap='gray', dpi=600, otype='jpeg', psf_type=0, tsO=None,
@@ -805,46 +806,819 @@ class TestPlotImage(unittest.TestCase):
         #
         img1=cv2.imread('out3_lam2_fs4_T1_I0.1.jpeg')
         sha1=img1.shape
-        print(sha0,sha1)
         self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
-        os.system('rm -f *.jpeg')
-    
-    #    #Grey 2d, static: Expected to be the same. Removed to keep test.py fast.
-    #    siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,-1,4,filename='out',dpi=1)
-    #    img1=cv2.imread('out_lam2_fs4_I0.1.jpeg')
-    #    sha1=img1.shape
-    #    print(sha0,sha1)
-    #    self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
-    #    os.system('rm -f *.jpeg')
-    #    #Color 2d, dynamic
-    #    siliscopy.plot_image.plot_ism(img0,[0.1,0.2,0.3],[2,3,4],1,5,6,filename='out',dpi=1)
-    #    img1=cv2.imread('out5_fs6_T1_I_0.1_0.2_0.3.jpeg')
-    #    sha1=img1.shape
-    #    print(sha0,sha1)
-    #    self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
-    #    os.system('rm -f *.jpeg')
-    #    #Color 2d, static
-    #    siliscopy.plot_image.plot_ism(img0,[0.1,0.2,0.3],[2,3,4],1,-1,6,filename='out',dpi=1)
-    #    img1=cv2.imread('out_fs6_I_0.1_0.2_0.3.jpeg')
-    #    sha1=img1.shape
-    #    print(sha0,sha1)
-    #    self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
-    #    os.system('rm -f *.jpeg')
-        #Grey 2d, dynamic, tiff
-        siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,3,4,filename='out',dpi=1, otype='tif8')
-        img1=cv2.imread('out3_lam2_fs4_T1_I0.1.tif')
-        sha1=img1.shape
-        print(sha0,sha1)
-        self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
-        os.system('rm -f *.tif')
 
-        #color 2d, dynamic, tiff
-        siliscopy.plot_image.plot_ism(img0,[0.1,0.2],[2,3],1,4,5,filename='out',dpi=1, otype='tif8')
-        img1=cv2.imread('out4_fs5_T1_I_0.1_0.2.tif')
-        sha1=img1.shape
-        print(sha0,sha1)
-        self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
-        os.system('rm -f *.tif')
+    def test_mono2d(self):
+        Img=np.random.rand(4,6)
+        Img[0,:]=-1.0
+        Img[-1,:]=-1.0
+        Img[:,0]=-1.0
+        Img[:,-1]=-1.0
+        writeIMG('img0_lam1_fs1.dat',Img)
+        siliscopy.plot_image.plot_grey_img('img',[1],[1],1,0,1,[4,6],1,0.1,otype='tiff8',dlmn=[0.1,0.1,0.1],pbc=[1,1,1])
+        data=tif.TiffFile('img0_lam1_fs1_T1_I1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'YX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3]]))
+        self.assertEqual(str(data.series[0].shape),str(tuple(Img.shape)))        
+
+    def test_mono2dt(self):
+        Img=np.random.rand(2,4,6)
+        Img[0,0,:]=-1.0
+        Img[0,-1,:]=-1.0
+        Img[0,:,0]=-1.0
+        Img[0,:,-1]=-1.0
+
+        Img[1,:2,:]=-1.0
+        Img[1,-1,:]=-1.0
+        Img[1,:,:2]=-1.0
+        Img[1,:,-1]=-1.0
+
+        writeIMG('img0_lam1_fs1.dat',Img[0,:,:])
+        writeIMG('img10_lam1_fs1.dat',Img[1,:,:])
+        siliscopy.plot_image.plot_grey_2dtimg('img',[1],[1],1,0,11,10,1,[4,6],[0.1,0.1,0.1],0.5,otype='tiff8')
+
+        data=tif.TiffFile('img0-11_lam1_fs1_T1_I1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'TYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3],[2,5,2,3]]))
+        self.assertEqual(data.imagej_metadata['finterval'],0.5)
+        self.assertEqual(data.imagej_metadata['funit'],'ns')
+        self.assertEqual(str(data.series[0].shape),str(tuple(Img.shape)))        
+
+    def test_mono3d(self):
+        Img=np.random.rand(3,4,6)
+        Img[:,0,:]=-1.0
+        Img[:,-1,:]=-1.0
+        Img[:,:,0]=-1.0
+        Img[:,:,-1]=-1.0
+        Img[0,:,:]=-1.0
+        Img[-1,:,:]=-1.0
+        for i in range(3):
+            writeIMG('img0_z'+str(i)+'_lam1_fs1.dat',Img[i,:,:])
+
+        siliscopy.plot_image.plot_grey_3dimg('img',[1],[1],1,0,1,[4,6],[0.1,0.1,0.2],3,2,otype='tiff8')
+
+        data=tif.TiffFile('img0_z_lam1_fs1_T1_I1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['spacing'],0.2)
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'ZYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,2,1,5,1,3]]))
+        self.assertEqual(str(data.series[0].shape),str(tuple(Img.shape)))        
+
+
+    def test_mono3dt(self):
+        Img=np.random.rand(2,3,4,6)
+        Img[:,:,0,:]=-1.0
+        Img[:,:,-1,:]=-1.0
+        Img[:,:,:,0]=-1.0
+        Img[:,:,:,-1]=-1.0
+        Img[:,0,:,:]=-1.0
+        Img[:,-1,:,:]=-1.0
+        for j in range(2):
+            for i in range(3):
+                writeIMG('img'+str(j*10)+'_z'+str(i)+'_lam1_fs1.dat',Img[j,i,:,:])
+
+        siliscopy.plot_image.plot_grey_3dtimg('img',[1],[1],1,0,11,10,1,[4,6],[0.1,0.1,0.2],3,2,0.5, otype='tiff8')
+
+        data=tif.TiffFile('img0-11_z_lam1_fs1_T1_I1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['spacing'],0.2)
+        self.assertEqual(data.imagej_metadata['finterval'],0.5)
+        self.assertEqual(data.imagej_metadata['funit'],'ns')
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'TZYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,2,1,5,1,3],[1,2,1,5,1,3]]))
+        self.assertEqual(str(data.series[0].shape),str(tuple(Img.shape)))        
+
+    def test_color2d(self):
+        Img=np.random.rand(2,4,6)
+        Img[:,0,:]=-1.0
+        Img[:,-1,:]=-1.0
+        Img[:,:,0]=-1.0
+        Img[:,:,-1]=-1.0
+        writeIMG('img0_lam1_fs1.dat',Img[0,:,:])
+        writeIMG('img0_lam2_fs1.dat',Img[1,:,:])
+
+        siliscopy.plot_image.plot_col_img('img',[1,1],[1,2],[0,120],1,0,1,[4,6],[0.1,0.1,0.1],1,0.1,otype='tiff8',pbc=[1,1,1])
+
+        data=tif.TiffFile('img0_fs1_T1_I_1_1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'CYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3]]))
+        sha=list(Img.shape)
+        sha[0]=3
+        self.assertEqual(str(data.series[0].shape),str(tuple(sha)))        
+
+    def test_nomix2d(self):
+        Img=np.random.rand(2,4,6)
+        Img[:,0,:]=-1.0
+        Img[:,-1,:]=-1.0
+        Img[:,:,0]=-1.0
+        Img[:,:,-1]=-1.0
+        writeIMG('img0_lam1_fs1.dat',Img[0,:,:])
+        writeIMG('img0_lam2_fs1.dat',Img[1,:,:])
+
+        siliscopy.plot_image.plot_col_img('img',[1,1],[1,2],[0,120],1,0,1,[4,6],[0.1,0.1,0.1],1,0.1,otype='tiff8',pbc=[1,1,1],mix_type='nomix')
+
+        data=tif.TiffFile('img0_fs1_T1_I_1_1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'CYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3]]))
+        self.assertEqual(str(data.series[0].shape),str(tuple(Img.shape)))        
+
+    def test_color2dt(self):
+        Img=np.random.rand(2,2,4,6)
+        Img[:,0,0,:]=-1.0
+        Img[:,0,-1,:]=-1.0
+        Img[:,0,:,0]=-1.0
+        Img[:,0,:,-1]=-1.0
+
+        Img[:,1,:2,:]=-1.0
+        Img[:,1,-1,:]=-1.0
+        Img[:,1,:,:2]=-1.0
+        Img[:,1,:,-1]=-1.0
+
+        writeIMG('img0_lam1_fs1.dat',Img[0,0,:,:])
+        writeIMG('img10_lam1_fs1.dat',Img[0,1,:,:])
+        writeIMG('img0_lam2_fs1.dat',Img[1,0,:,:])
+        writeIMG('img10_lam2_fs1.dat',Img[1,1,:,:])
+        siliscopy.plot_image.plot_col_2dtimg('img',[1,1],[1,2],[0,120],1,0,11,10,1,[4,6],0.5,[0.1,0.1,0.1],otype='tiff8')
+
+        data=tif.TiffFile('img0-11_fs1_T1_I_1_1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'TCYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3],[2,5,2,3]]))
+        self.assertEqual(data.imagej_metadata['finterval'],0.5)
+        self.assertEqual(data.imagej_metadata['funit'],'ns')
+        sha=list(Img.shape)
+        sha[1]=3
+        self.assertEqual(str(data.series[0].shape),str(tuple(sha)))        
+
+    def test_color3d(self):
+        Img=np.random.rand(2,5,4,6) #CZXY
+        Img[:,:,0,:]=-1.0
+        Img[:,:,-1,:]=-1.0
+        Img[:,:,:,0]=-1.0
+        Img[:,:,:,-1]=-1.0
+        Img[:,0,:,:]=-1.0
+        Img[:,-1,:,:]=-1.0
+        for i in range(5):
+            writeIMG('img0_z'+str(i)+'_lam1_fs1.dat',Img[0,i,:,:])
+            writeIMG('img0_z'+str(i)+'_lam2_fs1.dat',Img[1,i,:,:])
+
+        siliscopy.plot_image.plot_col_3dimg('img',[1,1],[1,2],[0,120],1,0,1,[4,6],[0.1,0.1,0.2],5,2,otype='tiff8')
+
+        data=tif.TiffFile('img0_z_fs1_T1_I_1_1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['spacing'],0.2)
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'ZCYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,4,1,5,1,3]]))
+        sha=[5,3,4,6]
+        self.assertEqual(str(data.series[0].shape),str(tuple(sha)))        
+
+
+    def test_color3dt(self):
+        Img=np.random.rand(2,2,3,4,6)
+        Img[:,:,:,0,:]=-1.0
+        Img[:,:,:,-1,:]=-1.0
+        Img[:,:,:,:,0]=-1.0
+        Img[:,:,:,:,-1]=-1.0
+        Img[:,:,0,:,:]=-1.0
+        Img[:,:,-1,:,:]=-1.0
+        for j in range(2):
+            for i in range(3):
+                writeIMG('img'+str(j*10)+'_z'+str(i)+'_lam1_fs1.dat',Img[0,j,i,:,:])
+                writeIMG('img'+str(j*10)+'_z'+str(i)+'_lam2_fs1.dat',Img[1,j,i,:,:])
+
+        siliscopy.plot_image.plot_col_3dtimg('img',[1,1],[1,2],[0,120],1,0,11,10,1,[4,6],[0.1,0.1,0.2],3,2,0.5, otype='tiff8')
+
+        data=tif.TiffFile('img0-11_z_fs1_T1_I_1_1.tiff')
+        foo=data.pages[0].tags['XResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        foo=data.pages[0].tags['YResolution'].value 
+        self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
+        self.assertEqual(data.imagej_metadata['spacing'],0.2)
+        self.assertEqual(data.imagej_metadata['finterval'],0.5)
+        self.assertEqual(data.imagej_metadata['funit'],'ns')
+        self.assertEqual(data.imagej_metadata['unit'],'nm')
+        self.assertEqual(data.series[0].axes,'TZCYX')
+        self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,2,1,5,1,3],[1,2,1,5,1,3]]))
+        sha=[2,3,3,4,6]
+        self.assertEqual(str(data.series[0].shape),str(tuple(sha)))        
+
+class TestConvert(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        pass
+
+    @classmethod
+    def tearDownClass(self):
+        pass
+
+    def setUp(self):
+        self.PSF=np.array([[0.,0.,0.,1.0],[0.1,0.,0.,0.829401],
+             [0.1,0.1,0.,0.683437],[0.,0.,0.2,0.92737],[0.1,0.,0.2,0.76942],
+             [0.1,0.1,0.2,0.634507]])
+        self.PSF2=np.array([[0.,0.,-0.2,0.90737],[0.1,0.,-0.2,0.70942],
+             [0.1,0.1,-0.2,0.604507],[0.,0.,0.,1.0],[0.1,0.,0.,0.829401],
+             [0.1,0.1,0.,0.683437],[0.,0.,0.2,0.92737],[0.1,0.,0.2,0.76942],
+             [0.1,0.1,0.2,0.634507]])
+
+    def tearDown(self):
+        pass
+
+    def test_dat2tiff(self):
+        writePSF('test.dat',self.PSF)
+        siliscopy.convert.psf_dat2tiff('test.dat','test.tiff',[0.1,0.1,0.2],
+                 [0.1,0.1,0.2],dtype='uint8',psf_type=0)
+        psf_dat=tif.imread('test.tiff')
+        foo_PSF=(self.PSF*np.iinfo('uint8').max).astype('uint8')
+        for i in range(3):
+            for j in range(3):
+                for k in range(3):
+                    x,y=sorted([abs(i-1),abs(j-1)],reverse=True)
+                    z=abs(k-1)
+                    self.assertEqual(psf_dat[k,j,i],foo_PSF[3*z+x+y,3])
+        os.system('rm test.dat')
+        os.system('rm test.tiff')
+
+        writePSF('test.dat',self.PSF2)
+        siliscopy.convert.psf_dat2tiff('test.dat','test.tiff',[0.1,0.1,0.2],
+                 [0.1,0.1,0.2],dtype='uint8',psf_type=1)
+        psf_dat=tif.imread('test.tiff')
+        foo_PSF=(self.PSF2*np.iinfo('uint8').max).astype('uint8')
+        for i in range(3):
+            for j in range(3):
+                for k in range(3):
+                    x,y=sorted([abs(i-1),abs(j-1)],reverse=True)
+                    self.assertEqual(psf_dat[k,j,i],foo_PSF[3*k+x+y,3])
+        os.system('rm test.dat')
+        os.system('rm test.tiff')
+
+    def test_dat2tiff2(self):
+        pass #Not tested.
+
+    def test_n2tiff2(self):
+        #Check YX -> ZYX
+        imgs=np.random.randint(0,255,(4,4,4),dtype='uint8')
+        for i in range(4):
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:], resolution=(1,1), 
+                imagej=True, metadata={'spacing':1, 'axes':'YX', 'unit':'nm',
+                'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
+        f=open('fname.dat','w')
+        for i in range(4): 
+            f.write('test'+str(i)+'.tif\n')
+        f.close()
+        siliscopy.convert.nstack2tiff('fname.dat','test_all.tif',2)
+        
+        img_dat=tif.TiffFile('test_all.tif')
+        self.assertEqual(img_dat.series[0].axes,'ZYX')
+        imgs_r=tif.imread('test_all.tif')
+        self.assertTrue((imgs_r==imgs).all())
+
+        #Check CYX -> ZCYX
+        imgs=np.random.randint(0,255,(4,3,4,4),dtype='uint8')
+        for i in range(4):
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:], resolution=(1,1), 
+                imagej=True, metadata={'spacing':1, 'axes':'CYX', 'unit':'nm',
+                'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
+        f=open('fname.dat','w')
+        for i in range(4): 
+            f.write('test'+str(i)+'.tif\n')
+        f.close()
+        siliscopy.convert.nstack2tiff('fname.dat','test_all.tif',1)
+        
+        img_dat=tif.TiffFile('test_all.tif')
+        self.assertEqual(img_dat.series[0].axes,'ZCYX')
+        imgs_r=tif.imread('test_all.tif')
+        self.assertTrue((imgs_r==imgs).all())
+
+        #Check TCYX -> TZCYX
+        imgs=np.random.randint(0,255,(5,4,3,4,4),dtype='uint8')
+        for i in range(4):
+            tif.imsave('test'+str(i)+'.tif', imgs[:,i,:,:,:], resolution=(1,1), 
+                imagej=True, metadata={'spacing':1, 'axes':'TCYX', 'unit':'nm',
+                'pbc':[1,1,1], 'bounds':[[0,4,0,4]]*5})
+        f=open('fname.dat','w')
+        for i in range(4): 
+            f.write('test'+str(i)+'.tif\n')
+        f.close()
+        siliscopy.convert.nstack2tiff('fname.dat','test_all.tif',3)
+        
+        img_dat=tif.TiffFile('test_all.tif')
+        self.assertEqual(img_dat.series[0].axes,'TZCYX')
+        imgs_r=tif.imread('test_all.tif')
+        self.assertTrue((imgs_r==imgs).all())
+        os.system('rm *.tif')
+        os.system('rm *.dat')
+
+    def test_t2tiff2(self):
+        #Check YX -> TYX
+        imgs=np.random.randint(0,255,(5,4,4),dtype='uint8')
+        for i in range(5):
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:], resolution=(1,1), 
+                imagej=True, metadata={'spacing':1, 'axes':'YX', 'unit':'nm',
+                'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
+        f=open('fname.dat','w')
+        for i in range(5): 
+            f.write('test'+str(i)+'.tif\n')
+        f.close()
+        siliscopy.convert.tstack2tiff('fname.dat','test_all.tif')
+        
+        img_dat=tif.TiffFile('test_all.tif')
+        self.assertEqual(img_dat.series[0].axes,'TYX')
+        imgs_r=tif.imread('test_all.tif')
+        self.assertTrue((imgs_r==imgs).all())
+
+        #Check CYX -> TCYX
+        imgs=np.random.randint(0,255,(5,3,4,4),dtype='uint8')
+        for i in range(5):
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:], resolution=(1,1), 
+                imagej=True, metadata={'spacing':1, 'axes':'CYX', 'unit':'nm',
+                'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
+        f=open('fname.dat','w')
+        for i in range(5): 
+            f.write('test'+str(i)+'.tif\n')
+        f.close()
+        siliscopy.convert.tstack2tiff('fname.dat','test_all.tif')
+        
+        img_dat=tif.TiffFile('test_all.tif')
+        self.assertEqual(img_dat.series[0].axes,'TCYX')
+        imgs_r=tif.imread('test_all.tif')
+        self.assertTrue((imgs_r==imgs).all())
+
+        #Check ZCYX -> TZCYX
+        imgs=np.random.randint(0,255,(5,4,3,4,4),dtype='uint8')
+        for i in range(5):
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:,:], resolution=(1,1), 
+                imagej=True, metadata={'spacing':1, 'axes':'ZCYX', 'unit':'nm',
+                'pbc': [1,1,1], 'bounds':[[0,4,0,4,0,4]]})
+        f=open('fname.dat','w')
+        for i in range(5): 
+            f.write('test'+str(i)+'.tif\n')
+        f.close()
+        siliscopy.convert.tstack2tiff('fname.dat','test_all.tif')
+        
+        img_dat=tif.TiffFile('test_all.tif')
+        self.assertEqual(img_dat.series[0].axes,'TZCYX')
+        imgs_r=tif.imread('test_all.tif')
+        os.system('rm *.tif')
+        os.system('rm *.dat')
+        self.assertTrue((imgs_r==imgs).all())
+    def test_imgs2color(self):
+        pass
+
+class TestProp(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        pass
+
+    @classmethod
+    def tearDownClass(self):
+        pass
+
+    def setUp(self):
+        self.I=np.random.random((5,5))
+        self.I[0,:]=-np.ones(5)
+        self.I[4,:]=-np.ones(5) 
+        self.I[:,0]=-np.ones(5)
+        self.I[:,4]=-np.ones(5)
+
+    def tearDown(self):
+        pass
+
+    def test_maxI(self):
+        writeIMG('test_lam1_fs2.dat',self.I)
+        Imax=siliscopy.prop.get_maxI('test',[1],2)
+        self.assertAlmostEqual(Imax,np.amax(self.I))
+        os.system('rm test*.dat')
+
+    def test_I0s(self):
+        pass 
+    
+    def test_hist(self):
+        pass
+  
+    def test_numarea_1(self):
+        #Check diagonals are not considered the same
+        #Simple particle count is correct
+        IMG=np.zeros((10,10),dtype='uint8')
+        for i in range(10):
+            IMG[i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'YX', 'bounds':[[0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm'})
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0')
+        for i in range(10):
+            self.assertAlmostEqual(area[0][i],0.02)
+        os.system('rm *.tif')
+
+    def test_numarea_2(self):
+        #Check simple connections
+        #Check threshold
+        IMG=np.zeros((8,8),dtype='uint8')
+        IMG[1,1:3]=200
+        IMG[1:3,4]=210
+        IMG[1,6:8]=215
+        IMG[2,7]=213
+        IMG[3,1:3]=230
+        IMG[4,1]=225
+        IMG[4,4:7]=211
+        IMG[6,1:4]=100
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'YX', 'bounds':[[0,8,0,8]], 'pbc':[1,1,1], 'unit':'nm'})
+        Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0')
+
+        Bin_0=np.zeros((8,8),dtype='int')
+        Bin_0[1,1:3]=1
+        Bin_0[1:3,4]=2
+        Bin_0[1,6:8]=3
+        Bin_0[2,7]=3
+        Bin_0[3,1:3]=4
+        Bin_0[4,1]=4
+        Bin_0[4,4:7]=5
+        self.assertTrue((Bin[0]==Bin_0).all()) 
+        self.assertTrue((abs(np.array(areas[0])-np.array([0.04,0.04,0.06,0.06,0.06]))<1E-6).all())
+
+    def test_numarea_3(self):
+        #Check complex connections
+        #Check minimum pixels
+        #Check pbc
+        IMG=np.zeros((10,9),dtype='uint8')
+        IMG[0:2,4]=200
+        IMG[3,0:2]=210
+        IMG[3,3:6]=215
+        IMG[3,7:9]=213
+        IMG[5:8,1]=212
+        IMG[4:7,5]=211
+        IMG[5,3]=210
+        IMG[5,8]=210
+        IMG[6,3:5]=210
+        IMG[7,0]=209
+        IMG[7,8]=209
+        IMG[8:10,4]=209
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'YX', 'bounds':[[0,9,0,10]], 'pbc':[1,1,1], 'unit':'nm'})
+        Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',min_pix=2)
+        Bin_0=np.array([[0,0,0,0,1,0,0,0,0],
+                        [0,0,0,0,1,0,0,0,0],
+                        [0,0,0,0,0,0,0,0,0],
+                        [2,2,0,3,3,3,0,2,2],
+                        [0,0,0,0,0,3,0,0,0],
+                        [0,4,0,3,0,3,0,0,0],
+                        [0,4,0,3,3,3,0,0,0],
+                        [4,4,0,0,0,0,0,0,4],
+                        [0,0,0,0,1,0,0,0,0],
+                        [0,0,0,0,1,0,0,0,0]])
+        self.assertTrue((Bin[0]==Bin_0).all()) 
+        self.assertTrue((abs(np.array(areas[0])-np.array([0.08,0.08,0.18,0.1]))<1E-6).all())
+
+    def test_numarea_4(self):
+        #Check complex connections
+        #Check minimum pixels
+        #Check pbc
+        IMG=np.zeros((10,9),dtype='uint8')
+        IMG[0:2,4]=200
+        IMG[3,0:2]=210
+        IMG[3,3:6]=215
+        IMG[3,7:9]=213
+        IMG[5:8,1]=212
+        IMG[4:7,5]=211
+        IMG[5,3]=210
+        IMG[5,8]=210
+        IMG[6,3:5]=210
+        IMG[7,0]=209
+        IMG[7,8]=209
+        IMG[8:10,4]=209
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'YX', 'bounds':[[0,9,0,10]], 'pbc':[0,0,0], 'unit':'nm'})
+        Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',min_pix=2)
+        Bin_0=np.array([[0,0,0,0,1,0,0,0,0],
+                        [0,0,0,0,1,0,0,0,0],
+                        [0,0,0,0,0,0,0,0,0],
+                        [2,2,0,3,3,3,0,4,4],
+                        [0,0,0,0,0,3,0,0,0],
+                        [0,5,0,3,0,3,0,0,0],
+                        [0,5,0,3,3,3,0,0,0],
+                        [5,5,0,0,0,0,0,0,0],
+                        [0,0,0,0,6,0,0,0,0],
+                        [0,0,0,0,6,0,0,0,0]])
+        self.assertTrue((Bin[0]==Bin_0).all()) 
+        self.assertTrue((abs(np.array(areas[0])-np.array([0.04,0.04,0.18,0.04,0.08,0.04]))<1E-6).all())
+        os.system('rm *.tif')
+
+    def test_numarea_5(self):
+        # Check different tiff file axes
+        # CYX
+        IMG=np.zeros((3,10,10),dtype='uint8')
+        for i in range(10):
+            IMG[0,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'CYX', 'bounds':[[0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm'})
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',col_channel=0)
+        for i in range(10):
+            self.assertAlmostEqual(area[0][i],0.02)
+        Bin_0=np.zeros((10,10),dtype='int')
+        for i in range(10):
+            Bin_0[i,i]=i+1
+        self.assertTrue((Bin[0]==Bin_0).all())
+        os.system('rm *.tif')
+
+        # ZYX
+        IMG=np.zeros((10,10,10),dtype='uint8')
+        for i in range(10):
+            IMG[5,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'ZYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5)
+        for i in range(10):
+            self.assertAlmostEqual(area[0][i],0.02)
+        Bin_0=np.zeros((10,10),dtype='int')
+        for i in range(10):
+            Bin_0[i,i]=i+1
+        self.assertTrue((Bin[0]==Bin_0).all())
+        os.system('rm *.tif')
+
+        # CZYX
+        IMG=np.zeros((10,3,10,10),dtype='uint8')
+        for i in range(10):
+            IMG[5,0,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'ZCYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5,col_channel=0)
+        for i in range(10):
+            self.assertAlmostEqual(area[0][i],0.02)
+        Bin_0=np.zeros((10,10),dtype='int')
+        for i in range(10):
+            Bin_0[i,i]=i+1
+        self.assertTrue((Bin[0]==Bin_0).all())
+        os.system('rm *.tif')
+
+        # TCYX
+        IMG=np.zeros((5,3,10,10),dtype='uint8')
+        for i in range(10):
+            for t in range(5):
+                IMG[t,0,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'TCYX', 'bounds':[[0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm'})
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',col_channel=0)
+        Bin_0=np.zeros((5,10,10),dtype='int')
+        for t in range(5):
+            for i in range(10):
+                self.assertAlmostEqual(area[t][i],0.02)
+                Bin_0[t,i,i]=i+1
+        self.assertTrue((Bin==Bin_0).all())
+        os.system('rm *.tif')
+
+        # TZYX
+        IMG=np.zeros((5,10,10,10),dtype='uint8')
+        for i in range(10):
+            for t in range(5):
+                IMG[t,5,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'TZYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5)
+        Bin_0=np.zeros((5,10,10),dtype='int')
+        for t in range(5):
+            for i in range(10):
+                self.assertAlmostEqual(area[t][i],0.02)
+                Bin_0[t,i,i]=i+1
+        self.assertTrue((Bin==Bin_0).all())
+        os.system('rm *.tif')
+
+        # TZCYX
+        IMG=np.zeros((5,10,3,10,10),dtype='uint8')
+        for i in range(10):
+            for t in range(5):
+                IMG[t,5,0,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'TZCYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5,col_channel=0)
+        Bin_0=np.zeros((5,10,10),dtype='int')
+        for t in range(5):
+            for i in range(10):
+                self.assertAlmostEqual(area[t][i],0.02)
+                Bin_0[t,i,i]=i+1
+        self.assertTrue((Bin==Bin_0).all())
+        os.system('rm *.tif')
+
+
+
+    def test_numvol_1(self):
+        #Check diagonals are not considered the same
+        #Simple particle count is correct
+        IMG=np.zeros((10,10,10),dtype='uint8')
+        for i in range(10):
+            IMG[i,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'ZYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.3})
+        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0')
+        for i in range(10):
+            self.assertAlmostEqual(vol[0][i],0.006)
+        os.system('rm *.tif')
+
+    def test_numvol_2(self):
+        #Check simple connections
+        #Check threshold
+        IMG=np.zeros((5,8,8),dtype='uint8')
+        IMG[1,1,1:3]=200 #3 voxels 
+        IMG[2:3,1,2]=200
+        IMG[1,1:3,4]=210 #3 voxels
+        IMG[2:3,2,4]=209
+        IMG[1,1,6:8]=215 #4 voxels
+        IMG[1:3,2,7]=213
+        IMG[1,3,1:3]=230 #4 voxels
+        IMG[1:3,4,1]=225
+        IMG[1,4,4:7]=211 #5 voxels
+        IMG[2:4,4,6]=210
+        IMG[1,6,1:4]=100 #5 voxels
+        IMG[2:4,6,3]=90
+
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'ZYX', 'bounds':[[0,8,0,8,0,5]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.3})
+        Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0')
+
+        Bin_0=np.zeros((5,8,8),dtype='int')
+        Bin_0[1,1,1:3]=1
+        Bin_0[2:3,1,2]=1
+        Bin_0[1,1:3,4]=2
+        Bin_0[2:3,2,4]=2
+        Bin_0[1,1,6:8]=3
+        Bin_0[1:3,2,7]=3
+        Bin_0[1,3,1:3]=4
+        Bin_0[1:3,4,1]=4
+        Bin_0[1,4,4:7]=5
+        Bin_0[2:4,4,6]=5
+        self.assertTrue((Bin[0]==Bin_0).all()) 
+        self.assertTrue((abs(np.array(vols[0])-np.array([0.018,0.018,0.024,0.024,0.03]))<1E-6).all())
+
+    def test_numvol_3(self):
+        #Check complex connections
+        #Check minimum pixels
+        #Check pbc
+        IMG=np.zeros((5,10,9),dtype='uint8')
+        IMG[0,0:2,4]=200 # Particle 1
+        IMG[0,8:10,4]=209
+        IMG[4,0:2,4]=208
+        IMG[0,3,0:2]=210 # Particle 2
+        IMG[0,3,7:9]=213
+        IMG[3:5,3,8]=212
+        IMG[0,3,3:6]=215 # Particle 3
+        IMG[0,4:7,5]=211
+        IMG[0,5,3]=210
+        IMG[0,6,3:5]=210
+        IMG[4,5,3:5]=210
+        IMG[0,5:8,1]=212 # Particle 4
+        IMG[0,7,0]=209 
+        IMG[0,7,8]=209
+        IMG[1,7,1:4]=208
+        IMG[0,5,8]=210 # Particle x
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'ZYX', 'bounds':[[0,9,0,10,0,5]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.3})
+        Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',min_pix=2)
+        Bin_0=np.zeros((5,10,9),dtype='int')
+        Bin_0[0,0:2,4]=1 # Particle 1
+        Bin_0[0,8:10,4]=1
+        Bin_0[4,0:2,4]=1
+        Bin_0[0,3,0:2]=2 # Particle 2
+        Bin_0[0,3,7:9]=2
+        Bin_0[3:5,3,8]=2
+        Bin_0[0,3,3:6]=3 # Particle 3
+        Bin_0[0,4:7,5]=3
+        Bin_0[0,5,3]=3
+        Bin_0[0,6,3:5]=3
+        Bin_0[4,5,3:5]=3
+        Bin_0[0,5:8,1]=4 # Particle 4
+        Bin_0[0,7,0]=4 
+        Bin_0[0,7,8]=4
+        Bin_0[1,7,1:4]=4
+        self.assertTrue((Bin==Bin_0).all()) 
+        self.assertTrue((abs(np.array(vols[0])-np.array([0.036,0.036,0.066,0.048]))<1E-6).all())
+
+    def test_numvol_4(self):
+        #Check pbc
+        IMG=np.zeros((5,5,5),dtype='uint8')
+        IMG[0,:,4]=200
+        IMG[0,2,4]=0
+        IMG[1,2,:]=200
+        IMG[1,2,2]=0
+        IMG[:,3,2]=200
+        IMG[2,3,2]=0
+
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'ZYX', 'bounds':[[0,5,0,5,0,5]], 'pbc':[0,0,9], 'unit':'nm', 'spacing':0.3})
+        Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',min_pix=2)
+        Bin_0=np.zeros((5,5,5),dtype='int')
+        Bin_0[0,:2,4]=1
+        Bin_0[:2,3,2]=2
+        Bin_0[0,3:,4]=3
+        Bin_0[1,2,:2]=4
+        Bin_0[1,2,3:]=5
+        Bin_0[3:,3,2]=6
+        self.assertTrue((Bin==Bin_0).all()) 
+        self.assertTrue((abs(np.array(vols[0])-np.array([0.012,0.012,0.012,0.012,0.012,0.012]))<1E-6).all())
+        os.system('rm *.tif')
+
+    def test_numvol_5(self):
+        # Check different tiff file axes
+
+        # CZYX
+        IMG=np.zeros((10,3,10,10),dtype='uint8')
+        for i in range(10):
+            IMG[i,0,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'ZCYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+
+        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',col_channel=0)
+        for i in range(10):
+            self.assertAlmostEqual(vol[0][i],0.002)
+        Bin_0=np.zeros((10,10,10),dtype='int')
+        for i in range(10):
+            Bin_0[i,i,i]=i+1
+        self.assertTrue((Bin==Bin_0).all())
+        os.system('rm *.tif')
+
+        # TZYX
+        IMG=np.zeros((5,10,10,10),dtype='uint8')
+        for i in range(10):
+            for t in range(5):
+                IMG[t,i,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'TZYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+
+        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0')
+        Bin_0=np.zeros((5,10,10,10),dtype='int')
+        for t in range(5):
+            for i in range(10):
+                self.assertAlmostEqual(vol[t][i],0.002)
+                Bin_0[t,i,i,i]=i+1
+        self.assertTrue((Bin==Bin_0).all())
+        os.system('rm *.tif')
+
+        # TZCYX
+        IMG=np.zeros((5,10,3,10,10),dtype='uint8')
+        for i in range(10):
+            for t in range(5):
+                IMG[t,i,0,i,i]=200
+        tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
+            metadata={'axes':'TZCYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+
+        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',col_channel=0)
+        Bin_0=np.zeros((5,10,10,10),dtype='int')
+        for t in range(5):
+            for i in range(10):
+                self.assertAlmostEqual(vol[t][i],0.002)
+                Bin_0[t,i,i,i]=i+1
+        self.assertTrue((Bin==Bin_0).all())
+        os.system('rm *.tif')
+
+
+
+        
     
 if __name__ == '__main__':
     unittest.main()

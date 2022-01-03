@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.) */
 */
 
 int opt_axis, nlam, nlam_atoms[10], fs, lam[10], Npsf[3], Nbox[3], MaxBox[3],
-    pbc[3]={0,0,0};
+    pbc[3]={0,0,0}, silent=0;
 char lam_atoms[10][200][5], psfheader[100]; 
 double dx[3], focus_cor, length[3], Lpsf[3], maxl[3], tsO=-1; 
 
@@ -357,7 +357,6 @@ void print_copyright(){
 
 int main(int argc, char* argv[] )
 {
-    print_copyright();
 /*
    OPTIONS
    -f input filename (The gro file .gro)
@@ -393,27 +392,33 @@ int main(int argc, char* argv[] )
         lam[i]=0;//initialize wavelengths to 0.
     }
     //read the arguments supplied
+    for (i=0;i<argc;i++){
+        if (strcmp(argv[i],"-silent")==0){ // Input gro file
+            silent=1;
+        }
+    }
+    if (silent==0) print_copyright();
     val=0; //number of arguments read
     for (i=2;i<argc;i+=2)
     {
         if (strcmp(argv[i-1],"-f")==0){ // Input gro file
             strcpy(infile,argv[i]);
-            printf("infile is %s\n",infile);
+            if (silent==0) printf("infile is %s\n",infile);
             val++;
         }
         else if (strcmp(argv[i-1],"-o")==0){ // Output image data file
             strcpy(outfile,argv[i]);
-            printf("outfile is %s\n",outfile);
+            if (silent==0) printf("outfile is %s\n",outfile);
             val++;
         }
         else if (strcmp(argv[i-1],"-p")==0){ // Parameters file
             strcpy(paramfile,argv[i]);
-            printf("paramfile is %s\n",paramfile);
+            if (silent==0) printf("paramfile is %s\n",paramfile);
             val++;
         }
         else if (strcmp(argv[i-1],"-psf")==0){ // PSF header name file
             strcpy(psfheader,argv[i]);
-            printf("psfheader is %s\n",psfheader);
+            if (silent==0) printf("psfheader is %s\n",psfheader);
             val++;
         }
     }
@@ -440,22 +445,22 @@ int main(int argc, char* argv[] )
 
         if(strcmp(varname,"fs")==0){
             fs=atoi(a);
-            printf("%s = %d\n",varname,fs);
+            if (silent==0) printf("%s = %d\n",varname,fs);
         }
         if(strcmp(varname,"tsO")==0){
             tsO=atof(a);
-            printf("%s = %f\n",varname,tsO);
+            if (silent==0) printf("%s = %f\n",varname,tsO);
         }
         else if(strcmp(varname,"focus_cor")==0){
             focus_cor=atof(a);
-            printf("%s = %f\n",varname,focus_cor);   
+            if (silent==0) printf("%s = %f\n",varname,focus_cor);   
         }
         else if(strcmp(varname,"maxlen")==0){
             for (i=0;i<3;i++){
                 maxl[i]=atof(a);
                 a=strtok(NULL," \n");
             }
-            printf("%s = [%f,%f,%f]\n",varname,maxl[0],maxl[1],maxl[2]);   
+            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,maxl[0],maxl[1],maxl[2]);   
         }
         else if(strcmp(varname,"pbc")==0){
             while ((*a != '\0')&&(*a != '\n')){
@@ -465,26 +470,26 @@ int main(int argc, char* argv[] )
                 }
                 a++;
             }
-            printf("%s = [%d,%d,%d] #1 is on, 0 is off\n", varname, pbc[0], 
+            if (silent==0) printf("%s = [%d,%d,%d] #1 is on, 0 is off\n", varname, pbc[0], 
                    pbc[1],pbc[2]);
         }
         else if(strcmp(varname,"opt_axis")==0){
             opt_axis=atoi(a);
-            printf("%s = %d\n",varname,opt_axis);   
+            if (silent==0) printf("%s = %d\n",varname,opt_axis);   
         }
         else if(strcmp2(varname,"lam",0,2)==0){
             if(strcmp2(varname,"_names",3,8)==0){
                 val=varname[9]-'1';// Here val is saved as index of lambda
                 nlam_atoms[val]=0;
-                printf("%s = ",varname);
+                if (silent==0) printf("%s = ",varname);
                 while(a!=NULL){
                     strcpy(lam_atoms[val][nlam_atoms[val]],a);
                     a=strtok(NULL," \n");
-                    printf("'%s' ",lam_atoms[val][nlam_atoms[val]]);
+                    if (silent==0) printf("'%s' ",lam_atoms[val][nlam_atoms[val]]);
                     nlam_atoms[val]++;
                 }
-                printf("\n");
-                printf("Number of atom names = %d\n",nlam_atoms[val]);
+                if (silent==0) printf("\n");
+                if (silent==0) printf("Number of atom names = %d\n",nlam_atoms[val]);
             }
             else if(strcmp2(varname,"_hue",3,6)==0){
                 continue;
@@ -495,7 +500,7 @@ int main(int argc, char* argv[] )
             else {
                 val=varname[3]-'1';
                 lam[val]=atoi(a);   
-                printf("%s = %d \n",varname,lam[val]);
+                if (silent==0) printf("%s = %d \n",varname,lam[val]);
                 nlam++;
             }
         }
@@ -509,18 +514,18 @@ int main(int argc, char* argv[] )
                 return -1;
             }
             
-            printf("%s = [%f,%f,%f]\n",varname,dx[0],dx[1],dx[2]);   
+            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,dx[0],dx[1],dx[2]);   
         }
         else if(strcmp(varname,"Plmn")==0){
             for (i=0;i<3;i++){
                 Lpsf[i]=atof(a);
                 a=strtok(NULL," \n");
             }
-            printf("%s = [%f,%f,%f]\n",varname,Lpsf[0],Lpsf[1],Lpsf[2]);   
+            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,Lpsf[0],Lpsf[1],Lpsf[2]);   
         }
         else if(strcmp(varname,"psf_type")==0){
             psf_type=atoi(a);
-            printf("%s = %d\n",varname,psf_type);
+            if (silent==0) printf("%s = %d\n",varname,psf_type);
         }
     }
     fclose(f); 
@@ -541,7 +546,7 @@ int main(int argc, char* argv[] )
             length[0]=strtof(line,&pend);
             length[1]=strtof(pend,&pend);
             length[2]=strtof(pend,&pend);
-            printf("Box length is [%f,%f,%f]\n",length[0],length[1],length[2]);
+            if (silent==0) printf("Box length is [%f,%f,%f]\n",length[0],length[1],length[2]);
         }
         i++; 
     }
@@ -564,9 +569,9 @@ int main(int argc, char* argv[] )
     MaxBox[0]=(int)(maxl[(opt_axis+1)%3]/dx[0]+1E-3); // Same as B*_l
     MaxBox[1]=(int)(maxl[(opt_axis+2)%3]/dx[1]+1E-3);// Same as B*_m
 
-    printf("MaxBox: %d %d\n",MaxBox[0],MaxBox[1]);
-    printf("Nbox: %d %d %d \n",Nbox[0],Nbox[1],Nbox[2]);
-    printf("Npsf: %d %d %d \n", Npsf[0],Npsf[1],Npsf[2]);
+    if (silent==0) printf("MaxBox: %d %d\n",MaxBox[0],MaxBox[1]);
+    if (silent==0) printf("Nbox: %d %d %d \n",Nbox[0],Nbox[1],Nbox[2]);
+    if (silent==0) printf("Npsf: %d %d %d \n", Npsf[0],Npsf[1],Npsf[2]);
     ///////////////////////////////////////////////////////////////////////////
     /*                          DEFINING IMAGE                               */
     ///////////////////////////////////////////////////////////////////////////
@@ -615,7 +620,7 @@ int main(int argc, char* argv[] )
             }
         }
     }
-    printf("Initialization of Image Done\n");    
+    if (silent==0) printf("Initialization of Image Done\n");    
     ////////////////////////////////////////////////////////////////////////////
     /*                             DEFINING PSF                               */
     ////////////////////////////////////////////////////////////////////////////
@@ -645,7 +650,7 @@ int main(int argc, char* argv[] )
         }
     }
     ///////////////////////////////////////////////////////////////////////////
-    printf("Initialization of PSF Done\n");   
+    if (silent==0) printf("Initialization of PSF Done\n");   
     //Read PSF
     for(i=0;i<nlam;i++){
         if (psf_type==0){
@@ -655,16 +660,16 @@ int main(int argc, char* argv[] )
             sprintf(filename,"%s_tsO%g_lam%d_fs%d.dat",psfheader,tsO,lam[i],fs);
         }
         read_psf(filename,psf,i,psf_type);
-        printf("%s: PSF for %d nm read.\n",filename,lam[i]);
+        if (silent==0) printf("%s: PSF for %d nm read.\n",filename,lam[i]);
     }
-    printf("PSF read\nReading Gro\n");
+    if (silent==0) printf("PSF read\nReading Gro\n");
 
     // Read gro and calculate I(l',m')
     read_gro(infile,fooIMG,psf,psf_type);
-    printf("Analyzing Gro done\n");
+    if (silent==0) printf("Analyzing Gro done\n");
 
     // Writing I(l',m')
-    printf("Writing data files\n");
+    if (silent==0) printf("Writing data files\n");
     for (l=0;l<nlam;l++)
     {
         FILE *f;
@@ -674,7 +679,7 @@ int main(int argc, char* argv[] )
         else if (psf_type==1){
             sprintf(outmod,"%s_tsO%g_lam%d_fs%d.dat",outfile,tsO,lam[l],fs);
         }
-        printf("output file is %s\n",outmod);
+        if (silent==0) printf("output file is %s\n",outmod);
         f=fopen(outmod,"w");
         fprintf(f,"#Lam= %d dx= %f,%f,%f fs= %d\n",lam[l],dx[0],dx[1],dx[2],fs);
 

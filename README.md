@@ -41,7 +41,7 @@ siliscopy gen_psf --method [Gandy/GL1991/Mod_Gandy] \
 > **_Note3:_** Creates file `output file header`\_lam`lam[i]`\_fs`fs`.dat, where `lam[i]` and `fs` are read from `parameter file`.  
 >  
 
-Current version 1.2.2 can generate three PSFs. Depth-invariant PSF (`psf_type = 0`) Gandy (`Gandy`), and depth-variant (`psf_type = 1`) Gibson and Lanni (`GL1991`), and Modified Gandy (`Mod_Gandy`). 
+Current version 1.2.2 can generate four PSFs. Depth-invariant (`psf_type = 0`) Gandy (`Gandy`) and Gauss (`Gauss`) PSF, and depth-variant (`psf_type = 1`) Gibson and Lanni (`GL1991`), and Modified Gandy (`Mod_Gandy`). 
 
 [2] Gandy PSF: R. O. Gandy, Out-of-Focus Diffraction Patterns for Microscope Objectives, *Proc. Phys. Soc. B* **1954**, 67, 825-831.
 
@@ -53,18 +53,14 @@ Current version 1.2.2 can generate three PSFs. Depth-invariant PSF (`psf_type = 
 
 > **_Note4:_** The functional form of Gibson and Lanni PSF is changed to be compatible with `siliscopy` and will be reported in the upcoming journal article.
 >  
-
+> **_Note5:_** A scaling factor is introduced to scale the dimensions of lenght. PSF values report the value at the center of a voxel.
 
 ### 2. Generate Monochrome Image Intensity 
 
-Calculate the monochrome image intensity using the convolution between PSF and particle number density (ρ), 
-
-<img src="https://render.githubusercontent.com/render/math?math=I(l^',m^')=\sum_{j=1}^N PSF(l^'-l_j,m^'-m_j,n_O-n_j)">
-
-The output file consisted of intensity values for <img src="https://render.githubusercontent.com/render/math?math=(l^',m^')"> coordinates. 
-While evaluating <img src="https://render.githubusercontent.com/render/math?math=I">, periodic boundary condition was applied.
-The intensity <img src="https://render.githubusercontent.com/render/math?math=I"> is between 0 and 1 (both included). Intensity of -1 was used 
-in to represent the white frame where molecular simulation system is absent (See Ref [1] for more details). 
+Calculate the monochrome image intensity using the convolution between PSF and particle number density (ρ).
+While evaluating the image, periodic boundary condition is applied.
+The image intensity is between 0 and 1 (both included). Intensity of -1 was used 
+in to represent the absence of molecular simulation system (See Ref [1] for more details). 
 The image can be generated for a specific object focal plane (`slice`) or multiple object focal planes (3D image; `volume`) using the method option.
 The default method is `slice`. 
 
@@ -91,11 +87,11 @@ Template of data file:
 Store all filenames, parameter file (can be the same), PSF header file name (can be the same), output file header separated by ','. For each new monochrome image intensity evaluation, write the arguments in a new line. For example,
 
 ```data
-file1.gro,param1.dat,psf.dat,out1,method
-file2.gro,param2.dat,psf.dat,out2,method
+file1.gro,param1.dat,psf_fileheader,out1,method
+file2.gro,param2.dat,psf_fileheader,out2,method
 ```
 
-> **_Note1:_** Index each output file with an index, which can be the timestep of the simulation.  
+> **_Note1:_** Index each output file, which can be the timestep of the simulation.  
 >  
 > **_Note2:_** The file names `output file header`\_lam`lam[i]`\_fs`fs`.dat will be created. The value `fs` and `lam[i]` are read from the parameter file.  
 >  
@@ -118,7 +114,7 @@ Show specific image
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [Parameter file] \
-               --method [mono/mono3d/mono3dt/noise_mono/noise_mono3d/noise_mono3dt] \
+               --method [mono/mono2dt/mono3d/mono3dt/noise_mono/noise_mono2dt/noise_mono3d/noise_mono3dt] \
                --timestep [timestep] \
                --calc show
 ```
@@ -127,7 +123,7 @@ Save a specific image:
 ```bash
 siliscopy plot --file [filename header] \
                --paramfile [parameter file] \
-               --method [mono/mono3d/mono3dt/noise_mono/noise_mono3d/noise_mono3dt] \
+               --method [mono/mono2dt/mono3d/mono3dt/noise_mono/nois_mono2dt/noise_mono3d/noise_mono3dt] \
                --timestep [timestep] \
                --calc specific \
                --output [output file header] 
@@ -160,7 +156,7 @@ siliscopy plot --file [filename header] \
 ```
 To calculate it serially remove `--multiprocess`
 
-> **_Note6:_** Use parallel processing when the number of images is high. Parallelism is not implemented for individual images.  
+> **_Note6:_** Use parallel processing when the number of images is high. Parallelism is implemented for individual 2DT, 3D, and 3DT images.  
 >  
 
 #### Plot Color Image
@@ -181,7 +177,7 @@ Use the method `lumin` to plot lumination and hue of pixels about a central pixe
 
 Use the method `region` to plot a region plot where hues occur in factors of 10 degrees and values are made one. 
 
-These methods will be demonstrated in future tutorial. For now read the documentation.
+These methods were tested but not found to be too important. With new updates, these functions may not work properly.
 
   
 ### 4. Generate Video
@@ -208,7 +204,8 @@ siliscopy video --method data \
                 --output [output filename with extension] 
 ```
 
-Video can also be generated using the `2dt` and `3dt` options while plotting images.
+Video can also be generated using the `2dt` and `3dt` options while plotting images as TIFF format.
+
 
 ### 5. Calculate Properties 
 
@@ -218,6 +215,7 @@ Calculate the maximum intensity use the command:
 siliscopy prop --method maxI  \
                --file [filename header] \
                --paramfile [parameter file] \
+               --timestep [timestep]
 ```
 
 Predict the maximum intensity to generate images:
@@ -225,7 +223,8 @@ Predict the maximum intensity to generate images:
 siliscopy prop --method predI0  \
                --file [filename header] \
                --paramfile [parameter file] \
-               --timestep [iterations]
+               --timestep [timestep]
+               --iterations [iterations]
 ```
 > **_Note1:_** The parameter for timestep is used as maximum number of iterations to predict I0.   
 >  
@@ -235,6 +234,7 @@ Calculate histogram of image intensities:
 siliscopy prop --method hist  \
                --file [filename header] \
                --paramfile [parameter file] \
+               --timestep [timestep]
                --output [output filename]
 ```
 
@@ -266,7 +266,40 @@ the maximum intensity is assumed to be 1 otherwise maximum intensity is assumed 
 the particle ID (starting from 0) and its area. `[output filename header].png` is the binary image used 
 to calculate the area. It is created based on the value of `calc`.
 
-### 6. Parameter File
+### 6. Convert Files
+
+Convert a PSF to a 3D Tiff:
+
+```bash
+siliscopy convert --method psf2tiff \
+                  --file [filename header] \
+                  --paramfile [parameter file] \
+                  --calc [uint8/uint16] \
+                  --output [output filename header] \
+```
+
+Convert a PSF to a 3D Tiff where color changes from black to red for intensity of 0-0.2, red to blue for intensity of 0.2-0.8, and blue to white for intensity of 0.8-1:
+
+```bash
+siliscopy convert --method psf2tiff2 \
+                  --file [filename header] \
+                  --paramfile [parameter file] \
+                  --calc [uint8/uint16] \
+                  --output [output filename header] \
+```
+
+Convert a stack of 2D tiff images to 3D tiff:
+
+```bash
+siliscopy convert --method psf2tiff2 \
+                  --file [filename header] \
+                  --paramfile [parameter file] \
+                  --calc [uint8/uint16] \
+                  --output [output filename header] \
+```
+
+
+### 7. Parameter File
 
 The parameter file should contain the following parameters (Not all are used in every step). 
 
@@ -306,10 +339,6 @@ Parameters for Gibson-Lanni and Modified-Gandy PSF.
 * `meus`: (float). Refractive index of specimen. 
 * `tsO`: (float). Location of object focal plane below the coverslip in nanometers. 
 * `psf_type`: (int). Default value is 0 is for Gandy PSF (Circular symmetry and depth-invariant). Value of 1 is for Gibson-Lanni and Modified-Gandy (Circular symmetry and depth-variant).  
-
-# Contributors
-1. Subhamoy Mahajan, PhD student, Mechanical Engineering, University of Alberta, Edmonton, Canada
-2. Tian Tang, Professor, Mechanical Engineering, University of Alberta, Edmonton, Canada 
 
 # Funding Sources
 This research was funded by Natural Science and Engineering Research Council of Canada through Tian Tang. My research was also funded by several scholarships, Mitacs Globalink Graduate Fellowship (2016-2019), RR Gilpin Memorial Scholarship (2019), Alberta Graduate Excellence Scholarship (2020), Sadler Graduate Scholarship (2020).

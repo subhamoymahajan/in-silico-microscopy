@@ -136,5 +136,6 @@ def gen_vid_data(datafile,outname,fps,fourcc):
             video=cv2.VideoWriter(outname,fourcc,fps,(w,h))
         video.write(img)
         i+=1
+    f.close()
     video.release
     print("Writing: "+outname)

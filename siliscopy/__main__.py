@@ -56,6 +56,8 @@ def main():
                        help="Index of the wavelength")    
     parser.add_option('-e','--type', dest="type", type="str",
                        help="Data type", default='jpeg')    
+    parser.add_option('-i','--iterations', dest="iters", type="int",
+                       help="Number of iterations", default=1)    
 
 
     options, remainder = parser.parse_args()
@@ -65,7 +67,7 @@ def main():
     params['hue']=np.zeros(10)
     params['I0']=np.zeros(10)
     params['fourcc']='mp4v'
-    params['fps']=1
+    params['fps']=1.0
     params['vid_ext']='.mov'
     params['meu']=1.515
     params['meu0']=1.515
@@ -94,11 +96,11 @@ def main():
             val_string=val_string.split()
             
             if varname in ["fs", "T", "dpi", "tbegin", "tmax", "tdiff", "opt_axis",\
-                "add_n", "psf_type"]:
+                "add_n", "psf_type", "min_pix"]:
                 params[varname]=int(val_string[0])
             elif varname in ["NA", "meu", "scale", "meu0", "t0", "meug", \
                 "meug0", "tg", "tg0", "tsO", "meus", "poi", "gauss",\
-                "frame_col"]:
+                "frame_col", "focus_cor", "sig_r", "sig_n", "fps"]:
                 params[varname]=float(val_string[0])
             elif varname in ["dlmn", "Plmn","maxlen"]:
                 val_string=[float(x) for x in val_string]
@@ -126,6 +128,7 @@ def main():
                     params[varname][1]=1
                 if 'z' in val_string[0]:
                     params[varname][2]=1
+        f.close()
         #Reduce the lam variable
         for i in range(10):
             if params['lam'][i]<1:
@@ -135,9 +138,9 @@ def main():
         params['I0']=params['I0'][:i]
         MaxBox=[0,0]
         MaxBox[0]=int(params['maxlen'][(params['opt_axis']+1)%3]/ \
-                      params['dlmn'][0]+small)
+                      params['dlmn'][0]+0.5)
         MaxBox[1]=int(params['maxlen'][(params['opt_axis']+2)%3]/ \
-                      params['dlmn'][1]+small)
+                      params['dlmn'][1]+0.5)
         params['nmax']=int(params['maxlen'][params['opt_axis']]/ \
                         params['dlmn'][2]+0.5)
     
@@ -152,8 +155,11 @@ def main():
                 raise Exception('Empty array')
 
         print('fs = '+str(params['fs']))
-
-        if options.method in ["gandy", "Gandy"]:
+        if options.method in ["gauss", "Gauss"]:
+            for lambd in params['lam']:
+                psf_gauss(params['sig_r'], params['sig_n'], params['dlmn'], 
+                    params['Plmn'], options.outname, lambd, params['fs'])
+        elif options.method in ["gandy", "Gandy"]:
             if options.calc=='all': #Calculates for all n' coordiantes
                 if options.mprocess==True: #Multiprocessing. 
                     for lambd in params['lam']:
@@ -257,23 +263,43 @@ def main():
         if options.data!=None: #Data available in a file
             if options.mprocess==True: #Use multiprocessing
                 # siliscopy gen_mono -d [data] -s
-                gen_mono_c_mp(options.data)
+                gen_mono_c_mp(options.data,True,False)
             else:#Run serially
                 # siliscopy gen_mono -d [data]
-                gen_mono_c_serial(options.data)
+                gen_mono_c_serial(options.data,True,False)
         elif options.method=='volume':
             gen_mono_c_vol([options.filename, options.pfile, 
-                options.psfheader,options.outname], params['maxlen'],
+                options.psfheader,options.outname],True, False, params['maxlen'],
                 params['opt_axis'], params['dlmn'], 
                 add_n=params['add_n'], mprocess=options.mprocess)
         elif options.method=='slice': #Generates one image slice.
             # siliscopy gen_mono -f [gro] -p [param] -o [out]
             gen_mono_c([options.filename, options.pfile, options.psfheader, 
-                        options.outname])
+                        options.outname],False,False)
+    elif remainder[0]=='gen_mono_pp':
+        if options.method == None:
+            options.method='slice'
+        if options.data!=None: #Data available in a file
+            if options.mprocess==True: #Use multiprocessing
+                # siliscopy gen_mono -d [data] -s
+                gen_mono_c_mp(options.data,True, True)
+            else:#Run serially
+                # siliscopy gen_mono -d [data]
+                gen_mono_c_serial(options.data,True, True)
+        elif options.method=='volume':
+            gen_mono_c_vol([options.filename, options.pfile, 
+                options.psfheader,options.outname], True, True, params['maxlen'],
+                params['opt_axis'], params['dlmn'], 
+                add_n=params['add_n'], mprocess=options.mprocess)
+        elif options.method=='slice': #Generates one image slice.
+            # siliscopy gen_mono -f [gro] -p [param] -o [out]
+            gen_mono_c([options.filename, options.pfile, options.psfheader, 
+                        options.outname], False, True)
     
     elif remainder[0]=='plot':
         filename=options.filename
-
+        foo=list(params['pbc'])*2
+        pbc_lmn=np.array(foo[params['opt_axis']+1:params['opt_axis']+4])
         for key in ["lam","I0","T","fs","dlmn","scale","dpi"]:
             if key not in params:
                 continue
@@ -300,7 +326,8 @@ def main():
                     params['scale'], params['dpi'], noise=noise, 
                     poi=params['poi'], gauss=params['gauss'], 
                     psf_type=params['psf_type'], tsO=params['tsO'],
-                    frame_col=params['frame_col'])
+                    frame_col=params['frame_col'], dlmn=params['dlmn'],
+                    pbc=pbc_lmn)
     
             elif options.calc in ["specific", "spec"]: #Specific output
                 plot_grey_img(filename, params['I0'], params['lam'],
@@ -308,7 +335,8 @@ def main():
                     params['scale'], params['dpi'], outname, noise=noise, 
                     poi=params['poi'], gauss=params['gauss'], 
                     otype=options.type, psf_type=params['psf_type'], 
-                    tsO=params['tsO'], frame_col=params['frame_col'])
+                    tsO=params['tsO'], frame_col=params['frame_col'],
+                    dlmn=params['dlmn'],pbc=pbc_lmn)
             
             elif options.calc == 'all':
                 print('tbegin = '+str(params['tbegin']))
@@ -321,7 +349,7 @@ def main():
                         params['scale'], params['dpi'], outname, 
                         params['frame_col'], noise, params['poi'],
                         params['gauss'], options.type, params['psf_type'],
-                        params['tsO'])
+                        params['tsO'], params['dlmn'],pbc_lmn)
                 else: #Serial
                     plot_grey_serial(filename, params['I0'], params['lam'],
                         params['T'], params['tbegin'], params['tmax'], 
@@ -329,7 +357,7 @@ def main():
                         params['scale'], params['dpi'], outname, 
                         params['frame_col'], noise, params['poi'], 
                         params['gauss'], options.type, params['psf_type'],
-                        params['tsO'])
+                        params['tsO'], params['dlmn'], pbc_lmn)
 
         elif options.method in ["col", "color", "noise_col", "noise_color"]:
             print("hue = "+str(params["hue"]))
@@ -338,19 +366,21 @@ def main():
             if options.calc=='show': #show specific
                 plot_col_img(filename, params['I0'], params['lam'],
                     params['hue'], params['T'], options.timestep, params['fs'],
-                    MaxBox, Bm, params['scale'], params['dpi'], 
+                    MaxBox, params['dlmn'], Bm, params['scale'], params['dpi'], 
                     frame_col=params['frame_col'], mix_type=params['mix_type'],
                     noise=noise, poi=params['poi'], tsO=params['tsO'], 
-                    gauss=params['gauss'], psf_type=params['psf_type']) 
+                    gauss=params['gauss'], psf_type=params['psf_type'],
+                    pbc=pbc_lmn) 
                                                  
             elif options.calc in ["specific", "s pec"]: #Save Specific
                 plot_col_img(filename, params['I0'], params['lam'],
                     params['hue'], params['T'], options.timestep, params['fs'],
-                    MaxBox, Bm, params['scale'], params['dpi'], 
+                    MaxBox, params['dlmn'], Bm, params['scale'], params['dpi'], 
                     outfile=outname, otype=options.type, noise=noise, 
                     poi=params['poi'], gauss=params['gauss'], 
                     psf_type=params['psf_type'], tsO=params['tsO'],
-                    mix_type=params['mix_type'], frame_col=params['frame_col'])
+                    mix_type=params['mix_type'], frame_col=params['frame_col'],
+                    pbc=pbc_lmn)
             
             elif options.calc == 'all':
                 print('tbegin = '+str(params['tbegin']))
@@ -363,7 +393,8 @@ def main():
                         Bm, params['scale'], params['dpi'], outname, 
                         params['frame_col'], params['mix_type'],noise, 
                         params['poi'], params['gauss'], options.type,
-                        params['psf_type'], params['tsO'])
+                        params['psf_type'], params['tsO'], params['dlmn'],
+                        pbc_lmn)
 
                 else: #Serial
                     plot_col_serial(filename, params['I0'], params['lam'],
@@ -372,10 +403,14 @@ def main():
                         Bm, params['scale'], params['dpi'], outname, 
                         params['frame_col'], params['mix_type'], noise, 
                         params['poi'], params['gauss'], options.type, 
-                        params['psf_type'], params['tsO'])
+                        params['psf_type'], params['tsO'], params['dlmn'],
+                        pbc_lmn)
 
         elif options.method in ["mono2dt", "grey2dt", "gray2dt", \
             "noise_mono2dt", "noise_grey2dt", "noise_gray2dt"]:
+            print('tbegin = '+str(params['tbegin']))
+            print('tmax = '+str(params['tmax']))
+            print('tdiff = '+str(params['tdiff']))
              
             if options.method[:6]=="noise_":
                 noise=True
@@ -384,10 +419,13 @@ def main():
                 MaxBox, params['dlmn'], params['fps'], outfile=outname, 
                 mprocess=options.mprocess, noise=noise, poi=params['poi'], 
                 otype=options.type, gauss=params['gauss'], 
-                psf_type=params['psf_type'], tsO=params['tsO'])
+                psf_type=params['psf_type'], tsO=params['tsO'], pbc=pbc_lmn)
 
         elif options.method in ["col2dt", "color2dt", "noise_col2dt", 
             "noise_color2dt"]:
+            print('tbegin = '+str(params['tbegin']))
+            print('tmax = '+str(params['tmax']))
+            print('tdiff = '+str(params['tdiff']))
              
             if options.method[:6]=="noise_":
                 noise=True
@@ -397,7 +435,7 @@ def main():
                 outfile=outname, otype=options.type, mprocess=options.mprocess, 
                 poi=params['poi'], gauss=params['gauss'], 
                 psf_type=params['psf_type'], tsO=params['tsO'], 
-                mix_type=params['mix_type'])
+                mix_type=params['mix_type'], pbc=pbc_lmn)
 
 
         elif options.method in ["mono3d", "grey3d", "gray3d", "noise_mono3d", \
@@ -410,7 +448,7 @@ def main():
                 params['nmax'], params['opt_axis'], add_n=params['add_n'], 
                 outfile=outname, poi=params['poi'], tsO=params['tsO'],
                 otype=options.type, mprocess=options.mprocess, noise=noise,
-                gauss=params['gauss'], psf_type=params['psf_type']) 
+                gauss=params['gauss'], psf_type=params['psf_type'],pbc=pbc_lmn) 
 
         elif options.method in ["col3d", "color3d", "noise_col3d", 
             "noise_color3d"]:
@@ -423,10 +461,13 @@ def main():
                 add_n=params['add_n'], outfile=outname, noise=noise, 
                 otype=options.type, mprocess=options.mprocess, 
                 poi=params['poi'], gauss=params['gauss'],
-                psf_type=params['psf_type'], tsO=params['tsO'])
+                psf_type=params['psf_type'], tsO=params['tsO'],pbc=pbc_lmn)
 
         elif options.method in ["mono3dt", "grey3dt", "gray3dt", "noise_mono3dt",\
             "noise_grey3dt", "noise_gray3dt"]:
+            print('tbegin = '+str(params['tbegin']))
+            print('tmax = '+str(params['tmax']))
+            print('tdiff = '+str(params['tdiff']))
              
             if options.method[:6]=="noise_":
                 noise=True
@@ -436,10 +477,13 @@ def main():
                 params['fps'], add_n=params['add_n'], noise=noise, 
                 outfile=outname, otype=options.type, mprocess=options.mprocess, 
                 poi=params['poi'], gauss=params['gauss'], 
-                psf_type=params['psf_type'], tsO=params['tsO'])
+                psf_type=params['psf_type'], tsO=params['tsO'], pbc=pbc_lmn)
 
         elif options.method in ["col3dt", "color3dt", "noise_col3dt", 
             "noise_color3dt"]:
+            print('tbegin = '+str(params['tbegin']))
+            print('tmax = '+str(params['tmax']))
+            print('tdiff = '+str(params['tdiff']))
              
             if options.method[:6]=="noise_":
                 noise=True
@@ -450,7 +494,7 @@ def main():
                 outfile=outname, noise=noise, otype=options.type, 
                 mprocess=options.mprocess, poi=params['poi'], 
                 gauss=params['gauss'], psf_type=params['psf_type'], 
-                tsO=params['tsO'])
+                tsO=params['tsO'], pbc=pbc_lmn)
     
         elif options.method == 'region':
             print("hue = "+str(params["hue"]))
@@ -509,12 +553,12 @@ def main():
             print('Method implemented') 
     elif remainder[0]=='prop':
         if options.method == 'maxI':
-            Imax=get_maxI(options.filename, params['lam'], params['fs'])
+            Imax=get_maxI(options.filename, params['lam'], params['fs'],tstep=options.timestep)
             print(Imax)
         elif options.method == 'predI0':
             if options.timestep!=None: #Using timestep as number of iterations
                 get_I0s(options.filename, params['lam'],params['fs'],
-                        iterations=options.timestep)
+                        iterations=options.iters, tstep=options.timestep)
             else:
                 get_I0s(options.filename, params['lam'], params['fs'])
 
@@ -522,68 +566,50 @@ def main():
             nor=False
             if options.calc=='norm':
                 nor=True
-            Imax=get_maxI(options.filename, params['lam'], params['fs'])
+            Imax=get_maxI(options.filename, params['lam'], params['fs'],tstep=options.timestep)
             get_hist(options.filename, params['lam'], params['fs'],
-                     options.outname, maxI=max(Imax), dI=0.1, norm=nor)
+                     options.outname, maxI=max(Imax), dI=0.1, norm=nor, tstep=options.timestep)
         elif options.method == 'num_area':
-            foo=params['pbc']
-            pbc=[foo[(params['opt_axis']+1)%3], foo[(params['opt_axis']+2)%3]]
-            sh=False
-            white =True
-            if options.calc=='show':
-                sh = True
-            elif options.calc=='show-test':
-                sh = True
-                white = False
-            elif options.calc=='test':
-                white = False
-            if options.threshold<1:
-                thres=int(options.threshold*255)
+            if options.outname==None:
+                write=False
             else:
-                thres=int(options.threshold)
-            get_num_area(options.filename, params['I0'][options.lambda_ID], \
-                          params['lam'][options.lambda_ID], params['T'], \
-                          options.timestep, params['fs'], \
-                          thres, MaxBox, params['dlmn'], \
-                          pbc, options.outname, sh, white ) 
+                write=True
+            get_num_area(options.filename, options.threshold, options.outname, min_pix=params['min_pix'], \
+                col_channel=options.lambda_ID, ncoor=params['focus_cor'], write=write) 
+        elif options.method == 'num_vol':
+            if options.outname==None:
+                write=False
+            else:
+                write=True
+            get_num_vol(options.filename, options.threshold, options.outname, min_pix=params['min_pix'], \
+                col_channel=options.lambda_ID, write=write) 
         else:
             print('Method not implemented')
     elif remainder[0]=="convert":
         if options.method == "psf2tiff":
             if options.calc== None:
-                dtype='uint16'
+                dtype='uint8'
             else:
                 dtype=options.calc
             psf_dat2tiff(options.filename, options.outname, params['Plmn'], \
                 params['dlmn'], dtype)
         if options.method == "psf2tiff2":
             if options.calc== None:
-                dtype='uint16'
+                dtype='uint8'
             else:
                 dtype=options.calc
             psf_dat2tiff2(options.filename, options.outname, params['Plmn'], \
                 params['dlmn'], dtype)
         
-        elif options.method == "zstack2tiff":
-            if options.calc== None:
-                dtype='uint16'
-            else:
-                dtype=options.calc
-            zmax=int(params['maxlen'][params['opt_axis']]/params['dlmn'][2]+0.5)
-            zstack_dat2tiff(options.filename, options.outname, params['lam'], \
-                params['I0'], params['fs'], options.timestep, params['T'], \
-                MaxBox, zmax, params['opt_axis'], dtype, params['add_n']) 
+        elif options.method == "nstack2tiff":
+            nstack2tiff(options.data, options.outname, options.threshold) 
+            #Threshold -a is used as the spacing
 
         elif options.method == "tstack2tiff":
-            if options.calc== None:
-                dtype='uint16'
-            else:
-                dtype=options.calc
-            tstack_dat2tiff(options.filename, options.outname, params['lam'], \
-                params['I0'], params['fs'], params['tbegin'], params['tmax'], \
-                params['tdiff'], params['T'], MaxBox, dtype) 
+            tstack2tiff(options.data, options.outname)
+
         elif options.method == "img2color":
-            print('not implemented')  
+            imgs2color(options.data,options.outname,options.type,params['mix_type'],params['hue'],params['dpi'])
     else:
         print("Function not specified or implemented") 
 if __name__=='__main__':
