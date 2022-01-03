@@ -905,7 +905,7 @@ def get_grey_3dimg(filename, lam_I0, lam, T, ti, fs, MaxBox, dlmn, nmax,
 
     Returns
     -------
-    img3d: 3D monochrome image. Axes ZYX.
+    img3d: 3D monochrome image. Axes ZXY.
     """
 
     nN=int(nmax/add_n)
@@ -985,7 +985,7 @@ def plot_grey_3dtimg(filename, lam_I0s, lams, T, tbegin, tmax, tdiff, fs,
   
     Returns
     -------
-    img3dt: 3DT monochrome image. Axes TZYX.
+    img3dt: 3DT monochrome image. Axes TZXY.
     """
     if outfile==None:
         outfile=filename
@@ -1071,7 +1071,7 @@ def get_col_3dimg(filename, lam_I0s, lams, lam_hues, T, ti, fs, MaxBox, dlmn,
 
     Returns
     -------
-    img3d: 3D monochrome image. Axes ZCYX.
+    img3d: 3D monochrome image. Axes ZCXY.
     """
     nN=int(nmax/add_n)
     xyz='xyz'
@@ -1222,7 +1222,6 @@ def plot_col_2dtimg(filename, lam_I0s, lams, lam_hues, T, tbegin, tmax, tdiff,
         foo,bound=intensity2image(foo,img2dt.dtype,axes='CXY')
         bounds+=bound
         img2dt[i,:,:,:]=foo[:,:,:]
-     
     oname=outfile +str(tbegin)+'-'+str(tmax) +tstr +'_fs'+str(fs) +'_T' + \
           str(T) +'_I'+Istring +'.tiff'
     print('Writing: '+oname)

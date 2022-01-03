@@ -101,36 +101,36 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
         // Ignoring lines were l', m', n' is not integral multiple 
         // of dl', dm', dn'. 
         if (x>0){
-  	    i=(int)(x/dx[0]+1E-3);
+  	    i=(int)(x/dx[0]+0.5);
         }
         else {
-            i=(int)(x/dx[0]-1E-3);
+            i=(int)(x/dx[0]-0.5);
         }
         if (cnt<10){
             if (fabs((double)i-x/dx[0])>dx[0]*0.1){
-                printf("x: ignoring PSF line: %d not equal to %f. Difference is %f\n"
+                if (silent==0) printf("x: ignoring PSF line: %d not equal to %f. Difference is %f\n"
                        ,i,x/dx[0],fabs((double)i-x/dx[0]));
                 cnt++;
                 if (cnt==10){
-                    printf("Similar output will not be shown as it repeated 10 times.\n");
+                    if (silent==0) printf("Similar output will not be shown as it repeated 10 times.\n");
                 }
                 continue;
             }
         }
 
         if (y>0){
-            j=(int)(y/dx[1]+1E-3);
+            j=(int)(y/dx[1]+0.5);
         }
         else{
-            j=(int)(y/dx[1]-1E-3);
+            j=(int)(y/dx[1]-0.5);
         }
         if (cnt<10){  
             if (fabs((double)j-y/dx[1])>dx[1]*0.1){
-                printf("y: ignoring PSF line: %d not equal to %f. Difference is %f\n"
+                if (silent==0) printf("y: ignoring PSF line: %d not equal to %f. Difference is %f\n"
                        ,j,y/dx[1],fabs((double)j-y/dx[1]));
                 cnt++;
                 if (cnt==10){
-                    printf("Similar output will not be shown as it repeated 10 times.\n");
+                    if (silent==0) printf("Similar output will not be shown as it repeated 10 times.\n");
                 }
                 continue;
             }
@@ -138,18 +138,18 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
         
 
         if (z>0){
-            k=(int)(z/dx[2]+1E-3);
+            k=(int)(z/dx[2]+0.5);
         }
         else{
-            k=(int)(z/dx[2]-1E-3);
+            k=(int)(z/dx[2]-0.5);
         }
         if (cnt<10){
             if (fabs((double)k-z/dx[2])>dx[2]*0.1){
-                printf("z: ignoring PSF line: %d not equal to %f. Difference is %f\n"
+                if (silent==0) printf("z: ignoring PSF line: %d not equal to %f. Difference is %f\n"
                        ,k,z/dx[2],fabs((double)k-z/dx[2]));
                 cnt++;
                 if (cnt==10){
-                    printf("Similar output will not be shown as it repeated 10 times.\n");
+                    if (silent==0) printf("Similar output will not be shown as it repeated 10 times.\n");
                 }
                 continue;
             }
@@ -554,20 +554,20 @@ int main(int argc, char* argv[] )
     ///////////////////////////////////////////////////////////////////////////
 
     for (i=0;i<3;i++){
-        Npsf[i]=(int)(0.5*Lpsf[i]/dx[i]+1E-4)+1; 
+        Npsf[i]=(int)(0.5*Lpsf[i]/dx[i]+0.5)+1; 
         // Npsf: Number of PSF voxels in l', m', n'
         // length: is dimensions of the gro box in MD x, y, and z.
         // (opt_axis+i+1)%3 : is l, m, n directions, if i ix x, y, and z.
         // dx: voxel size dl, dm and dn
         // Number of voxels in MD simulation box in l, m, n
-        Nbox[i]=(int)(length[(opt_axis+i+1)%3]/dx[i]+1E-3); 
+        Nbox[i]=(int)(length[(opt_axis+i+1)%3]/dx[i]+0.5); 
     }
     if (psf_type==1){
-        Npsf[2]=(int)(Lpsf[2]/dx[2]+1E-4)*2+1;
+        Npsf[2]=(int)(Lpsf[2]/dx[2]+0.5)*2+1;
     }
     // Maximum number of voxels in largest MD simulation box in l and m. 
-    MaxBox[0]=(int)(maxl[(opt_axis+1)%3]/dx[0]+1E-3); // Same as B*_l
-    MaxBox[1]=(int)(maxl[(opt_axis+2)%3]/dx[1]+1E-3);// Same as B*_m
+    MaxBox[0]=(int)(maxl[(opt_axis+1)%3]/dx[0]+0.5); // Same as B*_l
+    MaxBox[1]=(int)(maxl[(opt_axis+2)%3]/dx[1]+0.5);// Same as B*_m
 
     if (silent==0) printf("MaxBox: %d %d\n",MaxBox[0],MaxBox[1]);
     if (silent==0) printf("Nbox: %d %d %d \n",Nbox[0],Nbox[1],Nbox[2]);

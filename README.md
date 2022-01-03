@@ -245,10 +245,8 @@ Calculate number of particles, area, volume, and binary images:
 siliscopy prop --method [num_area/num_vol] \
                --file [filename header] \
                --paramfile [parameter file] \
-               --calc [show/show-test/test] \ 
                --threshold [intensity] \
                --lambdaID [index of fluorophore] \
-               --timestep [timestep] \
                --output [output filename header]
 ```
 Use `calc` value of 'show' to show the figure. This option won't save the file shown. 'show-test' 
@@ -323,10 +321,11 @@ The parameter file should contain the following parameters (Not all are used in 
 * `tbegin`: (int). Index associated with first timestep (will be included).
 * `tmax`: (int). Index associated with last timestep (will not be included).
 * `tdiff`: (int). Difference in index associated with timestep.
-* `fps`: (int). Frames per second of the output video. (default value is 1)
+* `fpns`: (int). Frames per second of the output video. (default value is 1)
 * `vid_ext`: (str). The extension of the output video. (default value is .mov)
 * `fourcc`: ('str'). The four character code of the encoder with which video will be created. (default value is 'mp4v') 
 * `add_n`: (int). For 3D image generate, slices are generated every `n=dlmn[2]*add_n`.  
+* `min_pix`: (int). Minimum pixels or voxels to calculate particle area/volume.
 
 Parameters for Gibson-Lanni and Modified-Gandy PSF.
 

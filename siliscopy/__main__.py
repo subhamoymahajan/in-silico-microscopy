@@ -67,7 +67,7 @@ def main():
     params['hue']=np.zeros(10)
     params['I0']=np.zeros(10)
     params['fourcc']='mp4v'
-    params['fps']=1.0
+    params['fpns']=1.0
     params['vid_ext']='.mov'
     params['meu']=1.515
     params['meu0']=1.515
@@ -79,6 +79,7 @@ def main():
     params['tsO']=0 #nm
     params['meus']=1.33 
     params['NA']=1
+    params['add_n']=1
     params['fs']=530
     params['psf_type']=0
     params['poi']=None
@@ -100,7 +101,7 @@ def main():
                 params[varname]=int(val_string[0])
             elif varname in ["NA", "meu", "scale", "meu0", "t0", "meug", \
                 "meug0", "tg", "tg0", "tsO", "meus", "poi", "gauss",\
-                "frame_col", "focus_cor", "sig_r", "sig_n", "fps"]:
+                "frame_col", "focus_cor", "sig_r", "sig_n", "fpns"]:
                 params[varname]=float(val_string[0])
             elif varname in ["dlmn", "Plmn","maxlen"]:
                 val_string=[float(x) for x in val_string]
@@ -416,7 +417,7 @@ def main():
                 noise=True
             plot_grey_2dtimg(filename, params['I0'], params['lam'], params['T'],
                 params['tbegin'], params['tmax'], params['tdiff'], params['fs'],
-                MaxBox, params['dlmn'], params['fps'], outfile=outname, 
+                MaxBox, params['dlmn'], params['fpns'], outfile=outname, 
                 mprocess=options.mprocess, noise=noise, poi=params['poi'], 
                 otype=options.type, gauss=params['gauss'], 
                 psf_type=params['psf_type'], tsO=params['tsO'], pbc=pbc_lmn)
@@ -431,7 +432,7 @@ def main():
                 noise=True
             plot_col_2dtimg(filename, params['I0'], params['lam'],params['hue'],
                 params['T'], params['tbegin'], params['tmax'], params['tdiff'], 
-                params['fs'], MaxBox, params['fps'],params['dlmn'], noise=noise,
+                params['fs'], MaxBox, params['fpns'],params['dlmn'], noise=noise,
                 outfile=outname, otype=options.type, mprocess=options.mprocess, 
                 poi=params['poi'], gauss=params['gauss'], 
                 psf_type=params['psf_type'], tsO=params['tsO'], 
@@ -474,7 +475,7 @@ def main():
             plot_grey_3dtimg(filename, params['I0'], params['lam'], params['T'],
                 params['tbegin'], params['tmax'], params['tdiff'], params['fs'],
                 MaxBox, params['dlmn'], params['nmax'], params['opt_axis'],
-                params['fps'], add_n=params['add_n'], noise=noise, 
+                params['fpns'], add_n=params['add_n'], noise=noise, 
                 outfile=outname, otype=options.type, mprocess=options.mprocess, 
                 poi=params['poi'], gauss=params['gauss'], 
                 psf_type=params['psf_type'], tsO=params['tsO'], pbc=pbc_lmn)
@@ -490,7 +491,7 @@ def main():
             plot_col_3dtimg(filename, params['I0'], params['lam'], params['hue'],
                 params['T'], params['tbegin'], params['tmax'], params['tdiff'],
                 params['fs'], MaxBox, params['dlmn'], params['nmax'], 
-                params['opt_axis'], params['fps'], add_n=params['add_n'], 
+                params['opt_axis'], params['fpns'], add_n=params['add_n'], 
                 outfile=outname, noise=noise, otype=options.type, 
                 mprocess=options.mprocess, poi=params['poi'], 
                 gauss=params['gauss'], psf_type=params['psf_type'], 
@@ -529,7 +530,7 @@ def main():
             print('Method Not implemented') 
 
     elif remainder[0]=='video':
-        print("fps = "+str(params['fps']))
+        print("fpns = "+str(params['fpns']))
         print("fourcc = "+str(params['fourcc']))
         if options.method!='data':
             for key in ["tbegin", "tmax", "tdiff", "T", "fs", "I0", "lam"]:
@@ -538,16 +539,16 @@ def main():
 
         if options.method == 'data':
             gen_vid_data(options.data,options.outname,
-                         params['fps'],params['fourcc'])       
+                         params['fpns'],params['fourcc'])       
         elif options.method in ["mono", "grey", "gray"]:
             gen_vid_mono(options.filename, params['tbegin'], params['tmax'],
                          params['tdiff'], params['T'], params['fs'], 
                          params['I0'], params['lam'], params['vid_ext'],
-                         params['fps'], params['fourcc'])
+                         params['fpns'], params['fourcc'])
         elif options.method in ["color", "col"]:
             gen_vid_col(options.filename, params['tbegin'], params['tmax'], 
                         params['tdiff'], params['T'], params['fs'],
-                        params['I0'], params['vid_ext'], params['fps'], 
+                        params['I0'], params['vid_ext'], params['fpns'], 
                         params['fourcc'])
         else:
             print('Method implemented') 

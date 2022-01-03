@@ -49,7 +49,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1 
         f.close()
 
@@ -67,7 +68,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1 
         f.close()
         
@@ -85,7 +87,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -103,7 +106,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -121,7 +125,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -139,7 +144,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -157,7 +163,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -175,7 +182,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -185,16 +193,18 @@ class TestPSFGeneration(unittest.TestCase):
         #Calculated the definite integral for PSF using WolframAlpha
         PSF0.append(0.0222045)  
         PSF0.append(0.000233725)
-        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, self.t0,
-            self.tsO, self.meus, self.tg, self.tg0, self.meug, self.meug0, 
-            self.lam_gl, self.dlmn, self.Plmn, self.fs, 'test.dat','w',0)
+        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, 
+            self.t0, self.tsO, self.meus, self.tg, self.tg0, self.meug, 
+            self.meug0, self.lam_gl, self.dlmn, self.Plmn, self.fs, 
+            'test.dat','w',0)
         f=open('test.dat','r')
         i=0 
         for lines in f:
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -203,16 +213,18 @@ class TestPSFGeneration(unittest.TestCase):
         #Calculated the definite integral for PSF using WolframAlpha
         PSF0.append(0.0410877)  
         PSF0.append(0.00547789)
-        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, self.t0,
-            self.tsO, self.meus, self.tg, self.tg0, self.meug, self.meug0, 
-            self.lam_gl, self.dlmn, self.Plmn, self.fs, 'test.dat','w',1)
+        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, 
+            self.t0, self.tsO, self.meus, self.tg, self.tg0, self.meug, 
+            self.meug0, self.lam_gl, self.dlmn, self.Plmn, self.fs,
+            'test.dat','w',1)
         f=open('test.dat','r')
         i=0 
         for lines in f:
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -221,8 +233,8 @@ class TestPSFGeneration(unittest.TestCase):
         #Calculated the definite integral for PSF using WolframAlpha
         PSF0.append(0.0222105)  
         PSF0.append(0.000287965)
-        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, self.t0,
-            1, self.meus, self.tg, self.tg0, self.meug, self.meug0, 
+        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, 
+            self.t0, 1, self.meus, self.tg, self.tg0, self.meug, self.meug0, 
             self.lam_gl, self.dlmn, self.Plmn, self.fs, 'test.dat','w',0)
         f=open('test.dat','r')
         i=0 
@@ -230,7 +242,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -239,8 +252,8 @@ class TestPSFGeneration(unittest.TestCase):
         #Calculated the definite integral for PSF using WolframAlpha
         PSF0.append(0.0222048)  
         PSF0.append(0.000234126)
-        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, self.t0,
-            self.tsO, self.meus, self.tg, self.tg0, 1.6, self.meug0, 
+        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, 
+            self.t0, self.tsO, self.meus, self.tg, self.tg0, 1.6, self.meug0, 
             self.lam_gl, self.dlmn, self.Plmn, self.fs, 'test.dat','w',0)
         f=open('test.dat','r')
         i=0 
@@ -248,7 +261,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -257,16 +271,18 @@ class TestPSFGeneration(unittest.TestCase):
         #Calculated the definite integral for PSF using WolframAlpha
         PSF0.append(0.0222105)  
         PSF0.append(0.000287965)
-        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, self.t0,
-            self.tsO, self.meus, self.tg0+1, self.tg0, self.meus, self.meus, 
-            self.lam_gl, self.dlmn, self.Plmn, self.fs, 'test.dat','w',0)
+        siliscopy.gen_psf.psf_Mod_Gandy_sep(self.NA, self.meu, self.meu0, 
+            self.t0, self.tsO, self.meus, self.tg0+1, self.tg0, self.meus, 
+            self.meus, self.lam_gl, self.dlmn, self.Plmn, self.fs, 
+            'test.dat','w',0)
         f=open('test.dat','r')
         i=0 
         for lines in f:
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -284,7 +300,8 @@ class TestPSFGeneration(unittest.TestCase):
             if lines[0]=='#':
                 continue
             foo=lines.split()
-            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+str(PSF0[i]))
+            self.assertAlmostEqual(float(foo[-1]),PSF0[i],6,foo[-1]+' '+ \
+                str(PSF0[i]))
             i+=1
         f.close()
 
@@ -325,9 +342,9 @@ def write_pos(filename,pos,atoms,box):
     f=open(filename,'w')
     f.write('Comment : Molecule t= 0.12\n '+str(len(pos))+'\n')
     for i in range(len(pos)):
-        f.write('    1'+'DC   '+'   '+str(atoms[i])+' '+str(i).ljust(5)+\
-                str(int(pos[i,0]*1000)/1000).ljust(8)+\
-                str(int(pos[i,1]*1000)/1000).ljust(8)+\
+        f.write('    1'+'DC   '+'   '+str(atoms[i])+' '+str(i).ljust(5)+ \
+                str(int(pos[i,0]*1000)/1000).ljust(8)+ \
+                str(int(pos[i,1]*1000)/1000).ljust(8)+ \
                 str(int(pos[i,2]*1000)/1000).ljust(8)+'\n')
     f.write(' '+str(box[0])+' '+str(box[1])+' '+str(box[2]))
     f.close()
@@ -373,7 +390,8 @@ class TestMonoGeneration(unittest.TestCase):
         write_pos('pos.gro',pos,atoms,box)
      
         #Generate image data
-        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
+        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'], 
+            silent=True)
 
         IMG1=readIMG('out_lam1_fs1.dat')
         IMG2=readIMG('out_lam2_fs1.dat')
@@ -412,12 +430,13 @@ class TestMonoGeneration(unittest.TestCase):
         write_param('param.dat',self.params)
 
         #Write positions file
-        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,0.06],[0.09,0.71,0.11]]),
-                       [1.0,1.0,1.0]]
+        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,0.06], 
+            [0.09,0.71,0.11]]),[1.0,1.0,1.0]]
         write_pos('pos.gro',pos,atoms,box)
      
         #Generate image data
-        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
+        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],
+            silent=True)
 
         IMG1=readIMG('out_lam1_fs1.dat')
         IMG2=readIMG('out_lam2_fs1.dat')
@@ -458,12 +477,13 @@ class TestMonoGeneration(unittest.TestCase):
         write_param('param.dat',self.params)
 
         #Write positions file
-        atoms,pos,box=[np.array(['A','A']),np.array([[0.15,0.15,-0.15],[0.49,0.69,0.31]]),
-                       [1.0,1.0,1.0]]
+        atoms,pos,box=[np.array(['A','A']),np.array([[0.15,0.15,-0.15],
+            [0.49,0.69,0.31]]), [1.0,1.0,1.0]]
         write_pos('pos.gro',pos,atoms,box)
      
         #Generate image data
-        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
+        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],
+            silent=True)
 
         IMG1=readIMG('out_lam1_fs1.dat')
         IMG2=readIMG('out_lam2_fs1.dat')
@@ -505,12 +525,13 @@ class TestMonoGeneration(unittest.TestCase):
         write_param('param.dat',self.params)
 
         #Write positions file
-        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,0.21],[0.49,0.69,-0.15]]),
-                       [1.0,1.0,1.0]]
+        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,0.21],
+            [0.49,0.69,-0.15]]), [1.0,1.0,1.0]]
         write_pos('pos.gro',pos,atoms,box)
      
         #Generate image data
-        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
+        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],
+            silent=True)
         IMG1=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat')
         IMG2=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat')
         self.assertEqual(IMG1.shape,(6,6))
@@ -550,12 +571,13 @@ class TestMonoGeneration(unittest.TestCase):
         write_param('param.dat',self.params)
 
         #Write positions file
-        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,-0.21],[0.09,0.7,0.25]]),
-                       [1.0,1.0,1.0]]
+        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,-0.21],
+            [0.09,0.7,0.25]]), [1.0,1.0,1.0]]
         write_pos('pos.gro',pos,atoms,box)
      
         #Generate image data
-        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
+        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],
+            silent=True)
 
         IMG1=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat')
         IMG2=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat')
@@ -595,12 +617,13 @@ class TestMonoGeneration(unittest.TestCase):
         write_param('param.dat',self.params)
 
         #Write positions file
-        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,-0.21],[0.09,0.71,0.25]]),
-                       [1.0,1.0,1.0]]
+        atoms,pos,box=[np.array(['A','B']),np.array([[0.15,0.15,-0.21],
+            [0.09,0.71,0.25]]), [1.0,1.0,1.0]]
         write_pos('pos.gro',pos,atoms,box)
      
         #Generate image data
-        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],silent=True)
+        siliscopy.gen_mono.gen_mono_c(['pos.gro','param.dat','psf','out'],
+            silent=True)
 
         IMG1=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam1_fs1.dat')
         IMG2=readIMG('out_tsO'+"%g"%self.params['tsO']+'_lam2_fs1.dat')
@@ -685,84 +708,100 @@ class TestPlotImage(unittest.TestCase):
     def test_get_grey1(self): 
         #no time
         writeIMG('img_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],frame=True)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],
+            frame=True)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img_lam100_fs1.dat')   
         #one time frame
         writeIMG('img10_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],frame=True)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],
+            frame=True)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img10_lam100_fs1.dat')   
         #three time frames 
         writeIMG('img10_lam100_fs1.dat',self.I1)
         writeIMG('img11_lam100_fs1.dat',self.I2)
         writeIMG('img12_lam100_fs1.dat',self.I3)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],frame=True)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],
+            frame=True)
         Itrue=np.ones((6,6))*-1
-        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],[0.75,0.625,0.725]]
+        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],
+            [0.75,0.625,0.725]]
         self.assertTrue((abs(IMG-Itrue)<1E-6).all())
         for i in range(10,13):
             os.remove('img'+str(i)+'_lam100_fs1.dat')   
 
         #test 3D slices x          
         writeIMG('img_x20_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],frame=True,nidx=20,opt_axis=0)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],
+            frame=True,nidx=20,opt_axis=0)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img_x20_lam100_fs1.dat')   
         #one time frame
         writeIMG('img10_x20_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],frame=True,nidx=20,opt_axis=0)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],
+            frame=True,nidx=20,opt_axis=0)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img10_x20_lam100_fs1.dat')   
         #three time frames 
         writeIMG('img10_x20_lam100_fs1.dat',self.I1)
         writeIMG('img11_x20_lam100_fs1.dat',self.I2)
         writeIMG('img12_x20_lam100_fs1.dat',self.I3)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],frame=True,nidx=20,opt_axis=0)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],
+            frame=True,nidx=20,opt_axis=0)
         Itrue=np.ones((6,6))*-1
-        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],[0.75,0.625,0.725]]
+        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],
+            [0.75,0.625,0.725]]
         self.assertTrue((abs(IMG-Itrue)<1E-6).all())
         for i in range(10,13):
             os.remove('img'+str(i)+'_x20_lam100_fs1.dat')  
  
         #test 3D slices y          
         writeIMG('img_y20_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],frame=True,nidx=20,opt_axis=1)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],
+            frame=True,nidx=20,opt_axis=1)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img_y20_lam100_fs1.dat')   
         #one time frame
         writeIMG('img10_y20_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],frame=True,nidx=20,opt_axis=1)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],
+            frame=True,nidx=20,opt_axis=1)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img10_y20_lam100_fs1.dat')   
         #three time frames 
         writeIMG('img10_y20_lam100_fs1.dat',self.I1)
         writeIMG('img11_y20_lam100_fs1.dat',self.I2)
         writeIMG('img12_y20_lam100_fs1.dat',self.I3)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],frame=True,nidx=20,opt_axis=1)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],
+            frame=True,nidx=20,opt_axis=1)
         Itrue=np.ones((6,6))*-1
-        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],[0.75,0.625,0.725]]
+        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],
+            [0.75,0.625,0.725]]
         self.assertTrue((abs(IMG-Itrue)<1E-6).all())
         for i in range(10,13):
             os.remove('img'+str(i)+'_y20_lam100_fs1.dat')  
  
         #test 3D slices z          
         writeIMG('img_z20_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],frame=True,nidx=20,opt_axis=2)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,-1,1,[6,6],
+            frame=True,nidx=20,opt_axis=2)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img_z20_lam100_fs1.dat')   
         #one time frame
         writeIMG('img10_z20_lam100_fs1.dat',self.I2)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],frame=True,nidx=20,opt_axis=2)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,1,10,1,[6,6],
+            frame=True,nidx=20,opt_axis=2)
         self.assertTrue((abs(IMG-self.I2)<1E-6).all())
         os.remove('img10_z20_lam100_fs1.dat')   
         #three time frames 
         writeIMG('img10_z20_lam100_fs1.dat',self.I1)
         writeIMG('img11_z20_lam100_fs1.dat',self.I2)
         writeIMG('img12_z20_lam100_fs1.dat',self.I3)
-        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],frame=True,nidx=20,opt_axis=2)
+        IMG=siliscopy.plot_image.get_grey_img('img',1,100,3,10,1,[6,6],
+            frame=True,nidx=20,opt_axis=2)
         Itrue=np.ones((6,6))*-1
-        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],[0.75,0.625,0.725]]
+        Itrue[1:4,1:4]=[[0.15,0.25,0.35],[0.45,0.3166666666,0.425],
+            [0.75,0.625,0.725]]
         self.assertTrue((abs(IMG-Itrue)<1E-6).all())
 
     def test_add_color(self):
@@ -788,22 +827,20 @@ class TestPlotImage(unittest.TestCase):
         #red+cyan
         self.assertTrue((abs(newIMGs[1,0,:]-np.array([0.5,0,0]))<1E-6).all())
         #red+green+violet
-        self.assertTrue((abs(newIMGs[1,1,:]-np.array([0.221605828,0.1,0.5]))<1E-6).all())
+        self.assertTrue((abs(newIMGs[1,1,:]-np.array([0.221605828,0.1,0.5]))< \
+            1E-6).all())
         #4-color
-        self.assertTrue((abs(newIMGs[2,0,:]-np.array([0.9,0.7969928058,0.6]))<1E-6).all())
+        self.assertTrue((abs(newIMGs[2,0,:]-np.array([0.9,0.7969928058,0.6]))< \
+            1E-6).all())
         #5-color
-        self.assertTrue((abs(newIMGs[2,1,:]-np.array([0.5,0.9,0.8375138173]))<1E-6).all())
+        self.assertTrue((abs(newIMGs[2,1,:]-np.array([0.5,0.9,0.8375138173]))< \
+            1E-6).all())
 
     def test_plot_ism(self): #Checks the shape of images produced.
         #Grey 2d, dynamic
         img0=np.random.random((4,8)) #XY
         sha0=img0.shape
         siliscopy.plot_image.plot_ism(img0,[0.1],[2],1,3,4,filename='out',dpi=2)
-        #
-        #def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None, 
-        #   show=False, gcolmap='gray', dpi=600, otype='jpeg', psf_type=0, tsO=None,
-        #   frame_col=1.0):
-        #
         img1=cv2.imread('out3_lam2_fs4_T1_I0.1.jpeg')
         sha1=img1.shape
         self.assertTrue(abs(sha0[1]/sha0[0]-sha1[1]/sha1[0])<1E-6) 
@@ -815,7 +852,8 @@ class TestPlotImage(unittest.TestCase):
         Img[:,0]=-1.0
         Img[:,-1]=-1.0
         writeIMG('img0_lam1_fs1.dat',Img)
-        siliscopy.plot_image.plot_grey_img('img',[1],[1],1,0,1,[4,6],1,0.1,otype='tiff8',dlmn=[0.1,0.1,0.1],pbc=[1,1,1])
+        siliscopy.plot_image.plot_grey_img('img',[1],[1],1,0,1,[4,6],1,0.1,
+            otype='tiff8',dlmn=[0.1,0.1,0.1],pbc=[1,1,1])
         data=tif.TiffFile('img0_lam1_fs1_T1_I1.tiff')
         foo=data.pages[0].tags['XResolution'].value 
         self.assertAlmostEqual(foo[1]/foo[0],0.1,4)
@@ -841,7 +879,8 @@ class TestPlotImage(unittest.TestCase):
 
         writeIMG('img0_lam1_fs1.dat',Img[0,:,:])
         writeIMG('img10_lam1_fs1.dat',Img[1,:,:])
-        siliscopy.plot_image.plot_grey_2dtimg('img',[1],[1],1,0,11,10,1,[4,6],[0.1,0.1,0.1],0.5,otype='tiff8')
+        siliscopy.plot_image.plot_grey_2dtimg('img',[1],[1],1,0,11,10,1,[4,6],
+            [0.1,0.1,0.1],0.5,otype='tiff8')
 
         data=tif.TiffFile('img0-11_lam1_fs1_T1_I1.tiff')
         foo=data.pages[0].tags['XResolution'].value 
@@ -851,7 +890,8 @@ class TestPlotImage(unittest.TestCase):
         self.assertEqual(data.imagej_metadata['unit'],'nm')
         self.assertEqual(data.series[0].axes,'TYX')
         self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
-        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3],[2,5,2,3]]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3],
+            [2,5,2,3]]))
         self.assertEqual(data.imagej_metadata['finterval'],0.5)
         self.assertEqual(data.imagej_metadata['funit'],'ns')
         self.assertEqual(str(data.series[0].shape),str(tuple(Img.shape)))        
@@ -943,7 +983,8 @@ class TestPlotImage(unittest.TestCase):
         writeIMG('img0_lam1_fs1.dat',Img[0,:,:])
         writeIMG('img0_lam2_fs1.dat',Img[1,:,:])
 
-        siliscopy.plot_image.plot_col_img('img',[1,1],[1,2],[0,120],1,0,1,[4,6],[0.1,0.1,0.1],1,0.1,otype='tiff8',pbc=[1,1,1],mix_type='nomix')
+        siliscopy.plot_image.plot_col_img('img',[1,1],[1,2],[0,120],1,0,1,[4,6],
+            [0.1,0.1,0.1],1,0.1,otype='tiff8',pbc=[1,1,1],mix_type='nomix')
 
         data=tif.TiffFile('img0_fs1_T1_I_1_1.tiff')
         foo=data.pages[0].tags['XResolution'].value 
@@ -972,7 +1013,8 @@ class TestPlotImage(unittest.TestCase):
         writeIMG('img10_lam1_fs1.dat',Img[0,1,:,:])
         writeIMG('img0_lam2_fs1.dat',Img[1,0,:,:])
         writeIMG('img10_lam2_fs1.dat',Img[1,1,:,:])
-        siliscopy.plot_image.plot_col_2dtimg('img',[1,1],[1,2],[0,120],1,0,11,10,1,[4,6],0.5,[0.1,0.1,0.1],otype='tiff8')
+        siliscopy.plot_image.plot_col_2dtimg('img',[1,1],[1,2],[0,120],1,0,11,
+            10,1,[4,6],0.5,[0.1,0.1,0.1],otype='tiff8')
 
         data=tif.TiffFile('img0-11_fs1_T1_I_1_1.tiff')
         foo=data.pages[0].tags['XResolution'].value 
@@ -982,7 +1024,8 @@ class TestPlotImage(unittest.TestCase):
         self.assertEqual(data.imagej_metadata['unit'],'nm')
         self.assertEqual(data.series[0].axes,'TCYX')
         self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
-        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3],[2,5,2,3]]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,5,1,3],
+            [2,5,2,3]]))
         self.assertEqual(data.imagej_metadata['finterval'],0.5)
         self.assertEqual(data.imagej_metadata['funit'],'ns')
         sha=list(Img.shape)
@@ -1001,7 +1044,8 @@ class TestPlotImage(unittest.TestCase):
             writeIMG('img0_z'+str(i)+'_lam1_fs1.dat',Img[0,i,:,:])
             writeIMG('img0_z'+str(i)+'_lam2_fs1.dat',Img[1,i,:,:])
 
-        siliscopy.plot_image.plot_col_3dimg('img',[1,1],[1,2],[0,120],1,0,1,[4,6],[0.1,0.1,0.2],5,2,otype='tiff8')
+        siliscopy.plot_image.plot_col_3dimg('img',[1,1],[1,2],[0,120],1,0,1,
+            [4,6],[0.1,0.1,0.2],5,2,otype='tiff8')
 
         data=tif.TiffFile('img0_z_fs1_T1_I_1_1.tiff')
         foo=data.pages[0].tags['XResolution'].value 
@@ -1027,10 +1071,13 @@ class TestPlotImage(unittest.TestCase):
         Img[:,:,-1,:,:]=-1.0
         for j in range(2):
             for i in range(3):
-                writeIMG('img'+str(j*10)+'_z'+str(i)+'_lam1_fs1.dat',Img[0,j,i,:,:])
-                writeIMG('img'+str(j*10)+'_z'+str(i)+'_lam2_fs1.dat',Img[1,j,i,:,:])
+                writeIMG('img'+str(j*10)+'_z'+str(i)+'_lam1_fs1.dat',
+                    Img[0,j,i,:,:])
+                writeIMG('img'+str(j*10)+'_z'+str(i)+'_lam2_fs1.dat',
+                    Img[1,j,i,:,:])
 
-        siliscopy.plot_image.plot_col_3dtimg('img',[1,1],[1,2],[0,120],1,0,11,10,1,[4,6],[0.1,0.1,0.2],3,2,0.5, otype='tiff8')
+        siliscopy.plot_image.plot_col_3dtimg('img',[1,1],[1,2],[0,120],1,0,11,
+            10,1,[4,6],[0.1,0.1,0.2],3,2,0.5, otype='tiff8')
 
         data=tif.TiffFile('img0-11_z_fs1_T1_I_1_1.tiff')
         foo=data.pages[0].tags['XResolution'].value 
@@ -1043,7 +1090,8 @@ class TestPlotImage(unittest.TestCase):
         self.assertEqual(data.imagej_metadata['unit'],'nm')
         self.assertEqual(data.series[0].axes,'TZCYX')
         self.assertEqual(data.imagej_metadata['pbc'],str([1,1,1]))
-        self.assertEqual(data.imagej_metadata['bounds'],str([[1,2,1,5,1,3],[1,2,1,5,1,3]]))
+        self.assertEqual(data.imagej_metadata['bounds'],str([[1,2,1,5,1,3],
+            [1,2,1,5,1,3]]))
         sha=[2,3,3,4,6]
         self.assertEqual(str(data.series[0].shape),str(tuple(sha)))        
 
@@ -1247,7 +1295,8 @@ class TestProp(unittest.TestCase):
         for i in range(10):
             IMG[i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'YX', 'bounds':[[0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm'})
+            metadata={'axes':'YX', 'bounds':[[0,10,0,10]], 'pbc':[1,1,1], 
+                      'unit':'nm'})
         Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0')
         for i in range(10):
             self.assertAlmostEqual(area[0][i],0.02)
@@ -1266,19 +1315,20 @@ class TestProp(unittest.TestCase):
         IMG[4,4:7]=211
         IMG[6,1:4]=100
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'YX', 'bounds':[[0,8,0,8]], 'pbc':[1,1,1], 'unit':'nm'})
+            metadata={'axes':'YX', 'bounds':[[0,8,0,8]], 'pbc':[1,1,1], 
+                      'unit':'nm'})
         Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0')
-
         Bin_0=np.zeros((8,8),dtype='int')
-        Bin_0[1,1:3]=1
-        Bin_0[1:3,4]=2
-        Bin_0[1,6:8]=3
-        Bin_0[2,7]=3
-        Bin_0[3,1:3]=4
-        Bin_0[4,1]=4
-        Bin_0[4,4:7]=5
+        Bin_0[1,1:3]=92
+        Bin_0[1:3,4]=133
+        Bin_0[1,6:8]=174
+        Bin_0[2,7]=174
+        Bin_0[3,1:3]=215
+        Bin_0[4,1]=215
+        Bin_0[4,4:7]=255
         self.assertTrue((Bin[0]==Bin_0).all()) 
-        self.assertTrue((abs(np.array(areas[0])-np.array([0.04,0.04,0.06,0.06,0.06]))<1E-6).all())
+        self.assertTrue((abs(np.array(areas[0])-np.array([0.04,0.04,0.06,0.06,
+            0.06]))<1E-6).all())
 
     def test_numarea_3(self):
         #Check complex connections
@@ -1298,20 +1348,24 @@ class TestProp(unittest.TestCase):
         IMG[7,8]=209
         IMG[8:10,4]=209
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'YX', 'bounds':[[0,9,0,10]], 'pbc':[1,1,1], 'unit':'nm'})
-        Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',min_pix=2)
-        Bin_0=np.array([[0,0,0,0,1,0,0,0,0],
-                        [0,0,0,0,1,0,0,0,0],
+            metadata={'axes':'YX', 'bounds':[[0,9,0,10]], 'pbc':[1,1,1], 
+                      'unit':'nm'})
+        Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            min_pix=2)
+        print(Bin[0])
+        Bin_0=np.array([[0,0,0,0,102,0,0,0,0],
+                        [0,0,0,0,102,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0],
-                        [2,2,0,3,3,3,0,2,2],
-                        [0,0,0,0,0,3,0,0,0],
-                        [0,4,0,3,0,3,0,0,0],
-                        [0,4,0,3,3,3,0,0,0],
-                        [4,4,0,0,0,0,0,0,4],
-                        [0,0,0,0,1,0,0,0,0],
-                        [0,0,0,0,1,0,0,0,0]])
+                        [153,153,0,204,204,204,0,153,153],
+                        [0,0,0,0,0,204,0,0,0],
+                        [0,255,0,204,0,204,0,0,0],
+                        [0,255,0,204,204,204,0,0,0],
+                        [255,255,0,0,0,0,0,0,255],
+                        [0,0,0,0,102,0,0,0,0],
+                        [0,0,0,0,102,0,0,0,0]])
         self.assertTrue((Bin[0]==Bin_0).all()) 
-        self.assertTrue((abs(np.array(areas[0])-np.array([0.08,0.08,0.18,0.1]))<1E-6).all())
+        self.assertTrue((abs(np.array(areas[0])-np.array([0.08,0.08,0.18,
+            0.1]))<1E-6).all())
 
     def test_numarea_4(self):
         #Check complex connections
@@ -1331,20 +1385,23 @@ class TestProp(unittest.TestCase):
         IMG[7,8]=209
         IMG[8:10,4]=209
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'YX', 'bounds':[[0,9,0,10]], 'pbc':[0,0,0], 'unit':'nm'})
-        Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',min_pix=2)
-        Bin_0=np.array([[0,0,0,0,1,0,0,0,0],
-                        [0,0,0,0,1,0,0,0,0],
+            metadata={'axes':'YX', 'bounds':[[0,9,0,10]], 'pbc':[0,0,0],
+                      'unit':'nm'})
+        Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            min_pix=2)
+        Bin_0=np.array([[0,0,0,0,85,0,0,0,0],
+                        [0,0,0,0,85,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0],
-                        [2,2,0,3,3,3,0,4,4],
-                        [0,0,0,0,0,3,0,0,0],
-                        [0,5,0,3,0,3,0,0,0],
-                        [0,5,0,3,3,3,0,0,0],
-                        [5,5,0,0,0,0,0,0,0],
-                        [0,0,0,0,6,0,0,0,0],
-                        [0,0,0,0,6,0,0,0,0]])
+                        [119,119,0,153,153,153,0,187,187],
+                        [0,0,0,0,0,153,0,0,0],
+                        [0,221,0,153,0,153,0,0,0],
+                        [0,221,0,153,153,153,0,0,0],
+                        [221,221,0,0,0,0,0,0,0],
+                        [0,0,0,0,255,0,0,0,0],
+                        [0,0,0,0,255,0,0,0,0]])
         self.assertTrue((Bin[0]==Bin_0).all()) 
-        self.assertTrue((abs(np.array(areas[0])-np.array([0.04,0.04,0.18,0.04,0.08,0.04]))<1E-6).all())
+        self.assertTrue((abs(np.array(areas[0])-np.array([0.04,0.04,0.18,0.04,
+            0.08,0.04]))<1E-6).all())
         os.system('rm *.tif')
 
     def test_numarea_5(self):
@@ -1354,13 +1411,15 @@ class TestProp(unittest.TestCase):
         for i in range(10):
             IMG[0,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'CYX', 'bounds':[[0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm'})
-        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',col_channel=0)
+            metadata={'axes':'CYX', 'bounds':[[0,10,0,10]], 'pbc':[1,1,1], 
+                      'unit':'nm'})
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            col_channel=0)
         for i in range(10):
             self.assertAlmostEqual(area[0][i],0.02)
         Bin_0=np.zeros((10,10),dtype='int')
         for i in range(10):
-            Bin_0[i,i]=i+1
+            Bin_0[i,i]=min((i+1)*int(255*0.8/10.+0.5)+int(0.2*255+0.5),255)
         self.assertTrue((Bin[0]==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1369,14 +1428,16 @@ class TestProp(unittest.TestCase):
         for i in range(10):
             IMG[5,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'ZYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+            metadata={'axes':'ZYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1],
+                      'unit':'nm', 'spacing':0.1})
 
-        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5)
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            ncoor=0.5)
         for i in range(10):
             self.assertAlmostEqual(area[0][i],0.02)
         Bin_0=np.zeros((10,10),dtype='int')
         for i in range(10):
-            Bin_0[i,i]=i+1
+            Bin_0[i,i]=min((i+1)*int(255*0.8/10.+0.5)+int(0.2*255+0.5),255)
         self.assertTrue((Bin[0]==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1385,14 +1446,16 @@ class TestProp(unittest.TestCase):
         for i in range(10):
             IMG[5,0,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'ZCYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+            metadata={'axes':'ZCYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1],
+                      'unit':'nm', 'spacing':0.1})
 
-        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5,col_channel=0)
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            ncoor=0.5,col_channel=0)
         for i in range(10):
             self.assertAlmostEqual(area[0][i],0.02)
         Bin_0=np.zeros((10,10),dtype='int')
         for i in range(10):
-            Bin_0[i,i]=i+1
+            Bin_0[i,i]=min((i+1)*int(255*0.8/10.+0.5)+int(0.2*255+0.5),255)
         self.assertTrue((Bin[0]==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1402,13 +1465,15 @@ class TestProp(unittest.TestCase):
             for t in range(5):
                 IMG[t,0,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'TCYX', 'bounds':[[0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm'})
-        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',col_channel=0)
+            metadata={'axes':'TCYX', 'bounds':[[0,10,0,10]]*5, 'pbc':[1,1,1], 
+                      'unit':'nm', 'finterval':0.5, 'funit':'ns'})
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            col_channel=0)
         Bin_0=np.zeros((5,10,10),dtype='int')
         for t in range(5):
             for i in range(10):
                 self.assertAlmostEqual(area[t][i],0.02)
-                Bin_0[t,i,i]=i+1
+                Bin_0[t,i,i]=min((i+1)*20+51,255)
         self.assertTrue((Bin==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1418,14 +1483,17 @@ class TestProp(unittest.TestCase):
             for t in range(5):
                 IMG[t,5,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'TZYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+            metadata={'axes':'TZYX', 'bounds':[[0,10,0,10,0,10]]*5, 
+                      'finterval':0.5, 'funit': 'ns', 'pbc':[1,1,1], 
+                      'unit':'nm', 'spacing':0.1})
 
-        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5)
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            ncoor=0.5)
         Bin_0=np.zeros((5,10,10),dtype='int')
         for t in range(5):
             for i in range(10):
                 self.assertAlmostEqual(area[t][i],0.02)
-                Bin_0[t,i,i]=i+1
+                Bin_0[t,i,i]=min((i+1)*20+51,255)
         self.assertTrue((Bin==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1435,14 +1503,17 @@ class TestProp(unittest.TestCase):
             for t in range(5):
                 IMG[t,5,0,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'TZCYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+            metadata={'axes':'TZCYX', 'bounds':[[0,10,0,10,0,10]]*5, 
+                      'finterval':0.5, 'funit':'ns', 'pbc':[1,1,1], 'unit':'nm', 
+                      'spacing':0.1})
 
-        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',ncoor=0.5,col_channel=0)
+        Bin,area=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
+            ncoor=0.5,col_channel=0)
         Bin_0=np.zeros((5,10,10),dtype='int')
         for t in range(5):
             for i in range(10):
                 self.assertAlmostEqual(area[t][i],0.02)
-                Bin_0[t,i,i]=i+1
+                Bin_0[t,i,i]=min((i+1)*20+51,255)
         self.assertTrue((Bin==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1455,7 +1526,8 @@ class TestProp(unittest.TestCase):
         for i in range(10):
             IMG[i,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'ZYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.3})
+            metadata={'axes':'ZYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1],
+                      'unit':'nm', 'spacing':0.3})
         Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0')
         for i in range(10):
             self.assertAlmostEqual(vol[0][i],0.006)
@@ -1479,28 +1551,29 @@ class TestProp(unittest.TestCase):
         IMG[2:4,6,3]=90
 
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'ZYX', 'bounds':[[0,8,0,8,0,5]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.3})
+            metadata={'axes':'ZYX', 'bounds':[[0,5,0,8,0,8]], 'pbc':[1,1,1], 
+                      'unit':'nm', 'spacing':0.3})
         Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0')
-
         Bin_0=np.zeros((5,8,8),dtype='int')
-        Bin_0[1,1,1:3]=1
-        Bin_0[2:3,1,2]=1
-        Bin_0[1,1:3,4]=2
-        Bin_0[2:3,2,4]=2
-        Bin_0[1,1,6:8]=3
-        Bin_0[1:3,2,7]=3
-        Bin_0[1,3,1:3]=4
-        Bin_0[1:3,4,1]=4
-        Bin_0[1,4,4:7]=5
-        Bin_0[2:4,4,6]=5
+        Bin_0[1,1,1:3]=92
+        Bin_0[2:3,1,2]=92
+        Bin_0[1,1:3,4]=133
+        Bin_0[2:3,2,4]=133
+        Bin_0[1,1,6:8]=174
+        Bin_0[1:3,2,7]=174
+        Bin_0[1,3,1:3]=215
+        Bin_0[1:3,4,1]=215
+        Bin_0[1,4,4:7]=255
+        Bin_0[2:4,4,6]=255
         self.assertTrue((Bin[0]==Bin_0).all()) 
-        self.assertTrue((abs(np.array(vols[0])-np.array([0.018,0.018,0.024,0.024,0.03]))<1E-6).all())
+        self.assertTrue((abs(np.array(vols[0])-np.array([0.018,0.018,0.024,
+            0.024,0.03]))<1E-6).all())
 
     def test_numvol_3(self):
         #Check complex connections
         #Check minimum pixels
         #Check pbc
-        IMG=np.zeros((5,10,9),dtype='uint8')
+        IMG=np.zeros((5,10,9),dtype='uint8') #ZXY
         IMG[0,0:2,4]=200 # Particle 1
         IMG[0,8:10,4]=209
         IMG[4,0:2,4]=208
@@ -1518,26 +1591,29 @@ class TestProp(unittest.TestCase):
         IMG[1,7,1:4]=208
         IMG[0,5,8]=210 # Particle x
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'ZYX', 'bounds':[[0,9,0,10,0,5]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.3})
-        Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',min_pix=2)
+            metadata={'axes':'ZYX', 'bounds':[[0,5,0,9,0,10]], 'pbc':[1,1,1], 
+                      'unit':'nm', 'spacing':0.3})
+        Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0', 
+            min_pix=2)
         Bin_0=np.zeros((5,10,9),dtype='int')
-        Bin_0[0,0:2,4]=1 # Particle 1
-        Bin_0[0,8:10,4]=1
-        Bin_0[4,0:2,4]=1
-        Bin_0[0,3,0:2]=2 # Particle 2
-        Bin_0[0,3,7:9]=2
-        Bin_0[3:5,3,8]=2
-        Bin_0[0,3,3:6]=3 # Particle 3
-        Bin_0[0,4:7,5]=3
-        Bin_0[0,5,3]=3
-        Bin_0[0,6,3:5]=3
-        Bin_0[4,5,3:5]=3
-        Bin_0[0,5:8,1]=4 # Particle 4
-        Bin_0[0,7,0]=4 
-        Bin_0[0,7,8]=4
-        Bin_0[1,7,1:4]=4
+        Bin_0[0,0:2,4]=102 # Particle 1
+        Bin_0[0,8:10,4]=102
+        Bin_0[4,0:2,4]=102
+        Bin_0[0,3,0:2]=153 # Particle 2
+        Bin_0[0,3,7:9]=153
+        Bin_0[3:5,3,8]=153
+        Bin_0[0,3,3:6]=204 # Particle 3
+        Bin_0[0,4:7,5]=204
+        Bin_0[0,5,3]=204
+        Bin_0[0,6,3:5]=204
+        Bin_0[4,5,3:5]=204
+        Bin_0[0,5:8,1]=255 # Particle 4
+        Bin_0[0,7,0]=255
+        Bin_0[0,7,8]=255
+        Bin_0[1,7,1:4]=255
         self.assertTrue((Bin==Bin_0).all()) 
-        self.assertTrue((abs(np.array(vols[0])-np.array([0.036,0.036,0.066,0.048]))<1E-6).all())
+        self.assertTrue((abs(np.array(vols[0])-np.array([0.036,0.036,0.066,
+            0.048]))<1E-6).all())
 
     def test_numvol_4(self):
         #Check pbc
@@ -1550,17 +1626,20 @@ class TestProp(unittest.TestCase):
         IMG[2,3,2]=0
 
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'ZYX', 'bounds':[[0,5,0,5,0,5]], 'pbc':[0,0,9], 'unit':'nm', 'spacing':0.3})
-        Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',min_pix=2)
+            metadata={'axes':'ZYX', 'bounds':[[0,5,0,5,0,5]], 'pbc':[0,0,9], 
+                      'unit':'nm', 'spacing':0.3})
+        Bin,vols=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',
+            min_pix=2)
         Bin_0=np.zeros((5,5,5),dtype='int')
-        Bin_0[0,:2,4]=1
-        Bin_0[:2,3,2]=2
-        Bin_0[0,3:,4]=3
-        Bin_0[1,2,:2]=4
-        Bin_0[1,2,3:]=5
-        Bin_0[3:,3,2]=6
+        Bin_0[0,:2,4]=85
+        Bin_0[:2,3,2]=119
+        Bin_0[0,3:,4]=153
+        Bin_0[1,2,:2]=187
+        Bin_0[1,2,3:]=221
+        Bin_0[3:,3,2]=255
         self.assertTrue((Bin==Bin_0).all()) 
-        self.assertTrue((abs(np.array(vols[0])-np.array([0.012,0.012,0.012,0.012,0.012,0.012]))<1E-6).all())
+        self.assertTrue((abs(np.array(vols[0])-np.array([0.012,0.012,0.012, 
+            0.012,0.012,0.012]))<1E-6).all())
         os.system('rm *.tif')
 
     def test_numvol_5(self):
@@ -1571,14 +1650,16 @@ class TestProp(unittest.TestCase):
         for i in range(10):
             IMG[i,0,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'ZCYX', 'bounds':[[0,10,0,10,0,10]], 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+            metadata={'axes':'ZCYX', 'bounds':[[0,10,0,10,0,10]], 
+                      'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
 
-        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',col_channel=0)
+        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',
+            col_channel=0)
         for i in range(10):
             self.assertAlmostEqual(vol[0][i],0.002)
         Bin_0=np.zeros((10,10,10),dtype='int')
         for i in range(10):
-            Bin_0[i,i,i]=i+1
+            Bin_0[i,i,i]=min((i+1)*20+51,255)
         self.assertTrue((Bin==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1588,14 +1669,16 @@ class TestProp(unittest.TestCase):
             for t in range(5):
                 IMG[t,i,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'TZYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+            metadata={'axes':'TZYX', 'bounds':[[0,10,0,10,0,10]]*5, 
+                      'finterval':0.5, 'funit':'ns', 'pbc':[1,1,1], 
+                      'unit':'nm', 'spacing':0.1})
 
         Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0')
         Bin_0=np.zeros((5,10,10,10),dtype='int')
         for t in range(5):
             for i in range(10):
                 self.assertAlmostEqual(vol[t][i],0.002)
-                Bin_0[t,i,i,i]=i+1
+                Bin_0[t,i,i,i]=min((i+1)*20+51,255)
         self.assertTrue((Bin==Bin_0).all())
         os.system('rm *.tif')
 
@@ -1605,14 +1688,17 @@ class TestProp(unittest.TestCase):
             for t in range(5):
                 IMG[t,i,0,i,i]=200
         tif.imwrite('test.tif',IMG,imagej=True,resolution=(1./0.1,1./0.2),
-            metadata={'axes':'TZCYX', 'bounds':[[0,10,0,10,0,10]]*5, 'pbc':[1,1,1], 'unit':'nm', 'spacing':0.1})
+            metadata={'axes':'TZCYX', 'bounds':[[0,10,0,10,0,10]]*5, 
+                      'finterval':0.5, 'funit':'ns', 'pbc':[1,1,1], 
+                      'unit':'nm', 'spacing':0.1})
 
-        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',col_channel=0)
+        Bin,vol=siliscopy.prop.get_num_vol('test.tif',0.5,outname='test0',
+                                           col_channel=0)
         Bin_0=np.zeros((5,10,10,10),dtype='int')
         for t in range(5):
             for i in range(10):
                 self.assertAlmostEqual(vol[t][i],0.002)
-                Bin_0[t,i,i,i]=i+1
+                Bin_0[t,i,i,i]=min((i+1)*20+51,255)
         self.assertTrue((Bin==Bin_0).all())
         os.system('rm *.tif')
 

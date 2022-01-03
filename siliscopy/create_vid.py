@@ -20,7 +20,7 @@ import os
 import numpy as np
 import cv2
 
-def gen_vid(begin_name,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc):
+def gen_vid(begin_name,end_name,vid_ext,fpns,tbegin,tmax,tdiff,fourcc):
     """ Generates a video from given begining and ending names of JPEG or PNG
         images.
     
@@ -32,8 +32,8 @@ def gen_vid(begin_name,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc):
         Ending name of images and video file.
     vid_ext: str
         Format of output video.
-    fps: int
-        Frames per second for the output video.
+    fpns: int
+        Frames per nanosecond for the output video.
     tbegin: int
         index of first timestep, which is included.
     tmax: int
@@ -59,7 +59,7 @@ def gen_vid(begin_name,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc):
     img0=cv2.imread(fname+img_ext)
     h,w,l=img0.shape
     fourcc=cv2.VideoWriter_fourcc(*fourcc)
-    video=cv2.VideoWriter(vidname,fourcc,fps,(w,h))
+    video=cv2.VideoWriter(vidname,fourcc,fpns,(w,h))
     for i in range(tbegin,tmax,tdiff):
         fname=begin_name+str(i)+end_name+img_ext
         if not os.path.exists(fname):
@@ -68,7 +68,7 @@ def gen_vid(begin_name,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc):
     video.release()
     print("Writing: "+vidname)
 
-def gen_vid_mono(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,lams,vid_ext,fps,
+def gen_vid_mono(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,lams,vid_ext,fpns,
     fourcc):
     """ Generates monochrome videos. see ''gen_vid'' for more details. filename
         is same as begin_name in ''gen_vid''
@@ -90,9 +90,9 @@ def gen_vid_mono(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,lams,vid_ext,fps,
     """
     for i in range(len(lams)):
         end_name='_lam'+str(lams[i])+'_fs'+str(fs)+'_T'+str(T)+'_I'+str(lam_I0s[i])
-        gen_vid(filename,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc)
+        gen_vid(filename,end_name,vid_ext,fpns,tbegin,tmax,tdiff,fourcc)
     
-def gen_vid_col(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,vid_ext,fps,fourcc):
+def gen_vid_col(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,vid_ext,fpns,fourcc):
     """ Generates color videos. see ''gen_vid_mono'' for more details.    
  
     """
@@ -101,10 +101,10 @@ def gen_vid_col(filename,tbegin,tmax,tdiff,T,fs,lam_I0s,vid_ext,fps,fourcc):
         Istring+='_'+str(lam_I0s[i])
     
     end_name='_fs'+str(fs)+'_T'+str(T)+'_I'+Istring
-    gen_vid(filename,end_name,vid_ext,fps,tbegin,tmax,tdiff,fourcc)
+    gen_vid(filename,end_name,vid_ext,fpns,tbegin,tmax,tdiff,fourcc)
 
 
-def gen_vid_data(datafile,outname,fps,fourcc):
+def gen_vid_data(datafile,outname,fpns,fourcc):
     """ Generate videos from images specified in a file
 
     Parameters
@@ -113,7 +113,7 @@ def gen_vid_data(datafile,outname,fps,fourcc):
         filename of the file containing all image filenames.
     outname: str
         output name of the video file
-    fps:
+    fpns:
         see ''gen_vid''
     fourcc:
         see ''gen_vid''
@@ -133,7 +133,7 @@ def gen_vid_data(datafile,outname,fps,fourcc):
         img=cv2.imread(fname)         
         if i==0:
             h,w,l=img.shape
-            video=cv2.VideoWriter(outname,fourcc,fps,(w,h))
+            video=cv2.VideoWriter(outname,fourcc,fpns,(w,h))
         video.write(img)
         i+=1
     f.close()
