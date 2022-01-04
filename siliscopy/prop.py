@@ -53,7 +53,6 @@ def get_maxI(filename, lams, fs, tstep=None):
                 maxI=foo_max
         f.close()
         Imax[i]=maxI
-       # print('lam '+str(lams[i])+' first I0:'+str(round(1/Imax[i],2)))
     return Imax
 
 def get_I0s(filename, lams, fs, iterations=10, tstep=None):
@@ -157,6 +156,12 @@ def str2array(string,dtype,width=None):
         n=len(arr)
         m=int(n/width+0.5)
         arr=arr.reshape(m,width)
+    if width==None:
+        arr=list(arr)
+    else:
+        arr=list(arr)
+        for i in range(len(arr)):
+            arr[i]=list(arr[i])
     return arr
 
 def get_num_area(filename, threshold, outname='test', min_pix=1, 
@@ -445,7 +450,6 @@ def get_num_vol(filename, threshold, outname='test', min_pix=1,
         IMG=IMG.reshape(1,sha[0],sha[1],sha[2])
     Bin=np.zeros(IMG.shape,dtype='int')    
     tN,zN,yN,xN=Bin.shape
-    print(sha)
     vols_t=[]
     for t in range(tN):
         max_label=1

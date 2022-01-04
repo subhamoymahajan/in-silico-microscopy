@@ -603,14 +603,14 @@ def main():
                 params['dlmn'], dtype)
         
         elif options.method == "nstack2tiff":
-            nstack2tiff(options.data, options.outname, options.threshold) 
+            nstack2tiff(options.data, options.outname, params['dlmn'][2]*params['add_n']) 
             #Threshold -a is used as the spacing
 
         elif options.method == "tstack2tiff":
-            tstack2tiff(options.data, options.outname)
+            tstack2tiff(options.data, params['fpns'], options.outname)
 
         elif options.method == "img2color":
-            imgs2color(options.data,options.outname,options.type,params['mix_type'],params['hue'],params['dpi'])
+            imgs2color(options.data,options.outname,params['mix_type'],params['hue'])
     else:
         print("Function not specified or implemented") 
 if __name__=='__main__':

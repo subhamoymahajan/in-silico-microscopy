@@ -13,3 +13,7 @@
 ## Tutorial 7: Generating *in-silico* microscopy image with depth-variant PSF
 
 ## Tutorial 8: Generating *in-silico* microscopy image with different format and noise
+
+## Tutorial 9: Calculating properties from *in-silico* microscopy images using siliscopy
+
+## Tutorial 10: Calculating properties from *in-silico* microscopy images using Fiji ImageJ

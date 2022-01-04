@@ -1151,8 +1151,8 @@ class TestConvert(unittest.TestCase):
         #Check YX -> ZYX
         imgs=np.random.randint(0,255,(4,4,4),dtype='uint8')
         for i in range(4):
-            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:], resolution=(1,1), 
-                imagej=True, metadata={'spacing':1, 'axes':'YX', 'unit':'nm',
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:], resolution=(0.1,0.1), 
+                imagej=True, metadata={'axes':'YX', 'unit':'nm',
                 'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
         f=open('fname.dat','w')
         for i in range(4): 
@@ -1162,14 +1162,22 @@ class TestConvert(unittest.TestCase):
         
         img_dat=tif.TiffFile('test_all.tif')
         self.assertEqual(img_dat.series[0].axes,'ZYX')
+        self.assertEqual(img_dat.series[0].shape,(4,4,4))
+        self.assertEqual(img_dat.imagej_metadata['unit'],'nm')
+        self.assertEqual(img_dat.imagej_metadata['spacing'],2)
+        foo=(img_dat.imagej_metadata['pbc']=='[1, 1, 1]') or (img_dat.imagej_metadata['pbc']=='[1 1 1]')
+        self.assertTrue(foo)
+        self.assertEqual(img_dat.imagej_metadata['bounds'],str([[0,4,0,4,0,4]]))
+        self.assertEqual(img_dat.pages[0].tags['XResolution'].value,(1,10))
+        self.assertEqual(img_dat.pages[0].tags['YResolution'].value,(1,10))
         imgs_r=tif.imread('test_all.tif')
         self.assertTrue((imgs_r==imgs).all())
 
         #Check CYX -> ZCYX
         imgs=np.random.randint(0,255,(4,3,4,4),dtype='uint8')
         for i in range(4):
-            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:], resolution=(1,1), 
-                imagej=True, metadata={'spacing':1, 'axes':'CYX', 'unit':'nm',
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:], resolution=(0.1,0.1), 
+                imagej=True, metadata={'axes':'CYX', 'unit':'nm',
                 'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
         f=open('fname.dat','w')
         for i in range(4): 
@@ -1179,15 +1187,24 @@ class TestConvert(unittest.TestCase):
         
         img_dat=tif.TiffFile('test_all.tif')
         self.assertEqual(img_dat.series[0].axes,'ZCYX')
+        self.assertEqual(img_dat.series[0].shape,(4,3,4,4))
+        self.assertEqual(img_dat.imagej_metadata['unit'],'nm')
+        self.assertEqual(img_dat.imagej_metadata['spacing'],1)
+        foo=(img_dat.imagej_metadata['pbc']=='[1, 1, 1]') or (img_dat.imagej_metadata['pbc']=='[1 1 1]')
+        self.assertTrue(foo)
+        self.assertEqual(img_dat.imagej_metadata['bounds'],str([[0,4,0,4,0,4]]))
+        self.assertEqual(img_dat.pages[0].tags['XResolution'].value,(1,10))
+        self.assertEqual(img_dat.pages[0].tags['YResolution'].value,(1,10))
         imgs_r=tif.imread('test_all.tif')
         self.assertTrue((imgs_r==imgs).all())
 
         #Check TCYX -> TZCYX
         imgs=np.random.randint(0,255,(5,4,3,4,4),dtype='uint8')
         for i in range(4):
-            tif.imsave('test'+str(i)+'.tif', imgs[:,i,:,:,:], resolution=(1,1), 
-                imagej=True, metadata={'spacing':1, 'axes':'TCYX', 'unit':'nm',
-                'pbc':[1,1,1], 'bounds':[[0,4,0,4]]*5})
+            tif.imsave('test'+str(i)+'.tif', imgs[:,i,:,:,:], resolution=(0.1,0.1), 
+                imagej=True, metadata={'axes':'TCYX', 'unit':'nm',
+                'pbc':[1,1,1], 'bounds':[[0,4,0,4]]*5, 'finterval':0.5, 
+                'funit':'ns'})
         f=open('fname.dat','w')
         for i in range(4): 
             f.write('test'+str(i)+'.tif\n')
@@ -1196,6 +1213,16 @@ class TestConvert(unittest.TestCase):
         
         img_dat=tif.TiffFile('test_all.tif')
         self.assertEqual(img_dat.series[0].axes,'TZCYX')
+        self.assertEqual(img_dat.series[0].shape,(5,4,3,4,4))
+        self.assertEqual(img_dat.imagej_metadata['unit'],'nm')
+        self.assertEqual(img_dat.imagej_metadata['spacing'],3)
+        foo=(img_dat.imagej_metadata['pbc']=='[1, 1, 1]') or (img_dat.imagej_metadata['pbc']=='[1 1 1]')
+        self.assertTrue(foo)
+        self.assertEqual(img_dat.imagej_metadata['finterval'],0.5)
+        self.assertEqual(img_dat.imagej_metadata['funit'],'ns')
+        self.assertEqual(img_dat.imagej_metadata['bounds'],str([[0,4,0,4,0,4]]*5))
+        self.assertEqual(img_dat.pages[0].tags['XResolution'].value,(1,10))
+        self.assertEqual(img_dat.pages[0].tags['YResolution'].value,(1,10))
         imgs_r=tif.imread('test_all.tif')
         self.assertTrue((imgs_r==imgs).all())
         os.system('rm *.tif')
@@ -1205,56 +1232,87 @@ class TestConvert(unittest.TestCase):
         #Check YX -> TYX
         imgs=np.random.randint(0,255,(5,4,4),dtype='uint8')
         for i in range(5):
-            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:], resolution=(1,1), 
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:], resolution=(0.1,0.1), 
                 imagej=True, metadata={'spacing':1, 'axes':'YX', 'unit':'nm',
                 'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
         f=open('fname.dat','w')
         for i in range(5): 
             f.write('test'+str(i)+'.tif\n')
         f.close()
-        siliscopy.convert.tstack2tiff('fname.dat','test_all.tif')
+        siliscopy.convert.tstack2tiff('fname.dat',0.5,'test_all.tif')
         
         img_dat=tif.TiffFile('test_all.tif')
         self.assertEqual(img_dat.series[0].axes,'TYX')
+        self.assertEqual(img_dat.series[0].shape,(5,4,4))
+        self.assertEqual(img_dat.imagej_metadata['finterval'],0.5)
+        self.assertEqual(img_dat.imagej_metadata['funit'],'ns')
+        self.assertEqual(img_dat.imagej_metadata['unit'],'nm')
+        foo=(img_dat.imagej_metadata['pbc']=='[1, 1, 1]') or (img_dat.imagej_metadata['pbc']=='[1 1 1]')
+        self.assertTrue(foo)
+        self.assertEqual(img_dat.imagej_metadata['bounds'],str([[0,4,0,4]]*5))
+        self.assertEqual(img_dat.pages[0].tags['XResolution'].value,(1,10))
+        self.assertEqual(img_dat.pages[0].tags['YResolution'].value,(1,10))
+
         imgs_r=tif.imread('test_all.tif')
         self.assertTrue((imgs_r==imgs).all())
-
+        
         #Check CYX -> TCYX
         imgs=np.random.randint(0,255,(5,3,4,4),dtype='uint8')
         for i in range(5):
-            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:], resolution=(1,1), 
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:], resolution=(0.1,0.1), 
                 imagej=True, metadata={'spacing':1, 'axes':'CYX', 'unit':'nm',
                 'pbc':[1,1,1], 'bounds':[[0,4,0,4]]})
         f=open('fname.dat','w')
         for i in range(5): 
             f.write('test'+str(i)+'.tif\n')
         f.close()
-        siliscopy.convert.tstack2tiff('fname.dat','test_all.tif')
+        siliscopy.convert.tstack2tiff('fname.dat',0.5,'test_all.tif')
         
         img_dat=tif.TiffFile('test_all.tif')
         self.assertEqual(img_dat.series[0].axes,'TCYX')
+        self.assertEqual(img_dat.series[0].shape,(5,3,4,4))
+        self.assertEqual(img_dat.imagej_metadata['finterval'],0.5)
+        self.assertEqual(img_dat.imagej_metadata['funit'],'ns')
+        self.assertEqual(img_dat.imagej_metadata['unit'],'nm')
+        foo=(img_dat.imagej_metadata['pbc']=='[1, 1, 1]') or (img_dat.imagej_metadata['pbc']=='[1 1 1]')
+        self.assertTrue(foo)
+        self.assertEqual(img_dat.imagej_metadata['bounds'],str([[0,4,0,4]]*5))
+        self.assertEqual(img_dat.pages[0].tags['XResolution'].value,(1,10))
+        self.assertEqual(img_dat.pages[0].tags['YResolution'].value,(1,10))
         imgs_r=tif.imread('test_all.tif')
         self.assertTrue((imgs_r==imgs).all())
 
         #Check ZCYX -> TZCYX
         imgs=np.random.randint(0,255,(5,4,3,4,4),dtype='uint8')
         for i in range(5):
-            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:,:], resolution=(1,1), 
+            tif.imsave('test'+str(i)+'.tif', imgs[i,:,:,:,:], resolution=(0.1,0.1), 
                 imagej=True, metadata={'spacing':1, 'axes':'ZCYX', 'unit':'nm',
                 'pbc': [1,1,1], 'bounds':[[0,4,0,4,0,4]]})
         f=open('fname.dat','w')
         for i in range(5): 
             f.write('test'+str(i)+'.tif\n')
         f.close()
-        siliscopy.convert.tstack2tiff('fname.dat','test_all.tif')
+        siliscopy.convert.tstack2tiff('fname.dat',0.5,'test_all.tif')
         
         img_dat=tif.TiffFile('test_all.tif')
         self.assertEqual(img_dat.series[0].axes,'TZCYX')
+        self.assertEqual(img_dat.series[0].shape,(5,4,3,4,4))
+        self.assertEqual(img_dat.imagej_metadata['finterval'],0.5)
+        self.assertEqual(img_dat.imagej_metadata['spacing'],1)
+        self.assertEqual(img_dat.imagej_metadata['funit'],'ns')
+        self.assertEqual(img_dat.imagej_metadata['unit'],'nm')
+        foo=(img_dat.imagej_metadata['pbc']=='[1, 1, 1]') or (img_dat.imagej_metadata['pbc']=='[1 1 1]')
+        self.assertTrue(foo)
+        self.assertEqual(img_dat.imagej_metadata['bounds'],str([[0,4,0,4,0,4]]*5))
+        self.assertEqual(img_dat.pages[0].tags['XResolution'].value,(1,10))
+        self.assertEqual(img_dat.pages[0].tags['YResolution'].value,(1,10))
+
         imgs_r=tif.imread('test_all.tif')
         os.system('rm *.tif')
         os.system('rm *.dat')
         self.assertTrue((imgs_r==imgs).all())
-    def test_imgs2color(self):
+    def test_imgs2color(self): 
+        # Not tested.
         pass
 
 class TestProp(unittest.TestCase):
@@ -1352,7 +1410,6 @@ class TestProp(unittest.TestCase):
                       'unit':'nm'})
         Bin,areas=siliscopy.prop.get_num_area('test.tif',0.5,outname='test0',
             min_pix=2)
-        print(Bin[0])
         Bin_0=np.array([[0,0,0,0,102,0,0,0,0],
                         [0,0,0,0,102,0,0,0,0],
                         [0,0,0,0,0,0,0,0,0],

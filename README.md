@@ -247,22 +247,16 @@ siliscopy prop --method [num_area/num_vol] \
                --paramfile [parameter file] \
                --threshold [intensity] \
                --lambdaID [index of fluorophore] \
-               --output [output filename header]
+               --output [output filename]
 ```
-Use `calc` value of 'show' to show the figure. This option won't save the file shown. 'show-test' 
-is used for check the area calculation algorithm is working correctly. If the pixels used to 
-calculate particle's area is shown in grey. In this option if this option shows particles in white,
-report the issue. Option 'test' will save the image shown in 'show-test'. Any other option will save
-generated binary image. 
 
-`threshold` is used to set the threshold intensity for particle detection. If the value is below 1 
-the maximum intensity is assumed to be 1 otherwise maximum intensity is assumed to be 255. 
+`threshold` is used to set the threshold intensity for particle detection. The value should be between 0 and 1.  
 
 `lambdaID` is used to chose a specific fluorophore. 
 
-`[output filename header].dat` is created which stores area of different particles. Each line contains,
-the particle ID (starting from 0) and its area. `[output filename header].png` is the binary image used 
-to calculate the area. It is created based on the value of `calc`.
+Each line in `[output filename]` starts with the time in ns followed by comma and comma separated areas or volumes.
+
+The command also creates a file starting with `bin_` for area and `bin_vol_` for volume followed by the tiff filename. This filestores the binary image. 
 
 ### 6. Convert Files
 
@@ -273,7 +267,7 @@ siliscopy convert --method psf2tiff \
                   --file [filename header] \
                   --paramfile [parameter file] \
                   --calc [uint8/uint16] \
-                  --output [output filename header] \
+                  --output [output filename] \
 ```
 
 Convert a PSF to a 3D Tiff where color changes from black to red for intensity of 0-0.2, red to blue for intensity of 0.2-0.8, and blue to white for intensity of 0.8-1:
@@ -283,19 +277,19 @@ siliscopy convert --method psf2tiff2 \
                   --file [filename header] \
                   --paramfile [parameter file] \
                   --calc [uint8/uint16] \
-                  --output [output filename header] \
+                  --output [output filename] \
 ```
 
-Convert a stack of 2D tiff images to 3D tiff:
+Convert a stack TIFF to n-stacked (volume), t-stacked (time) or c-stacked (color) TIFF:
 
 ```bash
-siliscopy convert --method psf2tiff2 \
-                  --file [filename header] \
+siliscopy convert --method [nstack2tiff/tstack2tiff/img2color] \
+                  --data [data filename] \
                   --paramfile [parameter file] \
-                  --calc [uint8/uint16] \
                   --output [output filename header] \
 ```
 
+`[data filename]` contains one filename in each line.
 
 ### 7. Parameter File
 
