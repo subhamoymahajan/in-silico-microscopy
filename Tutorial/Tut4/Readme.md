@@ -1,4 +1,4 @@
-# Tutorial 4 - Generating *in-silico* microscopy images with different optical axis and focus coordinate.
+# Tutorial 4: Generating *in-silico* microscopy images with different optical axis and focus coordinate.
 
 For this tutorial, we will reuse the PSF generated in **Tutorial 1**.
 

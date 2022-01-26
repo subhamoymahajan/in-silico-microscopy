@@ -46,13 +46,18 @@ Number and area from a monochrome 3D TIFF.
 siliscopy prop --method num_area --file img10_z_lam670_fs530_T1_I0.13.tiff --paramfile parameters.dat --threshold 0.4 --output area_mono3d.dat
 ```
 
+**Note:** The areas would be different from the ones obtained from 2D images. This is because 2D image is generated for focus\_cor 12.5, and 3D images are generated for focus\_cor with increments of 0.2, i.e., 3D image calculates area for focus\_cor 12.6.
+
+
 Number and area from a monochrome 3DT TIFF.
  
 ```bash
 siliscopy prop --method num_area --file img10-111_z_lam670_fs530_T1_I0.13.tiff --paramfile parameters.dat --threshold 0.4 --output area_mono3dt.dat
 ```
 
-Note: To use color TIFF images, use `rgb` or `nomix` color mixing scheme. Code not supported for PNG images.
+**Note 1:** To use color TIFF images, use `rgb` or `nomix` color mixing scheme. Code not supported for PNG images.
+**Note 2:** The areas would be different from the ones obtained from 2DT images. This is because 2DT image is generated for focus\_cor 12.5, and 3DT images are generated for focus\_cor with increments of 0.2, i.e., 3DT image calculates area for focus\_cor 12.6.
+
 
 ## Calculating Number of particles and volume
 

@@ -241,7 +241,7 @@ def plot_ism(IMG, lam_I0, lam, T, ti, fs, img_hei=3.0, filename=None,
         plt.close()
     else:
         foo=1
-        if otype[:4]=='tiff':
+        if otype[:-2]=='tiff':
             foo=2
         if len(consts)==2: #Greyscale
             IMG,bounds=intensity2image(IMG,'uint'+otype.split('f')[-1],

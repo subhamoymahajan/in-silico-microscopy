@@ -21,7 +21,7 @@ To view the PSF in Fiji ImageJ:
 5. Select Edit > Show bounding box
 6. With the cursor find the desired view. Use `View > Center > ` and `View > Fit view to > ` settings if necessary.
 
-![PSF 3D view](https://github.com/subhamoymahajan/in-silico-microscopy/Tutorial/Tut10/PSF_view.png?raw=true)
+![PSF 3D view](https://github.com/subhamoymahajan/in-silico-microscopy/blob/main/Tutorial/Tut10/PSF_view.png?raw=true)
 
 The PSF generated using psf2tiff can be used for deconvolution in Fiji ImageJ (Shown later).
 
@@ -35,7 +35,7 @@ The PSF generated using psf2tiff2 is good for visualization and cannot be used f
 When this PSF is opened it would appear black and white.  To displa color select `Image > Color > Make Composite`. 
 Folow the steps above to see the 3D view. Additionally, select `View > Change background color` and change Red, Green and Blue to 255.
 
-![Color PSF 3D view](https://github.com/subhamoymahajan/in-silico-microscopy/Tutorial/Tut10/PSF2_view.png?raw=true)
+![Color PSF 3D view](https://github.com/subhamoymahajan/in-silico-microscopy/blob/main/Tutorial/Tut10/PSF2_view.png?raw=true)
 
 0-0.2 Changes the color black to fully saturated red. (Changing the background color to white changes it from transparent white to red).
 

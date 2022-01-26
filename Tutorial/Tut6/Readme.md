@@ -1,4 +1,4 @@
-# Tutorial 6 - Generating *in-silico* microsocpy image with different thickness of excitation
+# Tutorial 6: Generating *in-silico* microsocpy image with different thickness of excitation
 
 ## 1. Generate in-silico monochrome images. 
 ```bash
