@@ -139,17 +139,20 @@ def psf_dat2tiff2(filename,outname,Plmn,dlmn,dtype='uint16',psf_type=0):
                metadata={'spacing':dlmn[2], 'axes':'ZCYX', 'unit':'nm' })
 
 def nstack2tiff(datafile, outname, spacing):
-    """ Generate a tiff file from multiple n-slice tiffs. 
+    """ Generate a volume tiff from multiple tiffs. 
 
     Parameter
     ---------
     datafile: str
-        File containing tiff file names in order of n coordinate
+        File containing tiff file names in order of n coordinate.
     outname: str
         Outname header for the tiff file. 
+    spacing: int
+        Distance between consecutive tiff files in nanometers.
+
     Writes
     ------
-    [outname]: A volume tiff image
+    [outname]: A volume tiff
     """ 
 
     f=open(datafile,'r')
@@ -177,16 +180,19 @@ def nstack2tiff(datafile, outname, spacing):
         bounds_n=[]
         for n in range(nN):
             imgdata_n=tif.TiffFile(data[n])
-            bounds_n.append(prop.str2array(imgdata_n.imagej_metadata['bounds'],int,width=4))
+            bounds_n.append(prop.str2array(imgdata_n.imagej_metadata['bounds'],
+                int,width=4))
         for t in range(sha[0]):
             z0,zN=0,nN
             for i in range(nN):
-                if bounds_n[i][t][0]>bounds_n[i][t][1] and bounds_n[i][t][2]>bounds_n[i][t][3]:
+                if bounds_n[i][t][0]>bounds_n[i][t][1] and bounds_n[i][t][2]> \
+                    bounds_n[i][t][3]:
                     z0+=1
                 else:
                     break
             for i in range(nN):
-                if bounds_n[nN-i-1][t][0]>bounds_n[nN-1-i][t][1] and bounds_n[nN-1-i][t][2]>bounds_n[nN-1-i][t][3]:
+                if bounds_n[nN-i-1][t][0]>bounds_n[nN-1-i][t][1] and \
+                    bounds_n[nN-1-i][t][2]>bounds_n[nN-1-i][t][3]:
                     zN-=1
                 else:
                     break
@@ -208,14 +214,17 @@ def nstack2tiff(datafile, outname, spacing):
         bounds_n=[]
         for n in range(nN):
             imgdata_n=tif.TiffFile(data[n])
-            bounds_n.append(prop.str2array(imgdata_n.imagej_metadata['bounds'],int,width=4))
+            bounds_n.append(prop.str2array(imgdata_n.imagej_metadata['bounds'],
+                int,width=4))
         for i in range(nN):
-            if bounds_n[i][0][0]>bounds_n[i][0][1] and bounds_n[i][0][2]>bounds_n[i][0][3]:
+            if bounds_n[i][0][0]>bounds_n[i][0][1] and bounds_n[i][0][2]> \
+                bounds_n[i][0][3]:
                 z0+=1
             else:
                 break
         for i in range(nN):
-            if bounds_n[nN-i-1][0][0]>bounds_n[nN-1-i][0][1] and bounds_n[nN-1-i][0][2]>bounds_n[nN-1-i][0][3]:
+            if bounds_n[nN-i-1][0][0]>bounds_n[nN-1-i][0][1] and \
+                bounds_n[nN-1-i][0][2]>bounds_n[nN-1-i][0][3]:
                 zN-=1
             else:
                 break
@@ -233,12 +242,14 @@ def nstack2tiff(datafile, outname, spacing):
             resolution=(float(res[0][0]/res[0][1]),float(res[1][0]/res[1][1])))
         
 def tstack2tiff(datafile, fpns, outname):
-    """ Generate a tiff file from multiple time frames.
+    """ Generate a timelapse tiff file from multiple tiffs.
     
     Parameter
     ---------
     datafile: str
         File containing n index and corresponding tiff file names
+    fpns: float
+        Frames per nanosecond.
     outname: str
         Outname header for the tiff file. 
         
@@ -280,15 +291,44 @@ def tstack2tiff(datafile, fpns, outname):
             metadata={'unit':'nm', 'finterval':fpns, 'bounds':bounds,
                       'funit':'ns', 'pbc':metaD['pbc'], 'axes':'T'+axes})
 
-def tiff2float(f):
-    foo=tif.imread(f)
+def tiff2float(filename):
+    """ Converts data type of tiff image to float.
+   
+    Parameter
+    ---------
+        filename: str
+            Filename of tiff file
+    
+    Returns
+    -------
+        foo: numpy array of flaots
+            
+    """
+    foo=tif.imread(filename)
     dtype=foo.dtype
     foo=foo.astype('float')
     foo=foo/np.iinfo(dtype).max
     return foo
 
 def imgs2color(datafile,outname,mix_type,lam_hues):
+    """ Generates a colored tiff from multiple tiff files.
 
+    Parameters
+    ----------
+    datafile: str
+        File containing n index and corresponding tiff file names
+    outname: str
+        Outname header for the tiff file. 
+    mix_type: str
+        type of color mixing
+    lam_hues: str
+        hues of different fluorophores or lambdas.    
+
+    Writes
+    ------
+    [outname]: a colored tiff file
+
+    """
     f=open(datafile,'r')
     data=[]
     for lines in f:
@@ -344,7 +384,8 @@ def imgs2color(datafile,outname,mix_type,lam_hues):
             Arguments=[]                
             for t in range(new_sha[0]):
                 for z in range(new_sha[1]):
-                    Arguments.append([np.transpose(IMGs[:,t,z,:,:],(2,1,0)),lam_hues,0,mix_type]) #XYC
+                    Arguments.append([np.transpose(IMGs[:,t,z,:,:],(2,1,0)),
+                        lam_hues,0,mix_type]) #XYC
             cpus=mp.cpu_count()
             if len(Arguments)<cpus:
                 cpus=len(Arguments)
@@ -360,7 +401,8 @@ def imgs2color(datafile,outname,mix_type,lam_hues):
         elif axes=='TYX' or axes=='ZYX':
             Arguments=[]                
             for z in range(new_sha[1]):
-                Arguments.append([np.transpose(IMGs[:,z,:,:],(2,1,0)),lam_hues,0,mix_type]) #XYC
+                Arguments.append([np.transpose(IMGs[:,z,:,:],(2,1,0)),lam_hues,
+                    0,mix_type]) #XYC
             cpus=mp.cpu_count()
             if len(Arguments)<cpus:
                 cpus=len(Arguments)

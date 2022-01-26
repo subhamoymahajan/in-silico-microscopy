@@ -25,25 +25,26 @@ import multiprocessing as mp
 import os 
 
 
-#Ref: https://www.micro-shop.zeiss.com/en/us/shop/objectives/420493-9900-000/Objective-EC-Plan-Neofluar-100x-1.3-Oil-Pol-M27#/
+#Ref: https://www.micro-shop.zeiss.com/en/us/shop/objectives/420493-9900-000/Ob
+#jective-EC-Plan-Neofluar-100x-1.3-Oil-Pol-M27#/
 #Lens: Plan-Neofluar 100x/1.3
 #NA=1.3
 #Refractive index on immersion oil = 1.51
 
 def psf_gandy(NA, meu, lambd, dlmn, Plmn, fs, outname):
     """ Calculates Point Spread Function based on R. O. Gandy, 1954 Proc. Phys.
-        Soc. B 67 825-831. 
+    Soc. B 67 825-831. 
     
-        Calculates PSF for 0 < l' < Pl'/2 , 0 < m' <= l', 0 < n' < Pn'/2.
+    Calculates PSF for 0 < l' < Pl'/2 , 0 < m' <= l', 0 < n' < Pn'/2.
     
-        Parameters
-        ----------
-            See psf_gandy_sep() 
+    Parameters
+    ----------
+        See psf_gandy_sep() 
 
-        Writes
-        ------
-        [outname]_lam[lambd]_fs[fs].dat: custom data file.
-            Contains l', m', n' and PSF(l',m',n') in each line.
+    Writes
+    ------
+    [outname]_lam[lambd]_fs[fs].dat: custom data file.
+        Contains l', m', n' and PSF(l',m',n') in each line.
     """
     Nn=int((int(Plmn[2]/dlmn[2])+1)/2)+1
     outname = outname + '_lam' + str(lambd) + '_fs' + str(fs) + '.dat'
@@ -52,33 +53,33 @@ def psf_gandy(NA, meu, lambd, dlmn, Plmn, fs, outname):
 
 def psf_gandy_sep(NA, meu, lambd, dlmn, Plmn, fs, outname, otype, nidx):
     """ Calculates Point Spread Function based on R. O. Gandy, 1954 Proc. Phys.
-        Soc. B 67 825-831 for a specific n' coordinate.
-      
-        Parameters
-        ----------
-        NA: float
-            Numerical aperture.
-        meu: float
-            Refractive index of immersion oil.
-        lambd: int
-            Wavelenght of fluorescence light
-        dlmn: array of floats
-            Delta l', Delta m', and Delta n'. Voxel size.
-        Plmn: array of floats
-            Dimensions of the box withing which PSF is calculated.
-        fs: int
-            Scaling factor for wavenumber or position coordinates
-        outname: str
-            Output filename header.
-        otype: char
-            'w' to create a new file. 'a' to append to an existing file
-        nidx: int
-            Index for the n' coordinate. nidx=int(n'/dn').
+    Soc. B 67 825-831 for a specific n' coordinate.
     
-        Writes
-        ------
-        [outname]:
-            Each line contains l', m', n' and PSF(l',m',n').
+    Parameters
+    ----------
+    NA: float
+        Numerical aperture.
+    meu: float
+        Refractive index of immersion oil.
+    lambd: int
+        Wavelenght of fluorescence light
+    dlmn: array of floats
+        Delta l', Delta m', and Delta n'. Voxel size.
+    Plmn: array of floats
+        Dimensions of the box withing which PSF is calculated.
+    fs: int
+        Scaling factor for wavenumber or position coordinates
+    outname: str
+        Output filename header.
+    otype: char
+        'w' to create a new file. 'a' to append to an existing file
+    nidx: int
+        Index for the n' coordinate. nidx=int(n'/dn').
+    
+    Writes
+    ------
+    [outname]:
+        Each line contains l', m', n' and PSF(l',m',n').
     """
     #d= k'\mu n' or -k'\mu n'. The negative sign is inconsequential.
     def integrand_real(x, r, d):
@@ -162,14 +163,14 @@ def psf_GL1991(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd, dlmn,\
     Plmn, fs, outname):
     """ See function psf_GL1991_sep()
     
-        Parameters
-        ----------
-        See function psf_GL1991_sep()
+    Parameters
+    ----------
+    See function psf_GL1991_sep()
  
-        Writes
-        ------
-        [outname]_lam[lambd]_fs[fs].dat: custom data file.
-            Contains l', m', n' and PSF(l',m',n') in each line.
+    Writes
+    ------
+    [outname]_lam[lambd]_fs[fs].dat: custom data file.
+        Contains l', m', n' and PSF(l',m',n') in each line.
     """
     Nn=int((int(Plmn[2]/dlmn[2])+1)/2)
     outname = outname + '_tsO' + str(tsO) + '_lam' + str(lambd) + '_fs' + \
@@ -181,59 +182,59 @@ def psf_GL1991(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd, dlmn,\
 def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
     dlmn, Plmn, fs, outname, otype, nidx):
     """ Calculates Point Spread Function based on Gibson et al., J. Opt. Soc. 
-        Am. A 1991, 8, 1601-1613. The same publication with better quality 
-        image can be found in Gibson et al., J. Opt. Soc. Am. A. 1992, 9, 154-
-        166.  
+    Am. A 1991, 8, 1601-1613. The same publication with better quality 
+    image can be found in Gibson et al., J. Opt. Soc. Am. A. 1992, 9, 154-
+    166.  
 
-        The microscope is assumed to be in best geometric focus, based on the 
-        2nd order approximation.
+    The microscope is assumed to be in best geometric focus, based on the 
+    2nd order approximation.
     
-        Calculates PSF for 0 < l' < Pl'/2 , 0 < m' <= l', -Pn'/2 < n' < Pn'/2.
-        Unlike Gandy Gibson and Lanni PSF is not symmetric about the object 
-        focal plane
+    Calculates PSF for 0 < l' < Pl'/2 , 0 < m' <= l', -Pn'/2 < n' < Pn'/2.
+    Unlike Gandy Gibson and Lanni PSF is not symmetric about the object 
+    focal plane
     
-        Parameters
-        ----------
-        NA: float
-            Numerical Aperture of objective lens
-        meu: float
-            Refractive index of immersion medium
-        meu0: float
-            Refractive index of immersion medium in design condition
-        t0: float
-            Thickness of immersion medium in design condition (in micrometers)
-        tsO: float 
-            Depth of specimen at which the microscoped is focused 
-            (in micrometers)
-        meus: float 
-            Effective refractive index of specimen
-        tg: float
-            Thickness of coverslip (in micrometers)
-        tg0: float
-            Thickness of coverslip in design condition (in micrometers)
-        meug: float 
-            Refractive index of coverslip 
-        meug0: float 
-            Refractive index of coverslip in design condition
-        lambd: int
-            Wavelenght of fluorescence light
-        dlmn: array of floats
-            Delta l', Delta m', and Delta n'. Voxel size.
-        Plmn: array of floats
-            Dimensions of the box withing which PSF is calculated.
-        fs: int
-            Scaling factor for wavenumber or position coordinates
-        outname: str
-            Output filename header.
-        otype: char
-            'w' to create a new file. 'a' to append to an existing file
-        nidx: int
-            Index for the n' coordinate. nidx=int(n'/dn').
+    Parameters
+    ----------
+    NA: float
+        Numerical Aperture of objective lens
+    meu: float
+        Refractive index of immersion medium
+    meu0: float
+        Refractive index of immersion medium in design condition
+    t0: float
+        Thickness of immersion medium in design condition (in micrometers)
+    tsO: float 
+        Depth of specimen at which the microscoped is focused 
+        (in micrometers)
+    meus: float 
+        Effective refractive index of specimen
+    tg: float
+        Thickness of coverslip (in micrometers)
+    tg0: float
+        Thickness of coverslip in design condition (in micrometers)
+    meug: float 
+        Refractive index of coverslip 
+    meug0: float 
+        Refractive index of coverslip in design condition
+    lambd: int
+        Wavelenght of fluorescence light
+    dlmn: array of floats
+        Delta l', Delta m', and Delta n'. Voxel size.
+    Plmn: array of floats
+        Dimensions of the box withing which PSF is calculated.
+    fs: int
+        Scaling factor for wavenumber or position coordinates
+    outname: str
+        Output filename header.
+    otype: char
+        'w' to create a new file. 'a' to append to an existing file
+    nidx: int
+        Index for the n' coordinate. nidx=int(n'/dn').
     
-        Writes
-        ------
-        [outname]:
-            Each line contains l', m', n' and PSF(l',m',n').
+    Writes
+    ------
+    [outname]:
+        Each line contains l', m', n' and PSF(l',m',n').
     """
     def integrand_r(rho, kr, z, k, NA, meu, meu0, t0, tsO, meus, tg, tg0, \
         meug, meug0): 
@@ -278,11 +279,12 @@ def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
     if otype=='w':
         w.write('# NA= '+str(NA) + ', lambda= '+str(lambd)+' nm' + ', dlmn= ('+\
                 str(dlmn[0])+','+str(dlmn[1])+','+str(dlmn[2])+') nm' + \
-                ', Plmn= ('+str(Plmn[0])+','+str(Plmn[1])+','+str(Plmn[2])+') nm'+\
-                ', fs= '+str(fs) + ', meu= '+str(meu) + ', meu0= '+str(meu0) +\
-                ', t0= '+str(t0)+' nm' + ', tsO= '+str(tsO)+' nm' + ', meus= '+\
-                str(meus) + ', tg= '+str(tg)+' nm' + ', tg0= '+str(tg0)+' nm' +\
-                ', meug= '+str(meug) + ', meug0= ' + str(meug0) + '\n')
+                ', Plmn= ('+str(Plmn[0])+','+str(Plmn[1])+','+str(Plmn[2])+ \
+                ') nm, fs= '+str(fs) + ', meu= '+str(meu) + ', meu0= '+ \
+                str(meu0) + ', t0= '+str(t0)+' nm' + ', tsO= '+str(tsO)+ \
+                ' nm' + ', meus= '+str(meus) + ', tg= '+str(tg)+' nm' + \
+                ', tg0= '+str(tg0)+' nm' + ', meug= '+str(meug) + ', meug0= '+\
+                str(meug0) + '\n')
     
     Nl=int((int(Plmn[0]/dlmn[0])+1)/2)+1
     Nm=int((int(Plmn[1]/dlmn[1])+1)/2)+1
@@ -294,9 +296,9 @@ def psf_GL1991_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
             m=round(j*dlmn[1],6)
             r=np.sqrt(l*l+m*m) #l,m,n is in nanometers
             Kr=K*r #dimensionless.
-            H1=integrate.quad(integrand_r, 0, 1, args=(Kr, n, K, NA, meu, meu0, \
+            H1=integrate.quad(integrand_r, 0, 1, args=(Kr, n, K, NA, meu, meu0,\
                 t0, tsO, meus, tg, tg0, meug, meug0), limit=150)
-            H2=integrate.quad(integrand_i, 0, 1, args=(Kr, n, K, NA, meu, meu0, \
+            H2=integrate.quad(integrand_i, 0, 1, args=(Kr, n, K, NA, meu, meu0,\
                 t0, tsO, meus, tg, tg0, meug, meug0), limit=150)
             I=H1[0]*H1[0]+H2[0]*H2[0]
             I=I*4.0
@@ -329,7 +331,7 @@ def psf_GL1991_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd,\
     os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO' + "%g"%tsO + \
               '_lam'+str(lambd)+ '_fs'+str(fs)+'.dat')
     for k in range(-Nn+1,Nn+1):
-        os.system('tail -n +2 ' + outname+'n'+str(k) + ' >> ' + outname+'_tsO'+ \
+        os.system('tail -n +2 ' + outname+'n'+str(k) + ' >> ' + outname+'_tsO'+\
                   "%g"%tsO + '_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
         os.system('rm '+ outname+'n'+str(k))
 
@@ -337,14 +339,14 @@ def psf_Mod_Gandy(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd, \
     dlmn, Plmn, fs, outname):
     """ See function psf_Mod_Gandy_sep()
     
-        Parameters
-        ----------
-        See function psf_Mod_Gandy_sep()
+    Parameters
+    ----------
+    See function psf_Mod_Gandy_sep()
  
-        Writes
-        ------
-        [outname]_lam[lambd]_fs[fs].dat: custom data file.
-            Contains l', m', n' and PSF(l',m',n') in each line.
+    Writes
+    ------
+    [outname]_lam[lambd]_fs[fs].dat: custom data file.
+        Contains l', m', n' and PSF(l',m',n') in each line.
     """
     Nn=int((int(Plmn[2]/dlmn[2])+1)/2)
     outname = outname + '_tsO' + str(tsO) + '_lam' + str(lambd) + '_fs' + \
@@ -356,59 +358,59 @@ def psf_Mod_Gandy(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, lambd, \
 def psf_Mod_Gandy_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
     lambd, dlmn, Plmn, fs, outname, otype, nidx):
     """ Calculates Point Spread Function based on Gandy 
-        modified using Gibson et al., J. Opt. Soc. Am. A 1991, 8, 1601-1613. The
-        same publication with better quality image can be found in Gibson et al.,
-         J. Opt. Soc. Am. A. 1992, 9, 154-166.  
+    modified using Gibson et al., J. Opt. Soc. Am. A 1991, 8, 1601-1613. The
+    same publication with better quality image can be found in Gibson et al.,
+     J. Opt. Soc. Am. A. 1992, 9, 154-166.  
 
-        The microscope is assumed to be in best geometric focus, based on the 
-        2nd order approximation.
+    The microscope is assumed to be in best geometric focus, based on the 
+    2nd order approximation.
     
-        Calculates PSF for 0 < l' < Pl'/2 , 0 < m' <= l', -Pn'/2 < n' < Pn'/2.
-        Unlike Gandy Gibson and Lanni PSF is not symmetric about the object 
-        focal plane
+    Calculates PSF for 0 < l' < Pl'/2 , 0 < m' <= l', -Pn'/2 < n' < Pn'/2.
+    Unlike Gandy Gibson and Lanni PSF is not symmetric about the object 
+    focal plane
     
-        Parameters
-        ----------
-        NA: float
-            Numerical Aperture of objective lens
-        meu: float
-            Refractive index of immersion medium
-        meu0: float
-            Refractive index of immersion medium in design condition
-        t0: float
-            Thickness of immersion medium in design condition (in micrometers)
-        tsO: float 
-            Depth of specimen at which the microscoped is focused 
-            (in micrometers)
-        meus: float 
-            Effective refractive index of specimen
-        tg: float
-            Thickness of coverslip (in micrometers)
-        tg0: float
-            Thickness of coverslip in design condition (in micrometers)
-        meug: float 
-            Refractive index of coverslip 
-        meug0: float 
-            Refractive index of coverslip in design condition
-        lambd: int
-            Wavelenght of fluorescence light
-        dlmn: array of floats
-            Delta l', Delta m', and Delta n'. Voxel size.
-        Plmn: array of floats
-            Dimensions of the box withing which PSF is calculated.
-        fs: int
-            Scaling factor for wavenumber or position coordinates
-        outname: str
-            Output filename header.
-        otype: char
-            'w' to create a new file. 'a' to append to an existing file
-        nidx: int
-            Index for the n' coordinate. nidx=int(n'/dn').
+    Parameters
+    ----------
+    NA: float
+        Numerical Aperture of objective lens
+    meu: float
+        Refractive index of immersion medium
+    meu0: float
+        Refractive index of immersion medium in design condition
+    t0: float
+        Thickness of immersion medium in design condition (in micrometers)
+    tsO: float 
+        Depth of specimen at which the microscoped is focused 
+        (in micrometers)
+    meus: float 
+        Effective refractive index of specimen
+    tg: float
+        Thickness of coverslip (in micrometers)
+    tg0: float
+        Thickness of coverslip in design condition (in micrometers)
+    meug: float 
+        Refractive index of coverslip 
+    meug0: float 
+        Refractive index of coverslip in design condition
+    lambd: int
+        Wavelenght of fluorescence light
+    dlmn: array of floats
+        Delta l', Delta m', and Delta n'. Voxel size.
+    Plmn: array of floats
+        Dimensions of the box withing which PSF is calculated.
+    fs: int
+        Scaling factor for wavenumber or position coordinates
+    outname: str
+        Output filename header.
+    otype: char
+        'w' to create a new file. 'a' to append to an existing file
+    nidx: int
+        Index for the n' coordinate. nidx=int(n'/dn').
     
-        Writes
-        ------
-        [outname]:
-            Each line contains l', m', n' and PSF(l',m',n').
+    Writes
+    ------
+    [outname]:
+        Each line contains l', m', n' and PSF(l',m',n').
     """
     def integrand_r(rho, kr, z, k, NA, meu, meu0, t0, tsO, meus, tg, tg0, \
         meug, meug0): 
@@ -453,13 +455,13 @@ def psf_Mod_Gandy_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
     
     w=open(outname, otype)
     if otype=='w':
-        w.write('# NA= '+str(NA) + ', lambda= '+str(lambd)+' nm' + ', dlmn= ('+ \
-                str(dlmn[0])+','+str(dlmn[1])+','+str(dlmn[2])+ ') nm' + \
-                ', Plmn= ('+str(Plmn[0])+','+str(Plmn[1])+','+str(Plmn) + ') nm' +\
-                ', fs= '+str(fs) + ', meu= '+str(meu) + ', meu0= '+str(meu0) + \
-                ', t0= '+str(t0)+' nm' + ', tsO= '+str(tsO)+' nm' + ', meus= '+ \
-                str(meus) + ', tg= '+str(tg)+' nm,' + ' tg0= '+str(tg0)+' nm' + \
-                ', meug= '+str(meug) + ', meug0= '+str(meug0) + '\n')
+        w.write('# NA= '+str(NA) + ', lambda= '+str(lambd)+' nm, dlmn= (' + \
+                str(dlmn[0])+','+str(dlmn[1])+','+str(dlmn[2])+ ') nm, ' + \
+                'Plmn= ('+str(Plmn[0])+','+str(Plmn[1])+','+str(Plmn) + \
+                ') nm, fs= '+str(fs) + ', meu= '+str(meu) + ', meu0= '+ \
+                str(meu0) + ', t0= '+str(t0)+' nm, tsO= '+str(tsO) + ' nm,'+ \
+                ' meus= '+str(meus) + ', tg= '+str(tg)+' nm, tg0= '+str(tg0)+ \
+                ' nm, meug= '+str(meug) + ', meug0= '+str(meug0) + '\n')
     
     Nl=int((int(Plmn[0]/dlmn[0])+1)/2)+1
     Nm=int((int(Plmn[1]/dlmn[1])+1)/2)+1
@@ -474,10 +476,10 @@ def psf_Mod_Gandy_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
             m=round(j*dlmn[1],6)
             r=np.sqrt(l*l+m*m) #l,m,n is in nanometers
             Kr=K*r #dimensionless.
-            H1=integrate.quad(integrand_r, 0, 1, args=(Kr, n, K, NA, meu, meu0, \
-                t0, tsO, meus, tg, tg0, meug, meug0), limit=150)
-            H2=integrate.quad(integrand_i, 0, 1, args=(Kr, n, K, NA, meu, meu0, \
-                t0, tsO, meus, tg, tg0, meug, meug0), limit=150)
+            H1=integrate.quad(integrand_r, 0, 1, args=(Kr, n, K, NA, meu, \
+                meu0, t0, tsO, meus, tg, tg0, meug, meug0), limit=150)
+            H2=integrate.quad(integrand_i, 0, 1, args=(Kr, n, K, NA, meu, \
+                meu0, t0, tsO, meus, tg, tg0, meug, meug0), limit=150)
             I=H1[0]*H1[0]+H2[0]*H2[0]
             I=I*fac
             w.write(str(l).rjust(10) + str(m).rjust(10) + str(n).rjust(10) + \
@@ -488,7 +490,8 @@ def psf_Mod_Gandy_sep(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
 def psf_Mod_Gandy_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
     lambd, dlmn, Plmn, fs, outname):
     """ Generates Gibson and Lanni PSF using multiprocssing. 
-        See psf_Mod_Gandy_sep() for more details
+    See psf_Mod_Gandy_sep() for more details
+
     Parameters
     ----------
         See psf_Mod_Gandy_sep() for more details
@@ -509,11 +512,36 @@ def psf_Mod_Gandy_mp(NA, meu, meu0, t0, tsO, meus, tg, tg0, meug, meug0, \
     os.system('mv ' + outname+'n'+str(-Nn)+' ' + outname+'_tsO'+ "%g"%tsO + \
               '_lam'+str(lambd)+ '_fs'+str(fs)+'.dat')
     for k in range(-Nn+1,Nn+1):
-        os.system('tail -n +2 ' + outname+'n'+str(k) + ' >> ' + outname+'_tsO'+ \
-                  "%g"%tsO + '_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
+        os.system('tail -n +2 ' + outname+'n'+str(k) + ' >> ' + outname+ \
+                  '_tsO'+"%g"%tsO + '_lam'+str(lambd)+'_fs'+str(fs)+'.dat')
         os.system('rm '+ outname+'n'+str(k))
 
 def psf_gauss(sig_r,sig_n,dlmn,Plmn,outname,lambd,fs):
+    """ 3D Gausssian PSF.
+
+    Parameters
+    ----------
+    sig_r: float
+        Variance in radial direction
+    sig_n: float
+        Variance along optical axis
+    dlmn: array of floats
+        Delta l', Delta m', and Delta n'. Voxel size.
+    Plmn: array of floats
+        Dimensions of the box withing which PSF is calculated.
+    outname: str
+        Output filename header.
+    lambd: int
+        Wavelenght of fluorescence light
+    fs: int
+        Scaling factor for wavenumber or position coordinates
+
+    Writes
+    ------
+    [outname]_lam[lambd]_fs[fs].dat
+        Each line contains l', m', n', and PSF(l',m',n')
+    
+    """
     Nl=int((int(Plmn[0]/dlmn[0])+1)/2)+1
     Nn=int((int(Plmn[2]/dlmn[2])+1)/2)+1
     outname = outname + '_lam' + str(lambd) + '_fs' + str(fs) + '.dat'

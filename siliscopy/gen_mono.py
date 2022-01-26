@@ -19,6 +19,7 @@ import os
 import multiprocessing as mp
 import numpy as np
 from . import convert
+
 def gen_mono_c(data,silent=False,photophys=False):
     """ Runs the C-binary to calculate monochome intensities
  
@@ -49,6 +50,7 @@ def gen_mono_c(data,silent=False,photophys=False):
     else:
         os.system(os.path.dirname(__file__) + '/'+mono+' -f ' + data[0] + ' -p ' + 
               data[1]+' -psf '+data[2]+' -o '+data[3])
+    return 0
     
 
 def read_data(datafile):
@@ -90,9 +92,11 @@ def gen_mono_c_mp(datafile,silent,photophys):
             Arg_slice.append([Arguments[i],silent,photophys])
     pool=mp.Pool(mp.cpu_count())
     results=pool.starmap(gen_mono_c,Arg_slice)
-    
+    pool.close()
+    pool.join()
     for i in range(len(Arg_vol)):
         gen_mono_c_vol(*Arg_vol[i])
+    
 
 def gen_mono_c_serial(datafile, silent, photophys):
     """ Runs gen_mon_c serially multiple times, using the filenames acquired
@@ -114,8 +118,8 @@ def gen_mono_c_serial(datafile, silent, photophys):
         else:#slice
             gen_mono_c(Arguments[i], silent, photophys)
 
-def gen_mono_c_vol(data, silent, photophys, maxlen=None, opt_axis=None, dlmn=None, add_n=1,
-    mprocess=True):
+def gen_mono_c_vol(data, silent, photophys, maxlen=None, opt_axis=None, 
+    dlmn=None, add_n=1, mprocess=True):
     """ Calculates image intensity for multiple slices, which is equivalent
         to a 3D image.
 
@@ -184,7 +188,8 @@ def gen_mono_c_vol(data, silent, photophys, maxlen=None, opt_axis=None, dlmn=Non
             fend="_lam"+str(lams[i])+"_fs"+str(fs)+".dat"
             if psf_type==1:
                 fend="_tsO%g"%tsO+fend
-            white_image(data[3]+'_'+xyz[opt_axis]+str(n*add_n)+fend,maxlen,dlmn,opt_axis)
+            white_image(data[3]+'_'+xyz[opt_axis]+str(n*add_n)+fend,maxlen,
+                dlmn,opt_axis)
     for n in range(N1+int((N-N1)/2),N):
         #-1 image
         for i in range(len(lams)):
@@ -193,16 +198,18 @@ def gen_mono_c_vol(data, silent, photophys, maxlen=None, opt_axis=None, dlmn=Non
             fend="_lam"+str(lams[i])+"_fs"+str(fs)+".dat"
             if psf_type==1:
                 fend="_tsO%g"%tsO+fend
-            white_image(data[3]+'_'+xyz[opt_axis]+str(n*add_n)+fend,maxlen,dlmn,opt_axis)
+            white_image(data[3]+'_'+xyz[opt_axis]+str(n*add_n)+fend,maxlen,
+                dlmn,opt_axis)
 
  
     w=open(data[0]+'datalist.dat','w')
     for i in range(N1):
         n=round(i*add_n*dlmn[2],4)
-        os.system("sed 's/focus_cor.*/focus_cor = "+str(n)+"/g' "+data[1]+" > " + \
-            data[0]+"foo_param"+str(i*add_n) + ".dat")
-        w.write(data[0] + ','+str(data[0])+'foo_param' + str(i*add_n) + '.dat,' + data[2] + ',' + \
-            data[3]+ '_'+ xyz[opt_axis] + str((i+int((N-N1)/2))*add_n) + ',slice\n')
+        os.system("sed 's/focus_cor.*/focus_cor = "+str(n)+"/g' "+ \
+            data[1]+" > " + data[0]+"foo_param"+str(i*add_n) + ".dat")
+        w.write(data[0] + ','+str(data[0])+'foo_param' + str(i*add_n) + \
+            '.dat,' + data[2] + ',' + data[3]+ '_'+ xyz[opt_axis] + \
+            str((i+int((N-N1)/2))*add_n) + ',slice\n')
     w.close()
     if mprocess==True:
         gen_mono_c_mp(data[0]+'datalist.dat', silent, photophys)
@@ -215,6 +222,26 @@ def gen_mono_c_vol(data, silent, photophys, maxlen=None, opt_axis=None, dlmn=Non
 
 
 def white_image(outname,maxlen,dlmn,opt_axis):
+    """ Generates white frame image.
+    
+    Image intensities are -1.
+  
+    Parameters
+    ----------
+    outname: str
+        Output filename
+    maxlen: array of floats
+        Maximum box length of the system. (default None)
+    dlmn: list of float
+        Voxel dimensions (default None)
+    opt_axis: int
+        Optical axis for in-silico microscope (default None)
+ 
+    Writes
+    ------
+    [outname]: white frame image.
+
+    """
     w=open(outname,'w')
     w.write('# White Frame for N axis\n')
     xN=int(maxlen[(opt_axis+1)%3]/dlmn[0]+0.5)

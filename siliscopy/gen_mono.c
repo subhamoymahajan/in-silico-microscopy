@@ -47,8 +47,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.) */
          Lpsf: length of PSF box length in each direction; P_l', P_m', P_n'
 */
 
-int opt_axis, nlam, nlam_atoms[10], fs, lam[10], Npsf[3], Nbox[3], MaxBox[3],
-    pbc[3]={0,0,0}, silent=0;
+int opt_axis, nlam, nlam_atoms[10], fs, lam[10], Npsf[3], Nbox[3], MaxBox[3], pbc[3]={0,0,0}, silent=0;
 char lam_atoms[10][200][5], psfheader[100]; 
 double dx[3], focus_cor, length[3], Lpsf[3], maxl[3], tsO=-1; 
 
@@ -108,8 +107,7 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
         }
         if (cnt<10){
             if (fabs((double)i-x/dx[0])>dx[0]*0.1){
-                if (silent==0) printf("x: ignoring PSF line: %d not equal to %f. Difference is %f\n"
-                       ,i,x/dx[0],fabs((double)i-x/dx[0]));
+                if (silent==0) printf("x: ignoring PSF line: %d not equal to %f. Difference is %f\n",i,x/dx[0],fabs((double)i-x/dx[0]));
                 cnt++;
                 if (cnt==10){
                     if (silent==0) printf("Similar output will not be shown as it repeated 10 times.\n");
@@ -126,8 +124,7 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
         }
         if (cnt<10){  
             if (fabs((double)j-y/dx[1])>dx[1]*0.1){
-                if (silent==0) printf("y: ignoring PSF line: %d not equal to %f. Difference is %f\n"
-                       ,j,y/dx[1],fabs((double)j-y/dx[1]));
+                if (silent==0) printf("y: ignoring PSF line: %d not equal to %f. Difference is %f\n",j,y/dx[1],fabs((double)j-y/dx[1]));
                 cnt++;
                 if (cnt==10){
                     if (silent==0) printf("Similar output will not be shown as it repeated 10 times.\n");
@@ -145,8 +142,7 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
         }
         if (cnt<10){
             if (fabs((double)k-z/dx[2])>dx[2]*0.1){
-                if (silent==0) printf("z: ignoring PSF line: %d not equal to %f. Difference is %f\n"
-                       ,k,z/dx[2],fabs((double)k-z/dx[2]));
+                if (silent==0) printf("z: ignoring PSF line: %d not equal to %f. Difference is %f\n",k,z/dx[2],fabs((double)k-z/dx[2]));
                 cnt++;
                 if (cnt==10){
                     if (silent==0) printf("Similar output will not be shown as it repeated 10 times.\n");
@@ -179,8 +175,9 @@ void read_psf(char filename[30],double  ****psf,int lam_id, int psf_type){
  *     lam_id: ID of fluorophore type
  *  ***fooIMG: Image intensity I(l',m') data
  *        pos: Position of a fluorophore particle
- *   psf_type: 0 implies rotational symmetry and symmetry about object focal plane
- *             1 implies rotational symmetrt and not symmetric about object focal plane
+ *   psf_type: 0 implies rotational symmetry and symmetry about object focal 
+ *             plane 1 implies rotational symmetrt and not symmetric about 
+ *             object focal plane
  */
 
 void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3], int psf_type){
@@ -260,8 +257,9 @@ void get_intensity(double ****psf,int lam_id, double ***fooIMG, double pos[3], i
  *   filename: Name of thr gromacs file
  *  ***fooIMG: Pointer containing image intensities
  *    ****psf: Pointer containing PSF.
- *   psf_type: 0 implies rotational symmetry and symmetry about object focal plane
- *             1 implies rotational symmetrt and not symmetric about object focal plane
+ *   psf_type: 0 implies rotational symmetry and symmetry about object focal 
+ *             plane 1 implies rotational symmetrt and not symmetric about 
+ *             object focal plane
  */
 void read_gro(char filename[30], double ***fooIMG, double ****psf, int psf_type){
     FILE *f;
@@ -298,16 +296,13 @@ void read_gro(char filename[30], double ***fooIMG, double ****psf, int psf_type)
 
             for (i=0;i<nlam;i++){
                 for (j=0;j<nlam_atoms[i];j++){
-                    if (strcmp(atom_name,lam_atoms[i][j])==0){ //atomname matches
-                        get_intensity(psf,i,fooIMG,pos,psf_type);//Update get_intensity
+                    if (strcmp(atom_name,lam_atoms[i][j])==0){//atomname matches
+                        get_intensity(psf,i,fooIMG,pos,psf_type);
+                        //Update get_intensity
                         break; //There is only one atom name so we should break.
                     }
                 }
             }
-            /*For printing progress
-            if (cnt%100==0){
-                printf("%f%% done\n",(double)cnt*100.0/(double)N);
-            }*/
         }
         cnt++;
     } 
@@ -363,7 +358,7 @@ int main(int argc, char* argv[] )
    -o output filename (image data file)
    -p parameters file (input)
    -psf PSF header name (input)
-*///////////////////////////////Define Variables////////////////////////////////
+*///////////////////////////////Define Variables///////////////////////////////
     int i, j, k, l, val, psf_type=0;
     char infile[50], outfile[50], paramfile[50], filename[70], line[1200], *a, 
          *varname, *pend, outmod[100];
@@ -371,13 +366,15 @@ int main(int argc, char* argv[] )
 /*  INTEGERS:
     i,j,k,l: are iteration variables
     val: generic value variable 
-    psf_type: 0 implies rotational symmetry and symmetry about object focal plane (Gandy, default)
-              1 implies rotational symmetry not symmetrical about object focal plane (Gibson and Lanni)
-    currently both types are shift-invariant. For Depth-varying PSF different PSF should be read.
+    psf_type: 0 implies rotational symmetry and symmetry about object focal 
+              plane (Gandy, default) 1 implies rotational symmetry not 
+              symmetrical about object focal plane (Gibson and Lanni) currently
+              both types are shift-invariant. For Depth-varying PSF different PSF
+              should be read.
 
     CHARACTERS:
-    infile: Input .gro structure file name. 
-    outfile: Output image file name containing I(l',m'). {outname}_lam[0-9].dat.
+    infile:  Input .gro structure file name. 
+    outfile:  Output image file name containing I(l',m'). {outname}_lam[0-9].dat.
     paramfile: Input parameters file. 
     filename: Generic variable to store file names of different files. 
     line: Generic variable to store lines read from a file. 
@@ -460,7 +457,7 @@ int main(int argc, char* argv[] )
                 maxl[i]=atof(a);
                 a=strtok(NULL," \n");
             }
-            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,maxl[0],maxl[1],maxl[2]);   
+            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,maxl[0],maxl[1],maxl[2]);
         }
         else if(strcmp(varname,"pbc")==0){
             while ((*a != '\0')&&(*a != '\n')){
@@ -470,8 +467,7 @@ int main(int argc, char* argv[] )
                 }
                 a++;
             }
-            if (silent==0) printf("%s = [%d,%d,%d] #1 is on, 0 is off\n", varname, pbc[0], 
-                   pbc[1],pbc[2]);
+            if (silent==0) printf("%s = [%d,%d,%d] #1 is on, 0 is off\n", varname, pbc[0], pbc[1],pbc[2]);
         }
         else if(strcmp(varname,"opt_axis")==0){
             opt_axis=atoi(a);
@@ -514,14 +510,14 @@ int main(int argc, char* argv[] )
                 return -1;
             }
             
-            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,dx[0],dx[1],dx[2]);   
+            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,dx[0],dx[1], dx[2]);   
         }
         else if(strcmp(varname,"Plmn")==0){
             for (i=0;i<3;i++){
                 Lpsf[i]=atof(a);
                 a=strtok(NULL," \n");
             }
-            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,Lpsf[0],Lpsf[1],Lpsf[2]);   
+            if (silent==0) printf("%s = [%f,%f,%f]\n",varname,Lpsf[0],Lpsf[1],Lpsf[2]);
         }
         else if(strcmp(varname,"psf_type")==0){
             psf_type=atoi(a);
@@ -621,9 +617,9 @@ int main(int argc, char* argv[] )
         }
     }
     if (silent==0) printf("Initialization of Image Done\n");    
-    ////////////////////////////////////////////////////////////////////////////
-    /*                             DEFINING PSF                               */
-    ////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////
+    /*                             DEFINING PSF                              */
+    ///////////////////////////////////////////////////////////////////////////
     double ****psf=(double ****)malloc(nlam*sizeof(double ***));
     for (i=0;i<nlam;i++)
     {
@@ -637,9 +633,9 @@ int main(int argc, char* argv[] )
             }
         }
     }
-    ///////////////////////////////////////////////////////////////////////////
-    /*                            INITIALIZING PSF                           */
-    ///////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
+    /*                            INITIALIZING PSF                          */
+    //////////////////////////////////////////////////////////////////////////
     for (i=0;i<nlam;i++){
         for (j=0;j<Npsf[0];j++){
             for (k=0;k<Npsf[1];k++){
@@ -649,7 +645,7 @@ int main(int argc, char* argv[] )
             }
         }
     }
-    ///////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     if (silent==0) printf("Initialization of PSF Done\n");   
     //Read PSF
     for(i=0;i<nlam;i++){
