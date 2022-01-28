@@ -48,14 +48,14 @@ S0f S0  -1   670
 
 ## Differences in parameters.dat for using photophysical processes
 1. Add `pp_file =  [.pp file]`
-2. Change `lam[i] = {primary wavelenght}` to `lam[i] = {primary wavelenght} ; 670 {other emissive wavelengths}`
+2. Change `lam[i] = {primary wavelenght}` to `lam[i] = {primary wavelenght} ; {emissive wavelengths including primary}`
 3. Add `pos_prec = [precision of .gro positions]`. 
 4. The line `max_Nf = {maximum number of emissions associated with primary wavelength 1} ; {maximum number of emissions associated with primary wavelength 2}`. This line should be automatically generated afeter step (2) shown below.
 5. Make sure the color mixing scheme is `mix_type = nomix`.
 
  
 ## 1. Extract GRO files
-Download `Struct.tar.gz` from University of Alberta Dataverse DOI: https://doi.org/10.7939/DVN/F3JKZH, version 1.3
+Download `Struct.tar.gz` from University of Alberta Dataverse DOI: https://doi.org/10.7939/DVN/F3JKZH, version 2.2
 ```bash
 mkdir -p GROs
 tar -xzf Struct.tar.gz -C GROs

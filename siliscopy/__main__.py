@@ -95,6 +95,8 @@ def main():
     if options.pfile !=None:
         f=open(options.pfile,'r')
         for lines in f:
+            if '=' not in lines:
+                continue
             foo=lines.split('=')
             varname=foo[0].strip()
             val_string=foo[1].split('/')[0].strip()
@@ -144,13 +146,14 @@ def main():
         params['lam']=params['lam'][:i]
         params['hue']=params['hue'][:i]
         params['I0']=params['I0'][:i]
-        MaxBox=[0,0]
-        MaxBox[0]=int(params['maxlen'][(params['opt_axis']+1)%3]/ \
-                      params['dlmn'][0]+0.5)
-        MaxBox[1]=int(params['maxlen'][(params['opt_axis']+2)%3]/ \
-                      params['dlmn'][1]+0.5)
-        params['nmax']=int(params['maxlen'][params['opt_axis']]/ \
-                        params['dlmn'][2]+0.5)
+        if 'maxlen' in params:
+            MaxBox=[0,0]
+            MaxBox[0]=int(params['maxlen'][(params['opt_axis']+1)%3]/ \
+                          params['dlmn'][0]+0.5)
+            MaxBox[1]=int(params['maxlen'][(params['opt_axis']+2)%3]/ \
+                          params['dlmn'][1]+0.5)
+            params['nmax']=int(params['maxlen'][params['opt_axis']]/ \
+                               params['dlmn'][2]+0.5)
     
     if remainder[0]=='gen_psf':
 
@@ -623,14 +626,14 @@ def main():
             else:
                 dtype=options.calc
             psf_dat2tiff(options.filename, options.outname, params['Plmn'], 
-                params['dlmn'], dtype)
+                params['dlmn'], dtype, psf_type=params['psf_type'])
         if options.method == "psf2tiff2":
             if options.calc== None:
                 dtype='uint8'
             else:
                 dtype=options.calc
             psf_dat2tiff2(options.filename, options.outname, params['Plmn'], 
-                params['dlmn'], dtype)
+                params['dlmn'], dtype, psf_type=params['psf_type'])
         
         elif options.method == "nstack2tiff":
             nstack2tiff(options.data, options.outname, 

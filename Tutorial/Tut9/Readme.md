@@ -46,7 +46,9 @@ Number and area from a monochrome 3D TIFF.
 siliscopy prop --method num_area --file img10_z_lam670_fs530_T1_I0.13.tiff --paramfile parameters.dat --threshold 0.4 --output area_mono3d.dat
 ```
 
-**Note:** The areas would be different from the ones obtained from 2D images. This is because 2D image is generated for focus\_cor 12.5, and 3D images are generated for focus\_cor with increments of 0.2, i.e., 3D image calculates area for focus\_cor 12.6.
+**Note 1:** The areas would be different from the ones obtained from 2D images. This is because 2D image is generated for focus\_cor 12.5, and 3D images are generated for focus\_cor with increments of 0.2, i.e., 3D image calculates area for focus\_cor 12.6.
+
+**Note 2:** The `pbc` and `bounds` attributes in the tiff are necessary.
 
 
 Number and area from a monochrome 3DT TIFF.
