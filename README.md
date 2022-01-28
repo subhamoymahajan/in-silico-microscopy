@@ -55,24 +55,38 @@ Current version 1.2.2 can generate four PSFs. Depth-invariant (`psf_type = 0`) G
 >  
 > **_Note5:_** A scaling factor is introduced to scale the dimensions of lenght. PSF values report the value at the center of a voxel.
 
-### 2. Generate Monochrome Image Intensity 
+### 2. Generate Specimen Containing Photophysical Emissions (Optional)
+
+Convert the coordinates of particles to specimen file format (.spm) using the command below. 
+Currently the command is only compatible with GROMACS coordinate file format (.gro). 
+The calculation of photophysical processes is computationally expensive, and uses a C-binary which is fast. The C-binary uses only 1 cpu. 
+
+```bash
+siliscopy gen_spm --data [data file] \
+                  --paramfile [parameter file] \
+                  --output [output file header] \
+``` 
+
+> **_Note1:_** See Readme in Tutorial 11 for more details. 
+>  
+
+### 3. Generate Monochrome Image Intensity 
 
 Calculate the monochrome image intensity using the convolution between PSF and particle number density (ρ).
 While evaluating the image, periodic boundary condition is applied.
 The image intensity is between 0 and 1 (both included). Intensity of -1 was used 
 in to represent the absence of molecular simulation system (See Ref [1] for more details). 
 The image can be generated for a specific object focal plane (`slice`) or multiple object focal planes (3D image; `volume`) using the method option.
-The default method is `slice`. 
-
+The default method is `slice`. Use `gen_mono_pp` when using `.spm` file.
 
 Single file:
 
 ```bash
-siliscopy gen_mono --file [GRO file] \
-                   --paramfile [parameter file] \
-                   --psf [PSF file header]
-                   --output [output file header]
-                   --method [slice/volume]
+siliscopy [gen_mono/gen_mono_pp] --file [GRO/SPM file] \
+                                 --paramfile [parameter file] \
+                                 --psf [PSF file header]
+                                 --output [output file header]
+                                 --method [slice/volume]
 ```
 
 Multiple file with parallel processing:
@@ -299,7 +313,7 @@ The parameter file should contain the following parameters (Not all are used in 
 * `maxlen`: (float float float). Maximum molecular simulation box dimensions in nm.
 * `focus_cor`:  (float). The n-coordinate (in gro file) at whic the *in-silico* microscope is focused in nm.
 * `opt_axis`: (int). The direction of the optical axis. 0 => x, 1 => y, 2 => z.
-* `lam[i]`: (int). Emission wavelenght of [i]th fluorophore type in vaccum. Unit is nanometers. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. 
+* `lam[i]`: (int). Emission wavelenght of [i]th fluorophore type in vaccum. Unit is nanometers. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. The format is different when using photophysics. See Tutorial 11.
 * `lam_names[i]`: (str str ... str). Atom names of [i]th fluorophore type. Replace [i] with integers strating from 1. Currently 200 names are supported.
 * `dlmn`: (float float float). The voxel dimensions <img src="https://render.githubusercontent.com/render/math?math=\Delta l^', \Delta m^', \Delta n^'"> in nm.  
 * `Plmn`: (float float float). The dimensions of the box in nm within which PSF is calculated; <img src="https://render.githubusercontent.com/render/math?math=P_{l^'}, P_{m^'}, P_{n^'}">
@@ -320,6 +334,13 @@ The parameter file should contain the following parameters (Not all are used in 
 * `fourcc`: ('str'). The four character code of the encoder with which video will be created. (default value is 'mp4v') 
 * `add_n`: (int). For 3D image generate, slices are generated every `n=dlmn[2]*add_n`.  
 * `min_pix`: (int). Minimum pixels or voxels to calculate particle area/volume.
+* `mix_type`:  (str). Use 'mt' for the new Mahajan-Tang color mixing scheme in HSV color system, 'rgb' for color mixing in the RGB color system, and 'nomix' for not mixing colors.
+
+Parameters for photophysics.
+
+* `pp_file`: (str). Filename containing photophysical constants. See tutorial 11 for details of format.
+* `pos_prec`: (int). Precision of position coordinates in the coordinate file.
+* `max_Nf`: (int ... ; int ... ; ... ). Contains the maximum emissions for each fluorophore type separated by semicolons. For each fluorophore type, number of emissions for different emission wavelengths are separated by space. The order of number of emissions should follow `lam[i]`. See Tutorial 11.
 
 Parameters for Gibson-Lanni and Modified-Gandy PSF.
 
@@ -332,6 +353,10 @@ Parameters for Gibson-Lanni and Modified-Gandy PSF.
 * `meus`: (float). Refractive index of specimen. 
 * `tsO`: (float). Location of object focal plane below the coverslip in nanometers. 
 * `psf_type`: (int). Default value is 0 is for Gandy PSF (Circular symmetry and depth-invariant). Value of 1 is for Gibson-Lanni and Modified-Gandy (Circular symmetry and depth-variant).  
+
+Parameters for Noise:
+* `poi`: (float). Effectiveness of poison noise. Takes value between 0 and 1. 0 is no noise whereas 1 is full poisson noise based on Lanza, A. et al. Image Restoration with Poisson-Gaussian Mixed Noise. *Comput. Methods Biomech. Biomed. Eng. Imaging Vis.* **2014**, 2 (1), 12–24.
+* `gauss`: (float). Variance of the 0-mean Gaussian noise.
 
 # Funding Sources
 This research was funded by Natural Science and Engineering Research Council of Canada through Tian Tang. My research was also funded by several scholarships, Mitacs Globalink Graduate Fellowship (2016-2019), RR Gilpin Memorial Scholarship (2019), Alberta Graduate Excellence Scholarship (2020), Sadler Graduate Scholarship (2020).

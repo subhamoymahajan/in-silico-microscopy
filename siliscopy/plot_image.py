@@ -19,10 +19,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import multiprocessing as mp
-import sys
 import copy
 import tifffile as tif
-import os
 small=1E-10
 
 def get_grey_img(filename, I0, lam, T, ti, fs, MaxBox, frame=False, \

@@ -21,4 +21,4 @@ dpi = 600
 psf_type = 0
 mix_type = mt
 min_pix = 10
-fpns = 0.5 
+fpns = 50 

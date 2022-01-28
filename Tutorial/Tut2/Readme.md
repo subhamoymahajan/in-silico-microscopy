@@ -21,3 +21,5 @@ siliscopy plot --file img --paramfile parameters2.dat --method color --calc all 
 siliscopy video --file img --paramfile parameters.dat --method color 
 siliscopy video --file img --paramfile parameters2.dat --method color 
 ```
+
+Since .mov movies are created `fpns` is essentially the FPS of the video.

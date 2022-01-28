@@ -15,8 +15,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.)
 import numpy as np
-import os
-import cv2
 import tifffile as tif
 import multiprocessing as mp
 from . import plot_image

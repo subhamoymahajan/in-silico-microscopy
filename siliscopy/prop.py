@@ -15,9 +15,13 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.)
 import numpy as np
+import networkx as nx
 import tifffile as tif
 import copy
 from .plot_image import get_grey_img
+from numba import njit, prange
+import multiprocessing as mp
+
 def get_maxI(filename, lams, fs, tstep=None):
     """ Get maximum intensity from I(l',m'). 
 
@@ -145,6 +149,22 @@ def get_hist(filename, lams, fs, outname, maxI=20, dI=0.1,norm=False, \
     w.close()
 
 def str2array(string,dtype,width=None):
+    """ Convert string to array.
+    
+    Parameters
+    ----------
+    string: str
+        string of text
+    dtype: str
+        dtype of values in the string (other than [,])
+    width: int
+        number of elements present in a row of 2D array. default (None)
+
+    Return
+    ------
+    arr: 1D or 2D array.
+
+    """
     string=string.replace('[','')    
     string=string.replace(']','')
     if ',' in string:    #bounds
@@ -480,14 +500,15 @@ def get_num_vol(filename, threshold, outname='test', min_pix=1,
                         max_label+=1
                     elif len(foo[0])==1:# Add the label to current
                         Bin[t,k,j,i]=labels[foo[0][0]]
-                    elif len(foo[0])>1:# Add the first label to current and add equiv
+                    elif len(foo[0])>1:# Add the first label to current 
+                                       # and add equiv
                         Bin[t,k,j,i]=labels[foo[0][0]]
                         for x1 in range(len(foo[0])-1):
                             for x2 in range(x1+1,len(foo[0])):
                                 equiv=add_equiv(equiv,labels[foo[0][x1]], \
                                     labels[foo[0][x2]])
             print('t = '+str(round((t+1)/tN*100,2))+ '%  '+ 
-                str(round((k+1-bounds[t][0])/(bounds[t][1]-bounds[t][0])*100,2))+
+               str(round((k+1-bounds[t][0])/(bounds[t][1]-bounds[t][0])*100,2))+
                 "% done    ",end='\r')
         for l in range(1,max_label):
             if l not in equiv:
@@ -531,6 +552,320 @@ def get_num_vol(filename, threshold, outname='test', min_pix=1,
     else:
         return Bin, vols_t 
 
+def max_Nf_t(filename):
+    """ Get max number of radiative emissions for a timestep.
+    
+    Parameters
+    ----------
+    filename: str
+        filename of a specimen format .spm 
+
+    Returns
+    -------
+    max_Nf: maximum radiative emissions 
+
+    """
+    f=open(filename,'r')
+    print('filename = '+filename)
+    cnt=0
+    max_Nf=0
+    for lines in f:
+        if cnt==0:
+            foo=lines.split()
+            Natoms=int(foo[1])
+        elif cnt>Natoms:
+            break
+        elif cnt>0 :
+            num_Nf=int(lines[70:75])
+            for i in range(num_Nf):
+                Nf=int(lines[75+15*i:85+15*i])
+                if Nf>max_Nf:
+                    max_Nf=Nf
+        cnt+=1
+    f.close()
+    return max_Nf
 
 
+def read_ppfile(filename):
+
+    # pp_file format
+    # Nfluor_type dt
+    # [ lam1 ]
+    # Nstate Nfluor_state
+    # states
+    # si sj kij
+    # ...
+    # si sj -1 lam1_1
+    # ...
+    f=open
+
+def max_Nf(filename, tbegin, tmax, tdiff, pp_file, mprocess=False):
+    """ Get max number of radiative emissions
+    
+    Parameters
+    ----------
+    filename: str
+        filename of a specimen format .spm 
+    tbegin: int
+        index of first timestep, which is included.
+    tmax: int
+        index of maximum timestep, tmax is not included.
+    tdiff: int 
+        difference between timesteps to generate the 3DT image.
+    mprocess: bool
+        If true multiprocessing is used. (default False)
+
+    Returns
+    -------
+    max_Nf: maximum radiative emissions 
+
+    """
+        
+
+    Arguments=[]
+    for i in range(tbegin,tmax,tdiff):
+        Arguments.append(filename+str(i)+'.spm')
+    if mprocess==True:
+        cpus=mp.cpu_count()
+        if len(Arguments)<cpus:
+            cpus=len(Arguments)
+        pool=mp.Pool(cpus)
+        results=pool.map(max_Nf_t,Arguments)
+        pool.close()
+    else:
+        results=[]
+        for i in range(len(Arguments)):
+            results.append(max_Nf_t(Arguments[i]))
+
+    max_Nf=max(results)
+    print('max_Nf = '+str(max_Nf)) 
+
+
+
+def get_fcs(IMGname,outname,fcs_tmax,nidx=None):
+    """ Get Fluorescence Correlation Spectroscopy data from an tiff image.
+
+    Parameters
+    ----------
+    IMGname: str
+        Filename of tiff image.
+    fcs_tmax: float?
+        Maximum time for the correlation function
+    nidx: int (Optional)
+        Index of the z coordinate in the tiff file. (default None)
+
+    Writes
+    ------
+    [outname].pickle: Writes a pickle file storing the fcs.
+ 
+    """
+    IMG_info=tif.TiffFile(IMGname)
+    xres=IMG_info.pages[0].tags['XResolution'].value
+    yres=IMG_info.pages[0].tags['YResolution'].value
+    axes=IMG_info.series[0].axes
+    dtype=IMG_info.series[0].dtype
+    if 'T' not in axes:
+        raise Exception('Time should be in Axes of the IMG')
+    if 'Z' in axes:
+        bounds=str2array(IMG_info.imagej_metadata['bounds'],dtype,width=6)
+        if nidx==None:
+            raise Exception('Not applicable for 3D images')
+    else:
+        bounds=str2array(IMG_info.imagej_metadata['bounds'],dtype,width=4)
+
+    dt=1.0/float(IMG_info.imagej_metadata['finterval'])
+    IMG=tif.imread(IMGname)
+    sha=IMG.shape
+    Nmax=int(fcs_tmax/dt)
+    if Nmax>sha[0]:
+        Nmax=sha[0]
+    #find strict bounds
+    xbnds=[0,sha[-1]]
+    ybnds=[0,sha[-2]]
+    for t in range(sha[0]):
+        if bounds[t][-2]>xbnds[0]:
+            xbnds[0]=bounds[t][-2]
+        if bounds[t][-1]<xbnds[1]:
+            xbnds[1]=bounds[t][-1]
+        if bounds[t][-4]>ybnds[0]:
+            ybnds[0]=bounds[t][-4]
+        if bounds[t][-3]<ybnds[1]:
+            ybnds[1]=bounds[t][-3]
+    #TZCYX/ TZYX / TCYX / TYX
+    if axes == 'TZCYX': #TZCYX -> TCYX
+        newIMG=np.zeros((sha[0],sha[2],ybnds[1]-ybnds[0],xbnds[1]-xbnds[0]),dtype=dtype)
+        for t in range(sha[0]):
+            newIMG[t,:,:,:]=IMG[t,nidx+bounds[t][0],:,ybnds[0]:ybnds[1],xbnds[0]:xbnds[1]]
+    elif axes == 'TZYX': #TZYX -> TYX
+        newIMG=np.zeros((sha[0],sha[2],sha[3]),dtype=dtype)
+        for t in range(sha[0]):
+            newIMG[t,:,:,]=IMG[t,nidx+bounds[t][0],ybnds[0]:ybnds[1],xbnds[0]:xbnds[1]]
+    elif axes == 'TYX': 
+        newIMG=IMG[:,ybnds[0]:ybnds[1],xbnds[0]:xbnds[1]]
+    elif axes == 'TCYX': 
+        newIMG=IMG[:,:,ybnds[0]:ybnds[1],xbnds[0]:xbnds[1]]
+
+    newIMG=newIMG.astype('float')
+    #now image is either TCYX or TYX
+    if 'C' in axes: #TCYX
+        foo=axes.find('C')
+        t=np.linspace(0,Nmax-1,Nmax)*dt
+        data=np.zeros((Nmax,sha[foo]+1)) #time, acf1, err, acf2, err,...
+        data[:,0]=t[:]
+        for i in range(sha[foo]):#color channels
+            ACF=get_acf(newIMG[:,i,:,:],Nmax)
+            data[:,1+i]=ACF[:]
+    else:
+        ACF=get_acf(newIMG,Nmax)
+        t=np.linspace(0,Nmax-1,Nmax)*dt
+        data=np.zeros((Nmax,3))
+        data[:,0]=t[:]
+        data[:,1]=ACF[:]
+
+    if len(outname)>7:
+        if outname[-7:]=='.pickle':
+            nx.write_gpickle(data,outname)
+        else:
+            nx.write_gpickle(data,outname+'.pickle')
+    else:
+        nx.write_gpickle(data,outname+'.pickle')
+
+@njit(parallel=True)
+def get_acf(I,Nmax):
+    """ Get auto correlation of fluorescence intensity
+
+    Parameters
+    ----------
+    I: numpy array of unsigned integers.
+        Tiff image -> fluorescence intensity. Axes is TYX.
+    Nmax: int
+        Maximum index to find autocorrelation
+
+    Returns
+    -------
+    ACF: Autocorrelation function of fluorescnce intensity 
+    """
+    sha=I.shape
+    Iavg=np.sum(I,axis=0)
+    Iavg=Iavg/sha[0]
+    Iavg2=np.square(Iavg)
+    ACF=np.zeros((Nmax,sha[1],sha[2]))
+    for i in prange(Nmax):
+        for j in prange(sha[0]-i):
+            ACF[i,:,:]+=np.multiply(I[j,:,:],I[j+i,:,:])
+        ACF[i,:,:]=np.divide(ACF[i,:,:],Iavg2*(sha[0]-i))
+    #average
+    ACF=ACF-1
+    ACF_avg=np.sum(ACF,axis=1)
+    ACF_avg=np.sum(ACF_avg,axis=1)
+    ACF_avg=ACF_avg/(sha[1]*sha[2])
+    return ACF_avg
+
+def get_fccs(IMGname, outname, tmax, c1, c2, nidx=None):
+    """ Get Fluorescence Cross-Correlation Spectroscopy data from an tiff image.
+
+    Parameters
+    ----------
+    tmax: float
+        Maximum time for the correlation function
+    c1: int
+        Color channel 1
+    c2: int
+        Color channel 2
+    nidx: int (Optional)
+        Index of the z coordinate in the tiff file. (default None)
+
+    Writes
+    ------
+    [outname].pickle: Writes a pickle file storing the fccs.
+ 
+    """
+    IMG_info=tif.TiffFile(IMGname)
+    xres=IMG_info.pages[0].tags['XResolution'].value
+    yres=IMG_info.pages[0].tags['YResolution'].value
+    axes=IMG_info.series[0].axes
+    dtype=IMG_info.series[0].dtype
+    if 'T' not in axes:
+        raise Exception('Time should be in Axes of the IMG')
+    if 'C' not in axes:
+        raise Exception('Color should be in Axes of the IMG')
+    if 'Z' in axes:
+        bounds=str2array(IMG_info.imagej_metadata['bounds'],dtype,width=6)
+        if nidx==None:
+            raise Exception('Not applicable for 3D images')
+    else:
+        bounds=str2array(IMG_info.imagej_metadata['bounds'],dtype,width=4)
+
+    dt=1.0/float(IMG_info.imagej_metadata['finterval'])
+    IMG=tif.imread(IMGname)
+    sha=IMG.shape
+    Nmax=int(tmax/dt)
+    if Nmax>sha[0]:
+        Nmax=sha[0]
+
+    #find strict bounds
+    xbnds=[0,sha[-1]]
+    ybnds=[0,sha[-2]]
+    for t in range(sha[0]):
+        if bounds[t][-2]>xbnds[0]:
+            xbnds[0]=bounds[t][-2]
+        if bounds[t][-1]<xbnds[1]:
+            xbnds[1]=bounds[t][-1]
+        if bounds[t][-4]>ybnds[0]:
+            ybnds[0]=bounds[t][-4]
+        if bounds[t][-3]<ybnds[1]:
+            ybnds[1]=bounds[t][-3]
+    #TZCYX/ TCYX 
+    if axes == 'TZCYX': #TZCYX -> TCYX
+        newIMG=np.zeros((sha[0],sha[2],sha[3],sha[4]),dtype=dtype)
+        for t in range(sha[0]):
+            newIMG[t,:,:,:]=IMG[t,nidx+bounds[t][0],:,ybnds[0]:ybnds[1],xbnds[0]:xbnds[1]]
+    else:
+        newIMG=IMG[:,:,ybnds[0]:ybnds[1],xbnds[0]:xbnds[1]]
+    newIMG=newIMG.astype(float)
+    t=np.linspace(0,Nmax-1,Nmax)*dt
+    data=np.zeros((Nmax,2))
+    data[:,0]=t[:]
+    CCF=get_ccf(newIMG,Nmax,c1,c2)
+    data[:,1]=CCF[:]
+    if len(outname)>7:
+        if outname[-7:]=='.pickle':
+            nx.write_gpickle(data,outname)
+        else:
+            nx.write_gpickle(data,outname+'.pickle')
+    else:
+        nx.write_gpickle(data,outname+'.pickle')
+
+
+@njit(parallel=True)
+def get_ccf(I,Nmax,c1,c2):
+    """ Get cross-correlation of fluorescence intensity
+
+    Parameters
+    ----------
+    I: numpy array of unsigned integers.
+        Tiff image -> fluorescence intensity. Aces is TCXY.
+    Nmax: int
+        Maximum index to find autocorrelation
+
+    Returns
+    -------
+    CCF: Cross-correlation function of fluorescnce intensity 
+    """
+    sha=I.shape
+    Iavg1=np.sum(I[:,c1,:,:],axis=0)
+    Iavg1=Iavg1/sha[0]
+    Iavg2=np.sum(I[:,c2,:,:],axis=0)
+    Iavg2=Iavg2/sha[0]
+    Iavg12=np.multiply(Iavg1,Iavg2)
+    CCF=np.zeros((Nmax,sha[2],sha[3]))
+    for i in prange(Nmax):
+        for j in prange(sha[0]-i):
+            CCF[i,:,:]+=np.multiply(I[j,c1,:,:],I[j+i,c2,:,:])
+        CCF[i,:,:]=np.divide(CCF[i,:,:],Iavg12*(sha[0]-i))
+    CCF=CCF-1
+    CCF_avg=np.sum(CCF,axis=1)
+    CCF_avg=np.sum(CCF_avg,axis=1)
+    CCF_avg=CCF_avg/(sha[1]*sha[2])
+    return CCF_avg
 

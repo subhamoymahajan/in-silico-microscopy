@@ -15,9 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.)
 
-import sys
 import os
-import numpy as np
 import cv2
 
 def gen_vid(begin_name,end_name,vid_ext,fpns,tbegin,tmax,tdiff,fourcc):

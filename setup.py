@@ -19,15 +19,19 @@ import setuptools
 
 setuptools.setup(
    name="in-silico-microscopy",
-   version="1.2.2 beta",
+   version="1.2.2",
    author="Subhamoy Mahajan",
-   author_email="subhamoygithub@gmail.com",
-   description="Toolbox for generating in-silico microscopy images from molecular simulations",
+   author_email="subhamoymahajan@gmail.com",
+   description="Toolbox for generating in-silico microscopy images from" +
+                 " molecular simulations",
    url="https://github.com/subhamoymahajan/in-silico-microscopy",
    license='GPLv3',
-   install_requires=['numpy','matplotlib','opencv-python','tifffile'],
+   install_requires=['numpy>=1.19.2', 'matplotlib>=3.3.2', 'tifffile>=2021.4.8',
+                     'opencv-python>=3.4.4', 'scipy>=1.4.1', 'numba>=0.49.1', 
+                     'networkx>=2.5'],
    packages=['siliscopy'],
-   package_data={'': ['LICENSE.txt'],'siliscopy': ['gen_mono', 'gen_mono.c']},
+   package_data={'': ['LICENSE.txt'],'siliscopy': ['gen_mono', 'gen_mono.c',
+                'gen_mono_pp.c','gen_mono_pp', 'photophysics.c', 'photo_phys']},
    classifiers=[
         "Development Status :: 5-Production/Stable",
         "Intended Audience :: Science/Research",
@@ -42,7 +46,7 @@ setuptools.setup(
    python_requires='>=3.7',
    entry_points={
        'console_scripts': [
-           'siliscopy = siliscopy.__main__:main'
+           'siliscopy = siliscopy.__main__:main',
        ]
    }
 )
