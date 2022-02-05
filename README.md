@@ -1,4 +1,4 @@
-# *In-silico* microscopy
+# In Silico Microscopy
 
 This open-source software package allows in silico microscopy of molecular simulations such as molecular
 dynamics, monte carlo, etc. The current version can perform widefield microscopy 
@@ -122,7 +122,7 @@ file2.gro,param2.dat,psf_fileheader,out2,method
 
 ### 3. Plot Images
 
-Generate *In-silico* microscopy images. If saved to a file, all images are saved with `JPEG`, `PNG`, or `TIFF` file format.
+Generate in silico microscopy images. If saved to a file, all images are saved with `JPEG`, `PNG`, or `TIFF` file format.
 
 #### Monochrome image
 

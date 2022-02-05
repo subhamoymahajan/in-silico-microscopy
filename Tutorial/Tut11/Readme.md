@@ -55,7 +55,7 @@ S0f S0  -1   670
 
  
 ## 1. Extract GRO files
-Download `Struct.tar.gz` from University of Alberta Dataverse DOI: https://doi.org/10.7939/DVN/F3JKZH, version 2.2
+Download `Struct.tar.gz` from University of Alberta Dataverse DOI: https://doi.org/10.7939/DVN/F3JKZH, version 3.0
 ```bash
 mkdir -p GROs
 tar -xzf Struct.tar.gz -C GROs
