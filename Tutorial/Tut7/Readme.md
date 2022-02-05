@@ -1,4 +1,4 @@
-# Tutorial 7: Generating *in-silico* microscopy image with depth-variant PSF
+# Tutorial 7: Generating in silico microscopy image with depth-variant PSF
 
 ## 1. Generating PSF
 
@@ -12,7 +12,7 @@ bash gen_psf.sh
 bash gen_mono.sh
 ```
 
-## 3. Generate Colored *In-silico* Images
+## 3. Generate Colored in silico Images
 
 ```bash
 bash gen_img.sh

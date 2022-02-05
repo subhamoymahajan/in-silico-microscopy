@@ -1,4 +1,4 @@
-# Tutorial 5: Generating *in-silico* microscopy images with different hues.
+# Tutorial 5: Generating in silico microscopy images with different hues.
 
 ## Red-green
 ```bash

@@ -1,6 +1,6 @@
 # *In-silico* microscopy
 
-This open-source software package allows *in-silico* microscopy of molecular simulations such as molecular
+This open-source software package allows in silico microscopy of molecular simulations such as molecular
 dynamics, monte carlo, etc. The current version can perform widefield microscopy 
 and approximate forms of confocal, light-sheet, two-photon, and super-resolution microscopy [1]. 
 The programs are developed for GROMACS (.gro) files in mind. Please look at the tutorials for examples.
@@ -12,7 +12,9 @@ package is free to use as long as you comply to the license (GPLv3).
 
 This toolbox is based on published work.
 
-[1] Mahajan S., and Tang T., Meeting experiments at the diffraction barrier: an in-silico widefield fluorescence microscopy, bioRxiv 2021.03.02.433395;  DOI: [10.1101/2021.03.02.433395](https://doi.org/10.1101/2021.03.02.433395) (Currently in peer-review)
+[1] Mahajan S., and Tang T., Meeting Experiments at the Diffraction Barrier with In Silico Fluorescence Microscopy, ACS Photonics, DOI:  https://doi.org/10.1021/acsphotonics.1c01469 
+
+(Older open-source version) Mahajan S., and Tang T., Meeting experiments at the diffraction barrier: an *in-silico* widefield fluorescence microscopy, bioRxiv 2021.03.02.433395;  DOI: [10.1101/2021.03.02.433395](https://doi.org/10.1101/2021.03.02.433395) (Please cite the peer-reviewed version)
 
 ## Installation
 
@@ -311,7 +313,7 @@ The parameter file should contain the following parameters (Not all are used in 
 
 * `fs`: (int). Full-Width-at-Half-Maximum (FWHM) scaling factor. Equivalently scales all molecular simulation coordinates or the wave vector.  
 * `maxlen`: (float float float). Maximum molecular simulation box dimensions in nm.
-* `focus_cor`:  (float). The n-coordinate (in gro file) at whic the *in-silico* microscope is focused in nm.
+* `focus_cor`:  (float). The n-coordinate (in gro file) at whic the in silico microscope is focused in nm.
 * `opt_axis`: (int). The direction of the optical axis. 0 => x, 1 => y, 2 => z.
 * `lam[i]`: (int). Emission wavelenght of [i]th fluorophore type in vaccum. Unit is nanometers. Replace [i] with integers starting from 1. Currently 10 wavelengths are supported. The format is different when using photophysics. See Tutorial 11.
 * `lam_names[i]`: (str str ... str). Atom names of [i]th fluorophore type. Replace [i] with integers strating from 1. Currently 200 names are supported.
@@ -321,7 +323,7 @@ The parameter file should contain the following parameters (Not all are used in 
 * `NA`: (float). Numerical aperture.
 * `meu`: (float). Refractive index of immersion oil.
 
-* `T`: (int). Number of consecutive timesteps to average the the *in-silico* microscopy image.
+* `T`: (int). Number of consecutive timesteps to average the the in silico microscopy image.
 * `lam_hue[i]`: (float). Hue in degrees of [i]th fluorophore type. Replace [i] with integers starting from 1.
 * `lam_I0_[i]`:  (float). Maximum image intensity of of [i]th fluorophore type. Replace [i] with integers starting from 1.
 * `scale`: (float). Length of scale bar in nm. 

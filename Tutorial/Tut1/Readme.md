@@ -1,4 +1,4 @@
-# Tutorial 1: First in-silico microscopy image
+# Tutorial 1: First in silico microscopy image
 
 ## 1. Generating PSF
 

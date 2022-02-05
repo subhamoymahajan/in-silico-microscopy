@@ -1,4 +1,4 @@
-# Tutorial 11: Generating *in-silico* images with fluorophores undergoing photophysical processes
+# Tutorial 11: Generating in silico images with fluorophores undergoing photophysical processes
 
 ## Format for photophysical constants filed (.pp)
 

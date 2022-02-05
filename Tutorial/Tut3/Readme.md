@@ -1,4 +1,4 @@
-# Tutorial 3: Geneerating *in-silico* microscopy image with different resolution and brightness
+# Tutorial 3: Geneerating in silico microscopy image with different resolution and brightness
 
 ## 1. Generate the the PSF
 ```bash
